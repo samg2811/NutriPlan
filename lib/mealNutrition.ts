@@ -1,5 +1,5 @@
 import { getIngredientNutritionPer100g } from "./usda";
-import { meals as allMeals, ingredientNames, type Meal } from "./meals";
+import { meals as allMeals, ingredientNames, type Meal } from "../data/meals";
 
 export interface Macros {
   calories: number;
