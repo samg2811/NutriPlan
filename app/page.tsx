@@ -1,12 +1,13 @@
+````tsx
 "use client";
 
 import { useState } from "react";
-import { meals, Meal } from "@/data/meals";
+import { meals, Meal, MealIngredient } from "@/data/meals";
 
 type RankedMeal = {
   meal: Meal;
   score: number;
-  matchedIngredients: string[];
+  matchedIngredients: MealIngredient[];
 };
 
 export default function Home() {
@@ -21,6 +22,7 @@ export default function Home() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisError, setAnalysisError] = useState("");
 
+  // Find meals using typed ingredients
   function findMeals() {
     const userIngredients = ingredients
       .toLowerCase()
@@ -109,9 +111,7 @@ export default function Home() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.error || "Food analysis failed."
-        );
+        throw new Error(data.error || "Food analysis failed.");
       }
 
       let foods: string[] = [];
@@ -139,55 +139,54 @@ export default function Home() {
     }
   }
 
-  // Use detected foods in recipe finder
+  // Use AI-detected foods in recipe finder
   function useDetectedFoods() {
     if (detectedFoods.length === 0) return;
 
     setIngredients(detectedFoods.join(", "));
 
-    setTimeout(() => {
-      const userIngredients = detectedFoods.map((food) =>
-        food.toLowerCase().trim()
-      );
+    const userIngredients = detectedFoods.map((food) =>
+      food.toLowerCase().trim()
+    );
 
-      const rankedMeals = meals
-        .map((meal) => {
-          let score = 0;
+    const rankedMeals = meals
+      .map((meal) => {
+        let score = 0;
 
-          const matchedIngredients = meal.ingredients.filter(
-            (ingredient) =>
-              userIngredients.includes(
-                ingredient.name.toLowerCase()
-              )
-          );
+        const matchedIngredients = meal.ingredients.filter(
+          (ingredient) =>
+            userIngredients.includes(ingredient.name.toLowerCase())
+        );
 
-          score += matchedIngredients.length * 5;
+        score += matchedIngredients.length * 5;
 
-          if (meal.cookingTime <= maxTime) {
-            score += 3;
-          }
+        if (meal.cookingTime <= maxTime) {
+          score += 3;
+        } else {
+          score -= 2;
+        }
 
-          if (meal.cost <= budget) {
-            score += 3;
-          }
+        if (meal.cost <= budget) {
+          score += 3;
+        } else {
+          score -= 2;
+        }
 
-          return {
-            meal,
-            score,
-            matchedIngredients,
-          };
-        })
-        .filter(
-          (item) => item.matchedIngredients.length > 0
-        )
-        .sort((a, b) => b.score - a.score);
+        return {
+          meal,
+          score,
+          matchedIngredients,
+        };
+      })
+      .filter((item) => item.matchedIngredients.length > 0)
+      .sort((a, b) => b.score - a.score);
 
-      setResults(rankedMeals.slice(0, 3));
-    }, 100);
+    setResults(rankedMeals.slice(0, 3));
   }
 
   return (
     <main className="container">
+      {/* NAVBAR */}
       <nav className="navbar">
         <div className="logo">🍽️ NutriPlan</div>
 
@@ -197,6 +196,7 @@ export default function Home() {
         </div>
       </nav>
 
+      {/* HERO */}
       <section className="hero">
         <p className="eyebrow">SMARTER MEAL PLANNING</p>
 
@@ -207,18 +207,17 @@ export default function Home() {
         </h1>
 
         <p className="hero-text">
-          NutriPlan uses your ingredients, budget, and
-          available time to help you find meals that fit
-          your needs.
+          NutriPlan uses your ingredients, budget, and available
+          time to help you find meals that fit your needs.
         </p>
       </section>
 
+      {/* MEAL PLANNER */}
       <section className="planner" id="planner">
         <h2>Find Your Meal</h2>
 
         <p className="section-description">
-          Tell us what you have and we'll find meals that
-          match.
+          Tell us what you have and we'll find meals that match.
         </p>
 
         <div className="form-card">
@@ -228,9 +227,7 @@ export default function Home() {
             type="text"
             placeholder="chicken, rice, broccoli"
             value={ingredients}
-            onChange={(e) =>
-              setIngredients(e.target.value)
-            }
+            onChange={(e) => setIngredients(e.target.value)}
           />
 
           <div className="form-row">
@@ -278,75 +275,51 @@ export default function Home() {
         </div>
       </section>
 
+      {/* RECOMMENDATIONS */}
       {results.length > 0 && (
         <section className="results">
           <h2>Your Recommendations</h2>
 
           <p className="section-description">
-            Meals ranked using your ingredients, budget,
-            and cooking time.
+            Meals ranked using your ingredients, budget, and
+            cooking time.
           </p>
 
           <div className="meal-grid">
-            {results.map(
-              ({
-                meal,
-                matchedIngredients,
-              }) => (
-                <div
-                  className="meal-card"
-                  key={meal.id}
-                >
-                  <div className="meal-icon">🍽️</div>
+            {results.map(({ meal, matchedIngredients }) => (
+              <div className="meal-card" key={meal.id}>
+                <div className="meal-icon">🍽️</div>
 
-                  <h3>{meal.name}</h3>
+                <h3>{meal.name}</h3>
 
-                  <p>{meal.description}</p>
+                <p>{meal.description}</p>
 
-                  <div className="match-info">
-                    ✓ {matchedIngredients.length} ingredient
-                    {matchedIngredients.length !== 1
-                      ? "s"
-                      : ""}{" "}
-                    match
-                    {matchedIngredients.length !== 1
-                      ? ""
-                      : "es"}
-                  </div>
-
-                  <div className="meal-info">
-                    <span>
-                      ⏱️ {meal.cookingTime} min
-                    </span>
-
-                    <span>
-                      💰 ${meal.cost.toFixed(2)}
-                    </span>
-                  </div>
-
-                  <div className="nutrition">
-                    <div>
-                      <strong>{meal.protein}g</strong>
-                      <small>Protein</small>
-                    </div>
-
-                    <div>
-                      <strong>{meal.carbs}g</strong>
-                      <small>Carbs</small>
-                    </div>
-
-                    <div>
-                      <strong>{meal.fat}g</strong>
-                      <small>Fat</small>
-                    </div>
-                  </div>
-
-                  <button className="secondary-button">
-                    View Meal
-                  </button>
+                <div className="match-info">
+                  ✓ {matchedIngredients.length} ingredient
+                  {matchedIngredients.length !== 1 ? "s" : ""}{" "}
+                  match
+                  {matchedIngredients.length !== 1 ? "" : "es"}
                 </div>
-              )
-            )}
+
+                <div className="meal-info">
+                  <span>⏱️ {meal.cookingTime} min</span>
+
+                  <span>💰 ${meal.cost.toFixed(2)}</span>
+                </div>
+
+                <div className="ingredient-tags">
+                  {matchedIngredients.map((ingredient) => (
+                    <span key={ingredient.name}>
+                      {ingredient.name}
+                    </span>
+                  ))}
+                </div>
+
+                <button className="secondary-button">
+                  View Meal
+                </button>
+              </div>
+            ))}
           </div>
         </section>
       )}
@@ -363,12 +336,13 @@ export default function Home() {
           </h2>
 
           <p>
-            Upload a photo of your food and our AI will
-            identify the foods it can recognize.
+            Upload a photo of your food and our AI will identify
+            the foods it can recognize.
           </p>
 
           <label className="upload-button">
             📷 Choose Food Photo
+
             <input
               type="file"
               accept="image/*"
@@ -404,8 +378,7 @@ export default function Home() {
               <h3>Upload a food photo</h3>
 
               <p>
-                We'll use AI to identify what's on your
-                plate.
+                We'll use AI to identify what's on your plate.
               </p>
             </div>
           )}
@@ -429,8 +402,7 @@ export default function Home() {
           <h2>We found these foods</h2>
 
           <p className="section-description">
-            Gemini identified the following foods in your
-            photo.
+            Gemini identified the following foods in your photo.
           </p>
 
           <div className="food-list">
@@ -456,6 +428,7 @@ export default function Home() {
         </section>
       )}
 
+      {/* FOOTER */}
       <footer>
         <strong>NutriPlan</strong>
 
@@ -466,3 +439,4 @@ export default function Home() {
     </main>
   );
 }
+````
