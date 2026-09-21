@@ -300,3 +300,12 @@ footer {
     gap: 10px;
   }
 }
+
+.match-info {
+  margin: 12px 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #f0f7f1;
+  font-size: 14px;
+  font-weight: 600;
+}
