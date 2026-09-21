@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { meals, Meal } from "@/data/meals";
+import { meals, Meal } from "@/data/meals";
+import ViewMealButton from "@/components/ViewMealButton";
 
 type Nutrition = {
   calories: number;
@@ -235,9 +237,11 @@ export default function Home() {
                   </p>
                 )}
 
-                <button className="secondary-button">
-                  View Meal
-                </button>
+                <ViewMealButton
+  meal={item.meal}
+  className="secondary-button"
+  label="View Meal"
+/>
               </div>
             ))}
           </div>
