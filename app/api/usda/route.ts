@@ -1,38 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getIngredientNutritionPer100g } from "@/lib/usda";
 
-export async function GET(request: NextRequest) {
-  const query = request.nextUrl.searchParams.get("query");
+export async function POST(request: NextRequest) {
+  const body = await request.json();
+  const ingredients: { name: string; grams: number; fdcId?: number }[] =
+    body.ingredients ?? [];
 
-  if (!query) {
-    return NextResponse.json(
-      { error: "Missing 'query' parameter" },
-      { status: 400 }
+  try {
+    const results = await Promise.all(
+      ingredients.map(async (ing) => {
+        const per100g = await getIngredientNutritionPer100g(
+          ing.name,
+          ing.fdcId
+        );
+        const factor = ing.grams / 100;
+        return {
+          calories: per100g.calories * factor,
+          protein: per100g.protein * factor,
+          carbs: per100g.carbs * factor,
+          fat: per100g.fat * factor,
+        };
+      })
     );
-  }
 
-  const apiKey = process.env.USDA_API_KEY;
+    const totals = results.reduce(
+      (acc, r) => ({
+        calories: acc.calories + r.calories,
+        protein: acc.protein + r.protein,
+        carbs: acc.carbs + r.carbs,
+        fat: acc.fat + r.fat,
+      }),
+      { calories: 0, protein: 0, carbs: 0, fat: 0 }
+    );
 
-  if (!apiKey) {
+    return NextResponse.json({
+      calories: Math.round(totals.calories),
+      protein: Math.round(totals.protein),
+      carbs: Math.round(totals.carbs),
+      fat: Math.round(totals.fat),
+    });
+  } catch (err) {
     return NextResponse.json(
-      { error: "USDA API key not configured" },
+      { error: err instanceof Error ? err.message : "Unknown error" },
       { status: 500 }
     );
   }
-
-  const usdaUrl = `https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(
-    query
-  )}&pageSize=5&api_key=${apiKey}`;
-
-  const response = await fetch(usdaUrl);
-
-  if (!response.ok) {
-    return NextResponse.json(
-      { error: "USDA API request failed" },
-      { status: response.status }
-    );
-  }
-
-  const data = await response.json();
-
-  return NextResponse.json(data);
 }
