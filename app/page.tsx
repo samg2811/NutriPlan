@@ -2,55 +2,12 @@
 
 import { useState } from "react";
 import { meals, Meal } from "@/data/meals";
-import ViewMealButton from "@/components/ViewMealButton";
-
-type Nutrition = {
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-};
 
 type RankedMeal = {
   meal: Meal;
   score: number;
   matchedIngredients: string[];
-  nutrition?: Nutrition;
-  nutritionLoading: boolean;
 };
-
-// Rough singular form so "eggs" matches "egg" and "tomatoes" matches "tomato".
-// It is applied to both what the user types and the ingredient names, so they always agree.
-function singular(word: string): string {
-  if (word.length <= 3) return word;
-  if (word.endsWith("ies")) return word.slice(0, -3) + "y";
-  if (word.endsWith("oes")) return word.slice(0, -2);
-  if (word.endsWith("ss") || word.endsWith("us")) return word;
-  if (word.endsWith("s")) return word.slice(0, -1);
-  return word;
-}
-
-function toWords(text: string): string[] {
-  return text
-    .toLowerCase()
-    .split(/[^a-z]+/)
-    .filter(Boolean)
-    .map(singular);
-}
-
-// A typed term matches an ingredient when every word in the term appears in the
-// ingredient's name: "chicken" -> "chicken breast", "rice" -> "white rice".
-// Words of 4+ letters can also match the end of a word: "berry" -> "blueberry".
-function termMatchesIngredient(term: string, ingredientName: string): boolean {
-  const termWords = toWords(term);
-  if (termWords.length === 0) return false;
-  const ingredientWords = toWords(ingredientName);
-
-  const wordMatches = (t: string, i: string) =>
-    t === i || (t.length >= 4 && i.endsWith(t));
-
-  return termWords.every((t) => ingredientWords.some((i) => wordMatches(t, i)));
-}
 
 export default function Home() {
   const [ingredients, setIngredients] = useState("");
@@ -58,38 +15,27 @@ export default function Home() {
   const [maxTime, setMaxTime] = useState(30);
   const [results, setResults] = useState<RankedMeal[]>([]);
 
-  async function fetchNutrition(meal: Meal): Promise<Nutrition | undefined> {
-    try {
-      const res = await fetch("/api/nutrition", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ingredients: meal.ingredients }),
-      });
+  // AI Food Analysis
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [detectedFoods, setDetectedFoods] = useState<string[]>([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisError, setAnalysisError] = useState("");
 
-      if (!res.ok) return undefined;
-      return await res.json();
-    } catch {
-      return undefined;
-    }
-  }
-
-  async function findMeals() {
+  function findMeals() {
     const userIngredients = ingredients
-      .split(/,|;|\n|\band\b/i)
+      .toLowerCase()
+      .split(",")
       .map((item) => item.trim())
       .filter(Boolean);
 
-    const rankedMeals: RankedMeal[] = meals
+    const rankedMeals = meals
       .map((meal) => {
         let score = 0;
 
-        const matchedIngredients = meal.ingredients
-          .filter((ingredient) =>
-            userIngredients.some((term) =>
-              termMatchesIngredient(term, ingredient.name)
-            )
-          )
-          .map((ingredient) => ingredient.name);
+        const matchedIngredients = meal.ingredients.filter(
+          (ingredient) =>
+            userIngredients.includes(ingredient.toLowerCase())
+        );
 
         score += matchedIngredients.length * 5;
 
@@ -105,26 +51,139 @@ export default function Home() {
           score -= 2;
         }
 
-        return { meal, score, matchedIngredients };
+        return {
+          meal,
+          score,
+          matchedIngredients,
+        };
       })
       .filter((item) => item.matchedIngredients.length > 0)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 3)
-      .map((item) => ({ ...item, nutritionLoading: true }));
+      .sort((a, b) => b.score - a.score);
 
-    setResults(rankedMeals);
-    
-    rankedMeals.forEach(async (item, index) => {
-      const nutrition = await fetchNutrition(item.meal);
+    setResults(rankedMeals.slice(0, 3));
+  }
 
-      setResults((prev) => {
-        const next = [...prev];
-        if (next[index]) {
-          next[index] = { ...next[index], nutrition, nutritionLoading: false };
-        }
-        return next;
+  // Handle photo upload
+  function handleImageUpload(
+    event: React.ChangeEvent<HTMLInputElement>
+  ) {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setAnalysisError("Please upload an image file.");
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      setSelectedImage(reader.result as string);
+      setDetectedFoods([]);
+      setAnalysisError("");
+    };
+
+    reader.readAsDataURL(file);
+  }
+
+  // Send photo to Gemini
+  async function analyzeFood() {
+    if (!selectedImage) return;
+
+    setIsAnalyzing(true);
+    setAnalysisError("");
+    setDetectedFoods([]);
+
+    try {
+      const response = await fetch("/api/analyze-food", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          image: selectedImage,
+        }),
       });
-    });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || "Food analysis failed."
+        );
+      }
+
+      let foods: string[] = [];
+
+      try {
+        foods = JSON.parse(data.foods);
+      } catch {
+        const cleaned = data.foods
+          .replace(/```json/g, "")
+          .replace(/```/g, "")
+          .trim();
+
+        foods = JSON.parse(cleaned);
+      }
+
+      setDetectedFoods(foods);
+    } catch (error) {
+      console.error(error);
+
+      setAnalysisError(
+        "We couldn't analyze that photo. Please try another image."
+      );
+    } finally {
+      setIsAnalyzing(false);
+    }
+  }
+
+  // Use detected foods in recipe finder
+  function useDetectedFoods() {
+    if (detectedFoods.length === 0) return;
+
+    setIngredients(detectedFoods.join(", "));
+
+    setTimeout(() => {
+      const userIngredients = detectedFoods.map((food) =>
+        food.toLowerCase().trim()
+      );
+
+      const rankedMeals = meals
+        .map((meal) => {
+          let score = 0;
+
+          const matchedIngredients = meal.ingredients.filter(
+            (ingredient) =>
+              userIngredients.includes(
+                ingredient.toLowerCase()
+              )
+          );
+
+          score += matchedIngredients.length * 5;
+
+          if (meal.cookingTime <= maxTime) {
+            score += 3;
+          }
+
+          if (meal.cost <= budget) {
+            score += 3;
+          }
+
+          return {
+            meal,
+            score,
+            matchedIngredients,
+          };
+        })
+        .filter(
+          (item) => item.matchedIngredients.length > 0
+        )
+        .sort((a, b) => b.score - a.score);
+
+      setResults(rankedMeals.slice(0, 3));
+    }, 100);
   }
 
   return (
@@ -148,8 +207,9 @@ export default function Home() {
         </h1>
 
         <p className="hero-text">
-          NutriPlan uses your ingredients, budget, and available time to help
-          you find meals that fit your needs.
+          NutriPlan uses your ingredients, budget, and
+          available time to help you find meals that fit
+          your needs.
         </p>
       </section>
 
@@ -157,7 +217,8 @@ export default function Home() {
         <h2>Find Your Meal</h2>
 
         <p className="section-description">
-          Tell us what you have and we'll find meals that match.
+          Tell us what you have and we'll find meals that
+          match.
         </p>
 
         <div className="form-card">
@@ -167,7 +228,9 @@ export default function Home() {
             type="text"
             placeholder="chicken, rice, broccoli"
             value={ingredients}
-            onChange={(e) => setIngredients(e.target.value)}
+            onChange={(e) =>
+              setIngredients(e.target.value)
+            }
           />
 
           <div className="form-row">
@@ -181,7 +244,9 @@ export default function Home() {
                   type="number"
                   value={budget}
                   min={1}
-                  onChange={(e) => setBudget(Number(e.target.value))}
+                  onChange={(e) =>
+                    setBudget(Number(e.target.value))
+                  }
                 />
               </div>
             </div>
@@ -194,7 +259,9 @@ export default function Home() {
                   type="number"
                   value={maxTime}
                   min={5}
-                  onChange={(e) => setMaxTime(Number(e.target.value))}
+                  onChange={(e) =>
+                    setMaxTime(Number(e.target.value))
+                  }
                 />
 
                 <span>min</span>
@@ -202,117 +269,199 @@ export default function Home() {
             </div>
           </div>
 
-          <button className="primary-button" onClick={findMeals}>
+          <button
+            className="primary-button"
+            onClick={findMeals}
+          >
             Find My Meals →
           </button>
         </div>
       </section>
-      
+
       {results.length > 0 && (
         <section className="results">
           <h2>Your Recommendations</h2>
 
           <p className="section-description">
-            Meals ranked using your ingredients, budget, and cooking time.
+            Meals ranked using your ingredients, budget,
+            and cooking time.
           </p>
 
           <div className="meal-grid">
-            {results.map((item) => (
-              <div className="meal-card" key={item.meal.id}>
-                <div className="meal-icon">🍽️</div>
+            {results.map(
+              ({
+                meal,
+                matchedIngredients,
+              }) => (
+                <div
+                  className="meal-card"
+                  key={meal.id}
+                >
+                  <div className="meal-icon">🍽️</div>
 
-                <h3>{item.meal.name}</h3>
+                  <h3>{meal.name}</h3>
 
-                <p>{item.meal.description}</p>
+                  <p>{meal.description}</p>
 
-                <div className="match-info">
-                  ✓ {item.matchedIngredients.length} ingredient
-                  {item.matchedIngredients.length !== 1 ? "s" : ""}{" "}
-                  match
-                  {item.matchedIngredients.length !== 1 ? "" : "es"}
-                </div>
+                  <div className="match-info">
+                    ✓ {matchedIngredients.length} ingredient
+                    {matchedIngredients.length !== 1
+                      ? "s"
+                      : ""}{" "}
+                    match
+                    {matchedIngredients.length !== 1
+                      ? ""
+                      : "es"}
+                  </div>
 
-                <div className="meal-info">
-                  <span>⏱️ {item.meal.cookingTime} min</span>
-                  <span>💰 ${item.meal.cost.toFixed(2)}</span>
-                </div>
+                  <div className="meal-info">
+                    <span>
+                      ⏱️ {meal.cookingTime} min
+                    </span>
 
-                {item.nutritionLoading ? (
-                  <p style={{ padding: "15px 0", color: "#666" }}>
-                    Loading nutrition…
-                  </p>
-                ) : item.nutrition ? (
+                    <span>
+                      💰 ${meal.cost.toFixed(2)}
+                    </span>
+                  </div>
+
                   <div className="nutrition">
                     <div>
-                      <strong>{item.nutrition.protein}g</strong>
+                      <strong>{meal.protein}g</strong>
                       <small>Protein</small>
                     </div>
 
                     <div>
-                      <strong>{item.nutrition.carbs}g</strong>
+                      <strong>{meal.carbs}g</strong>
                       <small>Carbs</small>
                     </div>
 
                     <div>
-                      <strong>{item.nutrition.fat}g</strong>
+                      <strong>{meal.fat}g</strong>
                       <small>Fat</small>
                     </div>
                   </div>
-                ) : (
-                  <p style={{ padding: "15px 0", color: "#999" }}>
-                    Nutrition unavailable
-                  </p>
-                )}
 
-                <ViewMealButton
-                  meal={item.meal}
-                  className="secondary-button"
-                  label="View Meal"
-                />
-              </div>
-            ))}
+                  <button className="secondary-button">
+                    View Meal
+                  </button>
+                </div>
+              )
+            )}
           </div>
         </section>
       )}
 
-      {results.length === 0 && ingredients && (
-        <section className="results">
-          <h2>No matching meals yet</h2>
-
-          <p className="section-description">
-            Try adding ingredients like chicken, rice, broccoli, cheese, or
-            lettuce.
-          </p>
-        </section>
-      )}
-
+      {/* AI FOOD ANALYSIS */}
       <section className="camera-section" id="camera">
         <div>
-          <p className="eyebrow">COMING NEXT</p>
+          <p className="eyebrow">AI FOOD ANALYSIS</p>
 
           <h2>
-            Analyze your meal
+            What's in your
             <br />
-            with AI 📸
+            meal? 📸
           </h2>
 
           <p>
-            Take a picture of your food and NutriPlan will identify likely
-            foods in your meal and provide approximate nutritional
-            information.
+            Upload a photo of your food and our AI will
+            identify the foods it can recognize.
           </p>
+
+          <label className="upload-button">
+            📷 Choose Food Photo
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              hidden
+            />
+          </label>
+
+          {selectedImage && (
+            <button
+              className="primary-button analyze-button"
+              onClick={analyzeFood}
+              disabled={isAnalyzing}
+            >
+              {isAnalyzing
+                ? "🤖 Analyzing..."
+                : "🤖 Analyze Food"}
+            </button>
+          )}
+
+          {analysisError && (
+            <p className="error-message">
+              {analysisError}
+            </p>
+          )}
         </div>
 
-        <div className="camera-placeholder">
-          <div className="camera-icon">📸</div>
-          <h3>AI Food Analysis</h3>
-          <p>Coming soon</p>
+        <div className="camera-card">
+          {!selectedImage && (
+            <div className="empty-camera">
+              <div className="camera-icon">📸</div>
+
+              <h3>Upload a food photo</h3>
+
+              <p>
+                We'll use AI to identify what's on your
+                plate.
+              </p>
+            </div>
+          )}
+
+          {selectedImage && (
+            <div className="image-preview">
+              <img
+                src={selectedImage}
+                alt="Uploaded food"
+              />
+            </div>
+          )}
         </div>
       </section>
 
+      {/* AI RESULTS */}
+      {detectedFoods.length > 0 && (
+        <section className="ai-results">
+          <p className="eyebrow">AI RESULTS</p>
+
+          <h2>We found these foods</h2>
+
+          <p className="section-description">
+            Gemini identified the following foods in your
+            photo.
+          </p>
+
+          <div className="food-list">
+            {detectedFoods.map((food, index) => (
+              <div className="food-item" key={index}>
+                <span>✓</span>
+                {food}
+              </div>
+            ))}
+          </div>
+
+          <p className="confirmation-text">
+            AI identification can make mistakes. Check the
+            results before continuing.
+          </p>
+
+          <button
+            className="primary-button"
+            onClick={useDetectedFoods}
+          >
+            🍽️ Find Recipes With These Foods →
+          </button>
+        </section>
+      )}
+
       <footer>
         <strong>NutriPlan</strong>
-        <span>Plan smarter. Eat better. Waste less.</span>
+
+        <span>
+          Plan smarter. Eat better. Waste less.
+        </span>
       </footer>
     </main>
   );
