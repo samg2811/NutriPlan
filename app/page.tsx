@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { meals, Meal } from "@/data/meals";
-import { meals, Meal } from "@/data/meals";
 import ViewMealButton from "@/components/ViewMealButton";
 
 type Nutrition = {
