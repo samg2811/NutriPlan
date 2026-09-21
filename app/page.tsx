@@ -34,7 +34,7 @@ export default function Home() {
 
         const matchedIngredients = meal.ingredients.filter(
           (ingredient) =>
-            userIngredients.includes(ingredient.toLowerCase())
+            userIngredients.includes(ingredient.name.toLowerCase())
         );
 
         score += matchedIngredients.length * 5;
@@ -157,7 +157,7 @@ export default function Home() {
           const matchedIngredients = meal.ingredients.filter(
             (ingredient) =>
               userIngredients.includes(
-                ingredient.toLowerCase()
+                ingredient.name.toLowerCase()
               )
           );
 
