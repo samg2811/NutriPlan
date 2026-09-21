@@ -3,11 +3,17 @@
 import { useState } from "react";
 import { meals, Meal } from "@/data/meals";
 
+type RankedMeal = {
+  meal: Meal;
+  score: number;
+  matchedIngredients: string[];
+};
+
 export default function Home() {
   const [ingredients, setIngredients] = useState("");
   const [budget, setBudget] = useState(10);
   const [maxTime, setMaxTime] = useState(30);
-  const [results, setResults] = useState<Meal[]>([]);
+  const [results, setResults] = useState<RankedMeal[]>([]);
 
   function findMeals() {
     const userIngredients = ingredients
@@ -20,39 +26,45 @@ export default function Home() {
       .map((meal) => {
         let score = 0;
 
-        // Time
+        // Find matching ingredients
+        const matchedIngredients = meal.ingredients.filter(
+          (ingredient) =>
+            userIngredients.includes(ingredient.toLowerCase())
+        );
+
+        // Ingredient matching
+        score += matchedIngredients.length * 5;
+
+        // Cooking time
         if (meal.cookingTime <= maxTime) {
-          score += 2;
+          score += 3;
+        } else {
+          score -= 2;
         }
 
         // Budget
         if (meal.cost <= budget) {
-          score += 2;
+          score += 3;
+        } else {
+          score -= 2;
         }
-
-        // Ingredients
-        userIngredients.forEach((ingredient) => {
-          if (meal.ingredients.includes(ingredient)) {
-            score += 3;
-          }
-        });
 
         return {
           meal,
           score,
+          matchedIngredients,
         };
       })
+      .filter((item) => item.matchedIngredients.length > 0)
       .sort((a, b) => b.score - a.score);
 
-    setResults(rankedMeals.slice(0, 3).map((item) => item.meal));
+    setResults(rankedMeals.slice(0, 3));
   }
 
   return (
     <main className="container">
       <nav className="navbar">
-        <div className="logo">
-          🍽️ MealMind
-        </div>
+        <div className="logo">🍽️ MealMind</div>
 
         <div className="nav-links">
           <a href="#planner">Meal Planner</a>
@@ -70,8 +82,8 @@ export default function Home() {
         </h1>
 
         <p className="hero-text">
-          MealMind uses your ingredients, budget, and available time
-          to help you find meals that fit your needs.
+          MealMind uses your ingredients, budget, and available
+          time to help you find meals that fit your needs.
         </p>
       </section>
 
@@ -83,9 +95,7 @@ export default function Home() {
         </p>
 
         <div className="form-card">
-          <label>
-            What ingredients do you have?
-          </label>
+          <label>What ingredients do you have?</label>
 
           <input
             type="text"
@@ -144,48 +154,79 @@ export default function Home() {
           <h2>Your Recommendations</h2>
 
           <p className="section-description">
-            Based on your ingredients, budget, and cooking time.
+            Meals ranked using your ingredients, budget, and
+            cooking time.
           </p>
 
           <div className="meal-grid">
-            {results.map((meal) => (
-              <div className="meal-card" key={meal.id}>
-                <div className="meal-icon">
-                  🍽️
-                </div>
+            {results.map(
+              ({
+                meal,
+                matchedIngredients,
+              }) => (
+                <div className="meal-card" key={meal.id}>
+                  <div className="meal-icon">🍽️</div>
 
-                <h3>{meal.name}</h3>
+                  <h3>{meal.name}</h3>
 
-                <p>{meal.description}</p>
+                  <p>{meal.description}</p>
 
-                <div className="meal-info">
-                  <span>⏱️ {meal.cookingTime} min</span>
-                  <span>💰 ${meal.cost.toFixed(2)}</span>
-                </div>
-
-                <div className="nutrition">
-                  <div>
-                    <strong>{meal.protein}g</strong>
-                    <small>Protein</small>
+                  <div className="match-info">
+                    ✓ {matchedIngredients.length} ingredient
+                    {matchedIngredients.length !== 1
+                      ? "s"
+                      : ""}{" "}
+                    match
+                    {matchedIngredients.length !== 1
+                      ? ""
+                      : "es"}
                   </div>
 
-                  <div>
-                    <strong>{meal.carbs}g</strong>
-                    <small>Carbs</small>
+                  <div className="meal-info">
+                    <span>
+                      ⏱️ {meal.cookingTime} min
+                    </span>
+
+                    <span>
+                      💰 ${meal.cost.toFixed(2)}
+                    </span>
                   </div>
 
-                  <div>
-                    <strong>{meal.fat}g</strong>
-                    <small>Fat</small>
+                  <div className="nutrition">
+                    <div>
+                      <strong>{meal.protein}g</strong>
+                      <small>Protein</small>
+                    </div>
+
+                    <div>
+                      <strong>{meal.carbs}g</strong>
+                      <small>Carbs</small>
+                    </div>
+
+                    <div>
+                      <strong>{meal.fat}g</strong>
+                      <small>Fat</small>
+                    </div>
                   </div>
+
+                  <button className="secondary-button">
+                    View Meal
+                  </button>
                 </div>
-
-                <button className="secondary-button">
-                  View Meal
-                </button>
-              </div>
-            ))}
+              )
+            )}
           </div>
+        </section>
+      )}
+
+      {results.length === 0 && ingredients && (
+        <section className="results">
+          <h2>No matching meals yet</h2>
+
+          <p className="section-description">
+            Try adding ingredients like chicken, rice,
+            broccoli, cheese, or lettuce.
+          </p>
         </section>
       )}
 
@@ -201,7 +242,7 @@ export default function Home() {
 
           <p>
             Take a picture of your food and MealMind will
-            identify the foods in your meal and provide
+            identify likely foods in your meal and provide
             approximate nutritional information.
           </p>
         </div>
@@ -211,15 +252,16 @@ export default function Home() {
 
           <h3>AI Food Analysis</h3>
 
-          <p>
-            Coming soon
-          </p>
+          <p>Coming soon</p>
         </div>
       </section>
 
       <footer>
         <strong>MealMind</strong>
-        <span>Plan smarter. Eat better. Waste less.</span>
+
+        <span>
+          Plan smarter. Eat better. Waste less.
+        </span>
       </footer>
     </main>
   );
