@@ -93,7 +93,7 @@ export default function Home() {
   return (
     <main className="container">
       <nav className="navbar">
-        <div className="logo">🍽️ MealMind</div>
+        <div className="logo">🍽️ NutriPlan</div>
 
         <div className="nav-links">
           <a href="#planner">Meal Planner</a>
@@ -111,7 +111,7 @@ export default function Home() {
         </h1>
 
         <p className="hero-text">
-          MealMind uses your ingredients, budget, and available
+          NutriPlan uses your ingredients, budget, and available
           time to help you find meals that fit your needs.
         </p>
       </section>
@@ -266,7 +266,7 @@ export default function Home() {
           </h2>
 
           <p>
-            Take a picture of your food and MealMind will
+            Take a picture of your food and NutriPlan will
             identify likely foods in your meal and provide
             approximate nutritional information.
           </p>
@@ -282,7 +282,7 @@ export default function Home() {
       </section>
 
       <footer>
-        <strong>MealMind</strong>
+        <strong>NutriPlan</strong>
 
         <span>
           Plan smarter. Eat better. Waste less.
