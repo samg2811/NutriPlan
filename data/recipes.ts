@@ -1,37 +1,108 @@
-// Prints the USDA entry each ingredient resolves to, so you can spot bad matches
-// (raw vs cooked, wrong food, etc.) and pin an fdcId or add a query override.
-//
-// Run from the project root, e.g.:
-//   npx tsx --env-file=.env.local scripts/check-usda-matches.ts
-import { ingredientNames } from "../data/meals";
-import { USDA_QUERY_OVERRIDES } from "../lib/mealNutrition";
+// Step-by-step instructions for each meal, keyed by meal id (see data/meals.ts).
+// Seasonings such as salt, pepper, or spices are not tracked as ingredients.
 
-const apiKey = process.env.USDA_API_KEY;
-if (!apiKey) throw new Error("USDA_API_KEY is not set");
+export const recipes: Record<number, string[]> = {
+  1: ["Cook the rice per package directions.", "Season the chicken and pan-sear 5-6 min per side until cooked through; slice.", "Steam or sauté the broccoli 4-5 min until tender-crisp.", "Serve the rice topped with chicken and broccoli."],
+  2: ["Season the chicken and cook in a skillet 5-6 min per side; shred or slice.", "Warm the tortillas in a dry pan, 30 sec per side.", "Fill with chicken, lettuce, and cheddar."],
+  3: ["Cook the rice per package directions.", "Stir-fry sliced chicken in a hot pan 5-6 min until cooked through.", "Add the broccoli and carrot; stir-fry 4-5 min until tender-crisp.", "Serve over the rice."],
+  4: ["Toast the bread if you like.", "Layer turkey, cheddar, lettuce, and tomato on one slice.", "Top with the second slice and cut in half."],
+  5: ["Cook the rice per package directions.", "Steam the broccoli and carrot 5-6 min until tender.", "Top the rice with the vegetables and sprinkle with cheddar."],
+  6: ["Melt half the butter in a nonstick pan over medium-low heat.", "Whisk the eggs with a pinch of salt, add to the pan, and stir gently until just set.", "Toast the bread, spread with the remaining butter, and serve with the eggs."],
+  7: ["Stir the oats, milk, and honey together in a jar.", "Cover and refrigerate at least 4 hours or overnight.", "Top with sliced banana before eating."],
+  8: ["Slice the strawberries.", "Layer the yogurt, strawberries, and blueberries in a glass.", "Drizzle with honey."],
+  9: ["Toast the bread until golden.", "Spread with peanut butter.", "Top with sliced banana."],
+  10: ["Preheat the oven to 400°F (200°C).", "Toss cubed sweet potato with half the oil and salt; roast 15 min.", "Add the salmon, brush with the remaining oil, and roast 12-15 min until it flakes.", "Serve together."],
+  11: ["Cook the quinoa per package directions.", "Sauté the sliced bell pepper in the oil 3-4 min.", "Add the shrimp and cook 2-3 min per side until pink.", "Serve over the quinoa."],
+  12: ["Cook the rice per package directions.", "Brown the ground beef 6-8 min over medium-high heat; drain the fat.", "Add the broccoli and stir-fry 4-5 min.", "Serve over the rice."],
+  13: ["Cook the pasta in salted boiling water until al dente; drain.", "Brown the beef with the diced onion 7-8 min.", "Add the chopped tomato and simmer 8-10 min.", "Toss with the pasta."],
+  14: ["Cook the rice per package directions.", "Warm the black beans in a small pot 5 min.", "Dice the tomato and slice the avocado.", "Assemble the bowl."],
+  15: ["Drain and rinse the chickpeas.", "Dice the cucumber and tomato; chop the spinach.", "Toss everything with the olive oil, salt, and pepper."],
+  16: ["Cook the rice per package directions.", "Press and cube the tofu; pan-fry until golden, about 8 min.", "Add the bell pepper and broccoli; stir-fry 4-5 min.", "Serve over the rice."],
+  17: ["Preheat the oven to 400°F (200°C).", "Toss cubed sweet potato with half the oil; roast 20 min.", "Season the pork chop and sear in the remaining oil 4-5 min per side until cooked through.", "Rest 3 min and serve with the sweet potato."],
+  18: ["Drain and flake the tuna into a bowl.", "Toast the bread if desired.", "Pile the tuna on one slice, add lettuce and tomato, and top with the second slice."],
+  19: ["Slice the strawberries.", "Spoon the cottage cheese into a bowl.", "Top with the strawberries and blueberries."],
+  20: ["Season the chicken and grill or pan-sear 5-6 min per side; slice.", "Chop the kale, discarding stems, and massage with the oil for 1 min.", "Top the kale with chicken and shaved parmesan."],
+  21: ["Spiralize the zucchini into noodles.", "Sauté the minced garlic in the oil for 30 sec.", "Add the shrimp; cook 2-3 min per side until pink.", "Toss in the zucchini noodles 1-2 min until warm."],
+  22: ["Pulse the cauliflower in a food processor until rice-sized.", "Scramble the egg in a hot pan; set aside.", "Sauté the cauliflower and diced carrot 5-6 min until tender.", "Stir the egg back in and season."],
+  23: ["Cook the bacon over medium heat 6-8 min until crisp; drain.", "Pour off most of the fat and scramble the eggs in the pan over low heat.", "Serve together."],
+  24: ["Cook the brown rice per package directions.", "Bake or pan-sear the salmon 10-12 min; flake it.", "Wilt the spinach in a warm pan 1 min.", "Top the rice with spinach and salmon."],
+  25: ["Add the milk, banana, and almond butter to a blender.", "Blend until smooth.", "Pour and serve immediately."],
+  26: ["Slice the mozzarella and tomato.", "Arrange in alternating layers on a plate.", "Drizzle with the olive oil; season with salt and pepper."],
+  27: ["Cook the quinoa per package directions; let cool slightly.", "Rinse the black beans; dice the bell pepper and avocado.", "Toss together gently and season."],
+  28: ["Slice the apple.", "Arrange with the almonds on a plate.", "Drizzle with honey."],
+  29: ["Cook the quinoa per package directions.", "Grill or pan-sear the seasoned chicken 5-6 min per side; slice.", "Slice the avocado and chop the spinach.", "Build the bowl."],
+  30: ["Peel the orange and separate the segments.", "Spoon the yogurt into a bowl.", "Top with orange and honey."],
+  31: ["Brown the turkey with the diced onion 6-8 min.", "Add the chopped tomato, drained black beans, a splash of water, and chili seasoning.", "Simmer 20 min, stirring occasionally, until thick."],
+  32: ["Brown the beef 6-8 min, seasoning as it cooks; drain the fat.", "Warm the tortillas in a dry pan, 30 sec per side.", "Fill with beef, lettuce, and cheddar."],
+  33: ["Sauté the diced bell pepper and mushroom 3-4 min.", "Add the spinach until wilted.", "Pour in the egg whites, cook until set, then fold and serve."],
+  34: ["Preheat the oven to 400°F (200°C).", "Toss cubed sweet potato with half the oil; roast 20-25 min.", "Season the steak and sear in the remaining oil 3-5 min per side.", "Rest 5 min, slice, and serve."],
+  35: ["Preheat the oven to 400°F (200°C).", "Place the cod and trimmed asparagus on a sheet pan; drizzle with oil and season.", "Bake 12-15 min until the cod flakes."],
+  36: ["Cook the pasta until al dente; drain.", "Grill or pan-sear the chicken 5-6 min per side; slice.", "Chop the basil with the parmesan into a quick pesto and toss with the pasta.", "Top with the chicken."],
+  37: ["Drain and rinse the chickpeas.", "Dice the cucumber and crumble the feta.", "Combine in a bowl with the olive oil."],
+  38: ["Sauté the diced onion and carrot in the oil 5 min.", "Add the rinsed lentils and enough water to cover by 1-2 inches.", "Simmer 20-25 min until tender; season."],
+  39: ["Preheat the oven to 400°F (200°C). Season the turkey and roll into meatballs.", "Bake 15-18 min until cooked through.", "Cook the pasta; simmer the chopped tomato into a quick sauce.", "Serve the meatballs over pasta with sauce."],
+  40: ["Sauté the shrimp 2-3 min per side until pink.", "Warm the tortillas in a dry pan.", "Fill with shrimp and shredded cabbage; squeeze lime on top."],
+  41: ["Preheat the oven to 425°F (220°C).", "Season the thighs and bake 25-30 min until they reach 165°F (74°C).", "Cook the rice per package directions and serve alongside."],
+  42: ["Sauté the sliced mushroom 3 min; add the spinach until wilted.", "Pour in the whisked eggs; cook over medium-low heat until nearly set.", "Add cheddar, fold, and serve."],
+  43: ["Cut the cucumber, carrot, and bell pepper into sticks.", "Spoon the hummus onto a plate.", "Arrange the vegetables around it."],
+  44: ["Butter one side of each bread slice; put the cheddar between the unbuttered sides.", "Grill 3-4 min per side until golden and melted.", "Serve with sliced tomato."],
+  45: ["Cook the rice per package directions.", "Slice the chicken, bell pepper, and onion into strips.", "Sauté the chicken 5-6 min, add the vegetables, and cook 4-5 min more.", "Serve over rice with a squeeze of lime."],
+  46: ["Preheat the oven to 400°F (200°C).", "Place the salmon and trimmed asparagus on a sheet pan; drizzle with oil and season.", "Bake 12-15 min until the salmon flakes."],
+  47: ["Slice or mash the avocado.", "Layer the turkey, avocado, and lettuce on the wrap.", "Roll tightly and cut in half."],
+  48: ["Toast the bread.", "Fry the egg 2-3 min until the white is set.", "Mash the avocado onto the toast, top with the egg, and season."],
+  49: ["Cook the rice per package directions.", "Slice the steak thinly and stir-fry over high heat 2-3 min; set aside.", "Stir-fry the pepper and onion 4 min, then return the beef.", "Serve over the rice."],
+  50: ["Cook the quinoa; let cool slightly.", "Dice the cucumber and tomato; crumble the feta.", "Toss together and season."],
+  51: ["Simmer the chicken in water 15 min until cooked; shred.", "Add the sliced carrot and diced onion; simmer 5 min.", "Add the pasta and cook until tender; return the chicken to the pot."],
+  52: ["Grill or pan-sear the shrimp 2-3 min per side until pink.", "Toss the spinach and tomato with the oil.", "Top with the shrimp."],
+  53: ["Preheat the oven to 400°F (200°C).", "Bake the seasoned tilapia with the oil 10-12 min until it flakes.", "Cook the rice per package directions and serve with the fish."],
+  54: ["Cook the pasta until al dente; drain.", "Sear the seasoned chicken 5-6 min per side; slice.", "Warm the milk, whisk in the parmesan until smooth and slightly thick.", "Toss with the pasta and top with the chicken."],
+  55: ["Cook the rice per package directions.", "Warm the black beans and corn together.", "Slice the avocado.", "Build the bowl."],
+  56: ["Preheat the oven to 400°F (200°C).", "Rub the pork with half the oil and seasoning; sear 2 min per side, then roast 15-20 min until 145°F (63°C).", "Toss the green beans with the remaining oil and roast alongside for the last 12 min.", "Rest the pork 5 min, slice, and serve."],
+  57: ["Grill or pan-sear the seasoned chicken 5-6 min per side; slice.", "Toast the bread.", "Layer chicken, mozzarella, and tomato between the bread."],
+  58: ["Preheat the oven to 400°F (200°C). Pierce the sweet potato and bake 45 min (or microwave 8-10 min).", "Warm the black beans.", "Split the potato, top with beans and cheddar, and let the cheese melt."],
+  59: ["Grill or pan-sear the seasoned chicken 5-6 min per side; slice.", "Warm the tortilla so it's pliable.", "Fill with chicken, lettuce, and parmesan; roll tightly."],
+  60: ["Scramble the egg in a hot pan; set aside.", "Stir-fry the diced carrot and peas 3-4 min.", "Add the cooked rice; stir-fry 3 min, then fold the egg back in."],
+  61: ["Brown the beef 6-8 min; drain the fat.", "Stir in the black beans and heat through.", "Fill the warmed tortilla with the beef mixture and cheddar; roll up."],
+  62: ["Sauté the small-diced sweet potato 8-10 min until starting to soften.", "Add the onion and turkey; cook 8-10 min, breaking up the turkey, until cooked through and the potato is tender."],
+  63: ["Cook the rice; let cool slightly.", "Cube the sushi-grade salmon (or use cooked salmon).", "Slice the cucumber and avocado.", "Assemble over the rice."],
+  64: ["Dice the chicken, sweet potato, and onion.", "Cook the sweet potato in a skillet 8 min, then add the chicken and onion.", "Cook 8-10 min more, stirring, until the chicken is done and the potato is tender."],
+  65: ["Preheat the oven to 375°F (190°C).", "Cook the pasta slightly under al dente; drain.", "Mix with the chopped tomato and half the mozzarella in a baking dish; top with the rest.", "Bake 20-25 min until bubbly."],
+  66: ["Brown the turkey 6-8 min.", "Add the diced carrot and bell pepper; cook 4-5 min.", "Spoon into lettuce leaves."],
+  67: ["Preheat the oven to 400°F (200°C).", "Pound the chicken flat, season, and sear 3 min per side.", "Top with sliced tomato and mozzarella; bake 15-18 min until cooked through."],
+  68: ["Scramble the egg; set aside.", "Stir-fry the shrimp 2-3 min until pink; set aside.", "Stir-fry the peas and cooked rice 3 min.", "Return the egg and shrimp; toss."],
+  69: ["Preheat the oven to 375°F (190°C).", "Sauté the bell pepper and spinach in an oven-safe pan 3 min.", "Pour in the whisked eggs, add parmesan, and cook 2 min.", "Bake 12-15 min until set."],
+  70: ["Sear the seasoned chicken in the oil 5-6 min per side; slice.", "Sauté the mushrooms and onion in the same pan 5-6 min.", "Return the chicken and toss."],
+  71: ["Slow-cook the pork shoulder, covered, 3-4 hours until it shreds.", "Shred and toss with BBQ sauce.", "Pile onto the bread."],
+  72: ["Preheat the oven to 400°F (200°C).", "Put the seasoned chicken and green beans on a sheet pan; drizzle with oil.", "Bake 20-25 min until the chicken reaches 165°F (74°C)."],
+  73: ["Cook the noodles per package directions; drain.", "Stir-fry the carrot, bell pepper, and broccoli 5-6 min.", "Toss with the noodles and a splash of soy sauce."],
+  74: ["Preheat the oven to 375°F (190°C). Cut the tops off the peppers and remove the seeds.", "Brown the beef 6-8 min and mix with the cooked rice.", "Stuff the peppers and bake 25-30 min until tender."],
+  75: ["Cook the bacon until crisp.", "Toast the bread.", "Layer turkey, bacon, lettuce, and tomato; cut in halves."],
+  76: ["Cook the rice per package directions.", "Cube and season the chicken; grill or pan-sear 8-10 min, turning, until cooked through.", "Dice the cucumber; crumble the feta.", "Serve over rice with cucumber and feta."],
+  77: ["Preheat the oven to 400°F (200°C). Slice the eggplant and bake 15 min until soft.", "Layer with chopped tomato and mozzarella in a dish.", "Bake 15-20 min until bubbly."],
+  78: ["Cook the rice per package directions.", "Brown the turkey 6-8 min.", "Add the broccoli and carrot; stir-fry 5 min.", "Serve over the rice."],
+  79: ["Simmer the chicken in water 15 min; shred.", "Add the chopped tomato, corn, and onion; simmer 10 min.", "Return the chicken to the pot and season."],
+  80: ["Preheat the oven to 400°F (200°C). Season the cod and bake 12-14 min until it flakes.", "Warm the tortillas.", "Flake the cod into the tortillas and top with cabbage."],
+  81: ["Preheat the oven to 350°F (175°C) and grease a muffin tin.", "Whisk the eggs; stir in the chopped spinach and feta.", "Pour into the tin and bake 15-18 min until set."],
+  82: ["Cook the rice per package directions.", "Sauté the onion 4 min; add cubed chicken and curry powder and cook 6-8 min.", "Add the chickpeas and a splash of water; simmer 10 min.", "Serve over the rice."],
+  83: ["Preheat the oven to 425°F (220°C). Cut the sweet potato into fries and roast 25 min, turning once.", "Form the turkey into a patty and season.", "Cook the patty 5-6 min per side and serve on the bread."],
+  84: ["Preheat the oven to 400°F (200°C). Season the chicken, roll into meatballs, and bake 15-18 min.", "Cook the pasta until al dente.", "Simmer the chopped tomato into a quick marinara; toss with the meatballs and pasta."],
+  85: ["Preheat the oven to 425°F (220°C). Roast the cubed sweet potato and chickpeas 20-25 min.", "Cook the quinoa per package directions.", "Massage the kale with a pinch of salt.", "Build the bowl."],
+  86: ["Cook the rice per package directions.", "Brown the beef 6-8 min; drain the fat.", "Warm the black beans.", "Top the rice with beef, beans, and cheddar."],
+  87: ["Bake or pan-sear the salmon 10-12 min; flake it.", "Toss the spinach and cucumber with the oil.", "Top with the salmon."],
+  88: ["Cook the rice per package directions.", "Cook the chicken with shawarma spices 6-7 min per side; slice.", "Slice the cucumber; thin the yogurt with a little water for a sauce.", "Serve over rice with cucumber and sauce."],
+  89: ["Preheat the oven to 375°F (190°C).", "Mix the turkey with seasoning, shape into a loaf, and bake 35-40 min until 165°F (74°C).", "Steam or roast the green beans 8-10 min and serve alongside."],
+  90: ["Hard-boil the eggs 10 min, cool in cold water, and peel.", "Chop and season with salt and pepper.", "Spread on the bread, add lettuce, and top with the second slice."],
+  91: ["Preheat the oven to 375°F (190°C). Poach or bake the chicken; shred.", "Fill the tortillas with chicken and half the cheddar; roll into a baking dish.", "Top with chopped tomato and the remaining cheddar; bake 20 min."],
+  92: ["Preheat the oven to 400°F (200°C).", "Bake the seasoned trout with the oil 12-15 min until it flakes.", "Cook the rice per package directions and serve with the fish."],
+  93: ["Cook the rice per package directions.", "Simmer the cauliflower and carrot with curry powder and a little water 12 min.", "Add the chickpeas; cook 5 min more.", "Serve over the rice."],
+  94: ["Preheat the oven to 375°F (190°C). Halve the peppers and remove the seeds.", "Brown the turkey 6-8 min; stir in the chopped spinach until wilted.", "Fill the peppers and bake 25-30 min until tender."],
+  95: ["Cook the bacon until crisp; crumble.", "Grill or pan-sear the chicken 5-6 min per side; slice.", "Fill the tortilla with chicken, bacon, and lettuce; roll tightly."],
+  96: ["Preheat the oven to 400°F (200°C).", "Place the halibut and trimmed asparagus on a sheet pan; drizzle with oil and season.", "Bake 12-15 min until the fish flakes."],
+  97: ["Cook the pasta until al dente; drain.", "Brown the turkey 6-8 min; add the chopped tomato, black beans, and chili seasoning.", "Simmer 15 min, then stir in the pasta."],
+  98: ["Cook the rice per package directions.", "Cube the chicken; cut the pepper and onion into chunks.", "Thread onto skewers; grill or broil 10-12 min, turning, until the chicken is cooked through.", "Serve with the rice."],
+  99: ["Preheat the oven to 400°F (200°C).", "Put the cod and broccoli on a sheet pan; drizzle with oil and season.", "Bake 12-15 min until the cod flakes and the broccoli is tender."],
+  100: ["Cook the diced sweet potato in a skillet 8 min.", "Add the turkey and cook 6-8 min.", "Fry or scramble the eggs and serve on top."],
+  101: ["Scramble the egg; set aside.", "Stir-fry the diced chicken 5-6 min until cooked through.", "Add the carrot and cooked rice; stir-fry 3-4 min.", "Fold the egg back in."],
+};
 
-async function main() {
-  for (const name of ingredientNames) {
-    const query = USDA_QUERY_OVERRIDES[name] ?? name;
-    // Same query params as searchIngredient() in lib/usda.ts
-    const url = `https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(
-      query
-    )}&dataType=Foundation,SR%20Legacy&pageSize=1&api_key=${apiKey}`;
-
-    try {
-      const res = await fetch(url);
-      if (!res.ok) {
-        console.log(`${name.padEnd(20)} -> HTTP ${res.status}`);
-        continue;
-      }
-      const food = (await res.json()).foods?.[0];
-      console.log(
-        `${name.padEnd(20)} -> ${food ? `${food.description} (fdcId ${food.fdcId}, ${food.dataType})` : "NO MATCH"}`
-      );
-    } catch (e) {
-      console.log(`${name.padEnd(20)} -> ERROR ${(e as Error).message}`);
-    }
-    await new Promise((r) => setTimeout(r, 150)); // stay well under rate limits
-  }
-}
-
-main();
+export const getRecipe = (mealId: number): string[] => recipes[mealId] ?? [];
