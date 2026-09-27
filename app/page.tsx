@@ -35,9 +35,50 @@ export default function Home() {
       .map((meal) => {
         let score = 0;
 
-        const matchedIngredients = meal.ingredients.filter(
-          (ingredient) =>
-            userIngredients.includes(ingredient.name.toLowerCase())
+        const ingredientAliases: Record<string, string> = {
+  "chicken breast": "chicken",
+  "chicken thigh": "chicken",
+  "ground chicken": "chicken",
+
+  "white rice": "rice",
+  "brown rice": "rice",
+
+  "corn tortilla": "tortilla",
+
+  "cheddar cheese": "cheese",
+  "parmesan cheese": "cheese",
+  "mozzarella cheese": "cheese",
+  "feta cheese": "cheese",
+
+  "whole wheat bread": "bread",
+
+  "ground beef": "beef",
+  "beef steak": "beef",
+
+  "ground turkey": "turkey",
+  "turkey breast": "turkey",
+
+  "greek yogurt": "yogurt",
+
+  "bell pepper": "pepper",
+
+  "olive oil": "oil",
+
+  "egg white": "egg",
+};
+
+const matchedIngredients = meal.ingredients.filter((ingredient) => {
+  const simplifiedName =
+    ingredientAliases[ingredient.name.toLowerCase()] ||
+    ingredient.name.toLowerCase();
+
+  return userIngredients.some((userIngredient) => {
+    return (
+      userIngredient === simplifiedName ||
+      userIngredient === ingredient.name.toLowerCase()
+    );
+  });
+});
         );
 
         score += matchedIngredients.length * 5;
