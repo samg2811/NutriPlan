@@ -830,9 +830,6 @@ export const meals: Meal[] = [
     cookingTime: 20,
     cost: 6,
   },
-];
-
-  export const additionalMeals: Meal[] = [
   {
     id: 102,
     name: "Chicken Teriyaki Rice Bowl",
