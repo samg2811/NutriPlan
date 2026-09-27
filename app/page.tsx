@@ -431,6 +431,73 @@ export default function Home() {
       )}
 
       {/* FOOTER */}
+      {selectedMeal && (
+  <div
+    className="modal-overlay"
+    onClick={() => setSelectedMeal(null)}
+  >
+    <div
+      className="recipe-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        className="close-button"
+        onClick={() => setSelectedMeal(null)}
+      >
+        ✕
+      </button>
+
+      <div className="recipe-icon">🍽️</div>
+
+      <p className="eyebrow">NUTRIPLAN RECIPE</p>
+
+      <h2>{selectedMeal.name}</h2>
+
+      <p className="recipe-description">
+        {selectedMeal.description}
+      </p>
+
+      <div className="recipe-stats">
+        <span>⏱️ {selectedMeal.cookingTime} min</span>
+        <span>💰 ${selectedMeal.cost.toFixed(2)}</span>
+      </div>
+
+      <h3>Ingredients</h3>
+
+      <ul className="ingredient-list">
+        {selectedMeal.ingredients.map((ingredient) => (
+          <li key={ingredient.name}>
+            <span>✓</span>
+            <strong>{ingredient.name}</strong>
+            <span>{ingredient.grams}g</span>
+          </li>
+        ))}
+      </ul>
+
+      <h3>How to Make It</h3>
+
+      <ol className="recipe-steps">
+        <li>Prepare and measure all ingredients.</li>
+        <li>
+          Cook the main ingredients according to the recipe.
+        </li>
+        <li>
+          Combine the ingredients and season to taste.
+        </li>
+        <li>
+          Serve immediately and enjoy!
+        </li>
+      </ol>
+
+      <button
+        className="primary-button"
+        onClick={() => setSelectedMeal(null)}
+      >
+        Done
+      </button>
+    </div>
+  </div>
+)}
       <footer>
         <strong>NutriPlan</strong>
 
