@@ -235,6 +235,29 @@ const matchedIngredients = meal.ingredients.filter((ingredient) => {
         <div className="nav-links">
           <a href="#planner">Meal Planner</a>
           <a href="#camera">Analyze Food</a>
+
+          {userEmail ? (
+            <>
+              <a href="/food-log">Food Log</a>
+
+              <button
+                className="login-button"
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  router.refresh();
+                }}
+              >
+                Log Out
+              </button>
+            </>
+          ) : (
+            <button
+              className="login-button"
+              onClick={() => router.push("/login")}
+            >
+              Log In
+            </button>
+          )}
         </div>
       </nav>
 
