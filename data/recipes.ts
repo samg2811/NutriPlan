@@ -103,6 +103,608 @@ export const recipes: Record<number, string[]> = {
   99: ["Preheat the oven to 400°F (200°C).", "Put the cod and broccoli on a sheet pan; drizzle with oil and season.", "Bake 12-15 min until the cod flakes and the broccoli is tender."],
   100: ["Cook the diced sweet potato in a skillet 8 min.", "Add the turkey and cook 6-8 min.", "Fry or scramble the eggs and serve on top."],
   101: ["Scramble the egg; set aside.", "Stir-fry the diced chicken 5-6 min until cooked through.", "Add the carrot and cooked rice; stir-fry 3-4 min.", "Fold the egg back in."],
+  102: [
+    "Cook the rice according to package directions.",
+    "Season the chicken and pan-sear 5-6 min per side until internal temperature reaches 165°F (74°C), then slice.",
+    "Steam or sauté the broccoli for 4-5 min until tender-crisp.",
+    "Assemble the rice, chicken, and broccoli in a bowl, then drizzle with simple teriyaki sauce."
+  ],
+  103: [
+    "Cook the rice according to package directions.",
+    "In a skillet over medium heat, brown the ground turkey until fully cooked (6-8 min), seasoning to taste.",
+    "Dice or shred the carrot and sauté or steam until tender.",
+    "Serve the ground turkey and carrot over a bed of warm rice."
+  ],
+  104: [
+    "Boil the pasta in salted water according to package directions; drain.",
+    "Dice the chicken, season, and pan-sear in a skillet until fully cooked (6-8 min).",
+    "Add chopped tomatoes to the skillet and simmer 3-4 min until soft to form a light sauce.",
+    "Toss the pasta with the chicken and tomato sauce until well combined."
+  ],
+  105: [
+    "Boil the pasta in salted water according to package directions; drain.",
+    "Brown the ground beef in a skillet over medium heat until cooked through; drain excess fat.",
+    "Add chopped tomatoes and simmer for 5 min to build the sauce.",
+    "Combine the pasta with the beef and tomato sauce and serve."
+  ],
+  106: [
+    "Cook the rice according to package directions.",
+    "Season and grill or pan-sear the chicken until fully cooked (5-6 min per side); slice.",
+    "Dice or slice the fresh avocado.",
+    "Assemble the bowl with a base of rice, topped with sliced chicken and avocado."
+  ],
+  107: [
+    "Cook the rice according to package directions and let cool slightly.",
+    "Slice or dice the cucumber and avocado.",
+    "Drain the tuna and flake it into bite-sized pieces.",
+    "Layer the rice in a bowl and top with tuna, cucumber, and avocado."
+  ],
+  108: [
+    "Pre-cook and shred or dice the chicken.",
+    "Place a tortilla in a warm skillet over medium heat, scattering cheese and chicken over one half.",
+    "Fold the tortilla over and cook 2-3 min per side until golden brown and the cheese is fully melted.",
+    "Slice into wedges and serve warm."
+  ],
+  109: [
+    "Brown and season the ground or sliced beef in a skillet; set aside.",
+    "Place a tortilla in a warm skillet and layer cheese and cooked beef on one half.",
+    "Fold over and cook for 2-3 min on each side until the exterior is crispy and cheese is melted.",
+    "Slice into wedges and serve."
+  ],
+  110: [
+    "Rinse and drain the black beans.",
+    "Place a tortilla in a skillet over medium heat, spreading black beans and cheese over one half.",
+    "Fold the tortilla in half and cook for 2-3 min per side until the tortilla is golden and cheese is melted.",
+    "Remove from heat, slice, and serve."
+  ],
+  111: [
+    "Cook the rice according to package instructions; warm the black beans.",
+    "Dice and cook the chicken in a skillet until fully cooked.",
+    "Warm the tortilla, then layer rice, black beans, chicken, and cheese down the center.",
+    "Fold the sides in, roll tightly into a burrito, and serve."
+  ],
+  112: [
+    "Cook the rice according to package instructions; warm the black beans.",
+    "Brown and season the beef in a skillet over medium heat.",
+    "Lay the tortilla flat and add rice, black beans, beef, and cheese.",
+    "Roll up tightly, seam-side down, and serve warm."
+  ],
+  113: [
+    "Dice and cook the chicken in a skillet; warm the black beans.",
+    "Dice the tomato and grate or portion the cheese.",
+    "Layer black beans, cooked chicken, diced tomato, and melted cheese in a bowl.",
+    "Top with a serving of tortilla chips or serve chips on the side."
+  ],
+  114: [
+    "Brown the ground turkey in a skillet over medium heat with taco seasoning until fully cooked.",
+    "Shred the lettuce and dice the tomato.",
+    "Warm the tortillas in a pan or microwave.",
+    "Divide the ground turkey into tortillas and top with lettuce and tomato."
+  ],
+  115: [
+    "Season the white fish and pan-sear or bake at 400°F (200°C) for 10-12 min until flaky.",
+    "Shred the cabbage and dice the tomato.",
+    "Warm the tortillas in a skillet.",
+    "Flake the fish into tortillas and top with shredded cabbage and diced tomato."
+  ],
+  116: [
+    "Season and cook the chicken in a skillet; slice or dice once done.",
+    "Chop the lettuce and place it in a large bowl as the base.",
+    "Rinse and drain the black beans, then dice the tomato.",
+    "Top the lettuce base with chicken, black beans, tomato, and cheese."
+  ],
+  117: [
+    "Cook the rice according to package directions.",
+    "Brown the ground turkey in a skillet with your preferred seasonings.",
+    "Rinse black beans, dice the tomato, and slice the avocado.",
+    "Assemble the bowl with rice, ground turkey, black beans, tomato, and fresh avocado."
+  ],
+  118: [
+    "Cook the rice according to package directions.",
+    "Dice and cook the chicken in a skillet until golden and cooked through.",
+    "Warm the black beans and dice the tomato.",
+    "Layer the rice, chicken, black beans, and tomato in a serving bowl."
+  ],
+  119: [
+    "Cook the rice according to package directions.",
+    "Dice or slice the beef and sauté in a skillet until browned and cooked to desired doneness.",
+    "Grate or dice the carrot and sauté briefly until tender.",
+    "Serve the cooked beef and carrots over a bed of warm rice."
+  ],
+  120: [
+    "Cook the rice according to package directions.",
+    "Season the salmon fillet and bake at 400°F (200°C) for 12-15 min or pan-sear until cooked through.",
+    "Thinly slice the cucumber.",
+    "Serve the salmon over rice accompanied by cucumber slices."
+  ],
+  121: [
+    "Boil the pasta according to package directions; drain.",
+    "Dice the chicken and pan-sear in a skillet until fully cooked.",
+    "Add broccoli florets and sliced carrots to the skillet with a splash of water, cooking 4-5 min until tender.",
+    "Toss the pasta, chicken, and vegetables together before serving."
+  ],
+  122: [
+    "Boil the pasta according to package directions; drain.",
+    "Slice the beef into thin strips; stir-fry in a skillet over high heat until browned.",
+    "Add sliced bell pepper and carrots to the skillet; cook for 3-4 min until tender-crisp.",
+    "Combine the noodles with the beef and vegetables."
+  ],
+  123: [
+    "Boil the pasta according to package directions; drain.",
+    "Sauté the shrimp in a skillet with oil for 2-3 min per side until pink and opaque.",
+    "Steam or sauté the broccoli until tender-crisp.",
+    "Toss the noodles, shrimp, and broccoli together in a bowl."
+  ],
+  124: [
+    "Season and pan-sear the chicken until fully cooked; slice into strips.",
+    "Chop the lettuce and tomato.",
+    "Warm or lightly toast the pita pocket.",
+    "Stuff the pita with chicken, lettuce, tomato, and spoonfuls of yogurt sauce."
+  ],
+  125: [
+    "Slice or shred the cooked turkey.",
+    "Chop the lettuce and tomato.",
+    "Warm the pita bread slightly.",
+    "Fill the pita pocket with turkey, lettuce, tomato, and yogurt."
+  ],
+  126: [
+    "Bake or pan-fry the falafel according to package instructions until crispy.",
+    "Chop the lettuce, tomato, and cucumber.",
+    "Warm the pita bread and open the pocket.",
+    "Fill with falafel, fresh chopped vegetables, and yogurt sauce."
+  ],
+  127: [
+    "Cook the rice according to package directions.",
+    "Season the chicken with Mediterranean herbs and pan-sear until internal temp is 165°F (74°C); slice.",
+    "Dice the cucumber and tomato; crumble the feta cheese.",
+    "Serve chicken, cucumber, tomato, and feta over the warm rice."
+  ],
+  128: [
+    "Cook the rice according to package directions.",
+    "Cook and season the turkey in a skillet until fully browned.",
+    "Dice the cucumber and tomato; portion the feta cheese.",
+    "Assemble the bowl with rice, turkey, cucumber, tomato, and feta."
+  ],
+  129: [
+    "Cook and slice the chicken breast.",
+    "Dice the tomato and cucumber; crumble the feta.",
+    "Warm the tortilla slightly for easy rolling.",
+    "Layer chicken, tomato, cucumber, and feta in the center, then wrap tightly."
+  ],
+  130: [
+    "Drain the tuna into a salad bowl.",
+    "Dice the cucumber and tomato, and wash the fresh spinach.",
+    "Add cucumber, tomato, and spinach to the tuna.",
+    "Drizzle with olive oil, toss well, and serve."
+  ],
+  131: [
+    "Boil the pasta in salted water according to package directions; drain.",
+    "Dice and pan-sear the chicken until fully cooked.",
+    "Toss fresh spinach into the warm chicken skillet until wilted.",
+    "Combine pasta, chicken, and spinach, then sprinkle with parmesan cheese."
+  ],
+  132: [
+    "Boil the pasta according to package directions; drain.",
+    "Brown the ground turkey in a skillet; add chopped tomatoes and simmer for 5 min.",
+    "Stir in the spinach during the last 2 minutes of cooking until wilted.",
+    "Combine the turkey and spinach sauce with the pasta."
+  ],
+  133: [
+    "Boil the pasta according to package directions; drain.",
+    "In a skillet, heat olive oil and cook chopped tomatoes until they break down into a sauce.",
+    "Add shrimp to the tomato sauce and cook for 3-4 min until pink.",
+    "Toss the pasta directly into the shrimp and tomato sauce."
+  ],
+  134: [
+    "Boil the pasta according to package directions; drain.",
+    "Cook the salmon (pan-sear or bake) and flake it into pieces using a fork.",
+    "Sauté or wilt the spinach in a skillet.",
+    "Toss the pasta, flaked salmon, and spinach together gently."
+  ],
+  135: [
+    "Boil the pasta according to package directions; drain.",
+    "In a pan, simmer chopped tomatoes for 5 min until soft.",
+    "Drain the tuna and stir it into the tomato sauce along with herbs.",
+    "Toss the warm pasta with the tuna-tomato sauce."
+  ],
+  136: [
+    "Boil the pasta according to package directions; drain.",
+    "Dice the zucchini, bell pepper, and tomato.",
+    "Sauté zucchini and bell pepper in a pan for 5 min, then add tomato and simmer into a sauce.",
+    "Combine the cooked vegetables and sauce with the pasta."
+  ],
+  137: [
+    "Boil the pasta according to package directions; drain.",
+    "Slice mushrooms and sauté in a skillet until browned (5-6 min).",
+    "Add spinach to the skillet and toss until wilted.",
+    "Combine pasta with mushrooms and spinach, then top with parmesan cheese."
+  ],
+  138: [
+    "Boil the pasta according to package directions; drain.",
+    "Dice the chicken and pan-sear until cooked; slice the mushrooms.",
+    "Sauté mushrooms with the chicken until golden brown.",
+    "Toss the chicken and mushrooms with the drained pasta."
+  ],
+  139: [
+    "Boil the pasta according to package directions; drain.",
+    "Brown the beef in a skillet; add sliced mushrooms and cook until soft.",
+    "Drain any excess fat from the skillet.",
+    "Mix the beef and mushroom combination into the cooked pasta."
+  ],
+  140: [
+    "Cook the rice according to package directions.",
+    "Season and pan-sear the chicken until fully cooked; slice into bite-sized pieces.",
+    "Dice the tomato.",
+    "Assemble rice and chicken in a bowl, stir in pesto, and top with fresh tomato."
+  ],
+  141: [
+    "Whisk and scramble the eggs in a non-stick skillet over medium heat.",
+    "Warm the tortilla in a separate pan or microwave.",
+    "Layer scrambled eggs and cheese inside the warm tortilla.",
+    "Roll up tightly into a wrap and serve immediately."
+  ],
+  142: [
+    "Scramble the eggs in a skillet until cooked.",
+    "Warm or lightly brown the turkey in the skillet.",
+    "Place eggs, turkey, and cheese into a warm tortilla.",
+    "Wrap tightly and serve warm."
+  ],
+  143: [
+    "Dice the potato, bell pepper, and onion.",
+    "Roast or pan-fry potatoes, peppers, and onions in a skillet until tender and crispy (15-18 min).",
+    "Scramble or fry the eggs to your liking.",
+    "Serve the eggs over the roasted potato and vegetable hash."
+  ],
+  144: [
+    "Dice the potato, bell pepper, and onion.",
+    "Brown the ground turkey in a skillet with the diced potatoes, peppers, and onion.",
+    "Cover and cook over medium heat for 15-20 min, stirring occasionally, until potatoes are tender.",
+    "Season to taste and serve hot."
+  ],
+  145: [
+    "Scramble the eggs in a skillet; rinse and drain black beans.",
+    "Warm the tortilla slightly.",
+    "Place scrambled eggs, black beans, and cheese in the center of the tortilla.",
+    "Fold in the sides, roll tightly, and serve."
+  ],
+  146: [
+    "In a bowl or blender, mash the banana and mix with oats, egg, and milk until smooth.",
+    "Heat a lightly oiled skillet over medium heat.",
+    "Pour batter onto the skillet to form small pancakes and cook 2-3 min per side until golden.",
+    "Serve warm."
+  ],
+  147: [
+    "In a small pot, combine oats and milk; bring to a gentle simmer for 5-7 min until thickened.",
+    "Slice the banana.",
+    "Pour oatmeal into a bowl.",
+    "Top with fresh blueberries and banana slices before serving."
+  ],
+  148: [
+    "Dice or chop the apple.",
+    "Combine oats and milk in a saucepan and cook over medium heat for 5-7 min.",
+    "Stir in the chopped apple and a dash of cinnamon during the last 2 minutes of cooking.",
+    "Transfer to a bowl and serve warm."
+  ],
+  149: [
+    "Peel the banana and wash the strawberries.",
+    "Add strawberries, banana, and milk into a blender.",
+    "Blend on high speed until completely smooth.",
+    "Pour into a glass and serve immediately."
+  ],
+  150: [
+    "Add blueberries, banana, and yogurt to a blender.",
+    "Blend on high until smooth and creamy.",
+    "If too thick, add a small splash of water or milk to reach desired consistency.",
+    "Pour into a glass and enjoy."
+  ],
+  151: [
+    "Cook the lentils according to package instructions until tender; drain.",
+    "Season and pan-sear the chicken until fully cooked; slice.",
+    "Wilt the spinach and dice the tomato.",
+    "Serve sliced chicken over cooked lentils, spinach, and tomato."
+  ],
+  152: [
+    "Cook the rice and lentils according to their respective package directions.",
+    "Grate or dice the carrot; chop the spinach.",
+    "Sauté carrots and spinach briefly until tender.",
+    "Combine lentils and rice in a bowl and top with the sautéed vegetables."
+  ],
+  153: [
+    "Cook the rice according to package directions.",
+    "Rinse and drain the chickpeas.",
+    "Dice the tomato and cucumber.",
+    "Serve chickpeas, tomato, and cucumber over a bed of warm rice."
+  ],
+  154: [
+    "Boil the pasta according to package directions; drain and let cool.",
+    "Rinse and drain the chickpeas.",
+    "Dice the tomato and cucumber.",
+    "Toss cold pasta, chickpeas, tomato, and cucumber together in a bowl."
+  ],
+  155: [
+    "Rinse and drain the black beans; warm slightly if desired.",
+    "Slice the avocado, chop the lettuce, and dice the tomato.",
+    "Layer black beans as the base in a bowl.",
+    "Top with fresh avocado, tomato, and lettuce."
+  ],
+  156: [
+    "Cook the rice according to package directions.",
+    "Cube the tofu and pan-fry in a lightly oiled skillet until golden and crispy.",
+    "Steam or sauté broccoli florets and sliced carrots.",
+    "Serve crispy tofu and vegetables over warm rice."
+  ],
+  157: [
+    "Boil the pasta according to package directions; drain.",
+    "Cube tofu and sauté until golden on all sides.",
+    "Slice bell pepper and broccoli; sauté with the tofu until tender-crisp.",
+    "Toss the tofu and vegetables with the cooked noodles."
+  ],
+  158: [
+    "Cook the rice according to package directions.",
+    "Cube tofu and pan-fry until golden-crisp; steam the broccoli.",
+    "Whisk peanut butter with a splash of warm water to create a smooth sauce.",
+    "Serve tofu and broccoli over rice, drizzled with the peanut sauce."
+  ],
+  159: [
+    "Dice the bell pepper and tomato.",
+    "In a pot, combine black beans, chopped tomato, corn, and bell pepper.",
+    "Simmer over medium-low heat for 20-25 minutes, stirring occasionally.",
+    "Ladle into bowls and serve warm."
+  ],
+  160: [
+    "Brown the ground turkey in a pot until cooked through.",
+    "Dice the tomato and bell pepper.",
+    "Add black beans, tomato, and bell pepper to the pot with the turkey.",
+    "Simmer together for 20-25 min until flavors melt together, then serve."
+  ],
+  161: [
+    "Dice the chicken, carrot, celery, and potato.",
+    "In a pot, combine chicken, vegetables, and water or broth; bring to a boil.",
+    "Reduce heat and simmer for 25-30 min until potatoes and carrots are tender and chicken is cooked.",
+    "Season to taste and serve warm."
+  ],
+  162: [
+    "Dice the carrot, celery, and potato.",
+    "Brown the ground turkey in a soup pot.",
+    "Add vegetables and broth/water to the pot; bring to a simmer.",
+    "Cook for 20-25 min until all vegetables are tender, then serve."
+  ],
+  163: [
+    "Cube the beef, potato, carrot, and celery.",
+    "Sear the beef cubes in a pot until browned on all sides.",
+    "Add water/broth and diced potatoes, carrots, and celery.",
+    "Simmer covered for 30-35 min until beef and potatoes are fully tender."
+  ],
+  164: [
+    "Dice the chicken, potato, carrot, and onion.",
+    "In a pot, sauté onion and chicken briefly, then add potato, carrot, and broth/water.",
+    "Bring to a boil, then cover and simmer for 20-25 min until potatoes are soft.",
+    "Season to taste and serve hot."
+  ],
+  165: [
+    "Dice the carrot and onion.",
+    "In a pot, combine lentils, chopped tomato, carrot, onion, and water or broth.",
+    "Bring to a boil, reduce heat, and simmer for 25-30 min until lentils are soft.",
+    "Ladle into bowls and serve."
+  ],
+  166: [
+    "Dice the chicken, carrot, and onion.",
+    "Add chicken, corn, carrot, onion, and broth to a pot.",
+    "Simmer over medium heat for 20-25 min until chicken is fully cooked and carrots are soft.",
+    "Season to taste and serve."
+  ],
+  167: [
+    "Brown the ground turkey in a pot over medium heat.",
+    "Dice the carrot and onion; add them to the pot along with chopped tomatoes and broth.",
+    "Simmer for 20-25 min until carrots are soft.",
+    "Serve hot in soup bowls."
+  ],
+  168: [
+    "Dice the carrot and chop the spinach; rinse white beans.",
+    "In a pot, combine white beans, tomato, carrot, and broth; simmer for 20 min.",
+    "Stir in the spinach during the last 3 minutes of cooking until wilted.",
+    "Serve warm."
+  ],
+  169: [
+    "Dice the onion and chop the spinach; rinse chickpeas.",
+    "In a pot, sauté onion briefly, then add chickpeas, tomato, and broth.",
+    "Simmer for 15-20 min, then stir in spinach until wilted.",
+    "Season to taste and serve."
+  ],
+  170: [
+    "Dice the potato, carrot, and celery; chop the spinach.",
+    "Combine potato, carrot, celery, and broth in a pot and simmer for 20 min until tender.",
+    "Stir in spinach during the final 2-3 minutes of cooking.",
+    "Ladle into bowls and serve."
+  ],
+  171: [
+    "Season the chicken and grill or pan-sear until cooked through (165°F / 74°C); slice.",
+    "Chop the lettuce and place it into a large salad bowl.",
+    "Top lettuce with sliced chicken and parmesan cheese.",
+    "Toss with your favorite Caesar dressing if desired and serve."
+  ],
+  172: [
+    "Slice or chop the cooked turkey.",
+    "Chop the lettuce, dice the tomato, and slice the avocado.",
+    "Arrange lettuce in a bowl and top with turkey, tomato, and avocado.",
+    "Serve fresh."
+  ],
+  173: [
+    "Drain the tuna into a bowl.",
+    "Chop the lettuce, slice the cucumber, and dice the avocado.",
+    "Combine lettuce, cucumber, and avocado in a salad bowl.",
+    "Top with flaked tuna and serve."
+  ],
+  174: [
+    "Season and pan-sear the chicken; slice into bite-sized pieces.",
+    "Core and thin-slice the apple.",
+    "Arrange fresh spinach in a bowl, then top with chicken, apple slices, and walnuts.",
+    "Toss and serve."
+  ],
+  175: [
+    "Slice cooked turkey into bite-sized pieces.",
+    "Thinly slice the apple.",
+    "Place spinach in a bowl and top with turkey, apple slices, and walnuts.",
+    "Serve immediately."
+  ],
+  176: [
+    "Cook and slice the chicken breast.",
+    "Chop the lettuce, dice the tomato and cucumber, and portion the feta.",
+    "Combine lettuce, tomato, cucumber, and feta in a bowl.",
+    "Top with sliced chicken and serve."
+  ],
+  177: [
+    "Drain the tuna and rinse the chickpeas.",
+    "Dice the cucumber and tomato; prepare fresh spinach.",
+    "Combine chickpeas, cucumber, tomato, and spinach in a bowl.",
+    "Top with tuna, toss gently, and serve."
+  ],
+  178: [
+    "Hard-boil the eggs in boiling water for 9-10 min; cool, peel, and slice.",
+    "Dice the tomato and avocado.",
+    "Place fresh spinach in a bowl and top with sliced eggs, tomato, and avocado.",
+    "Serve fresh."
+  ],
+  179: [
+    "Rinse and drain the chickpeas.",
+    "Dice the avocado, tomato, and cucumber.",
+    "Combine chickpeas, avocado, tomato, and cucumber in a bowl.",
+    "Toss gently and serve."
+  ],
+  180: [
+    "Rinse and drain the black beans.",
+    "Dice the avocado and tomato; chop the lettuce.",
+    "Combine black beans, avocado, tomato, corn, and lettuce in a bowl.",
+    "Toss well and serve."
+  ],
+  181: [
+    "Toast the bread slices until golden and crisp.",
+    "Spread peanut butter evenly over each slice.",
+    "Core and thinly slice the apple.",
+    "Arrange apple slices on top of the peanut butter and serve."
+  ],
+  182: [
+    "Toast the bread to desired crispness.",
+    "Spread peanut butter over the warm toast.",
+    "Slice fresh strawberries.",
+    "Top the peanut butter toast with sliced strawberries."
+  ],
+  183: [
+    "Spoon Greek yogurt into a bowl.",
+    "Slice the banana.",
+    "Top yogurt with sliced banana and dry oats.",
+    "Drizzle honey over the top before serving."
+  ],
+  184: [
+    "Spoon Greek yogurt into a bowl.",
+    "Dice or slice the apple.",
+    "Top yogurt with apple slices and oats.",
+    "Dust with a pinch of cinnamon and serve."
+  ],
+  185: [
+    "Add cottage cheese to a serving bowl.",
+    "Slice the banana and strawberries.",
+    "Top cottage cheese with banana and berry slices.",
+    "Serve immediately."
+  ],
+  186: [
+    "Add cottage cheese to a bowl.",
+    "Dice the apple and roughly chop almonds.",
+    "Top cottage cheese with apple pieces and chopped almonds.",
+    "Serve fresh."
+  ],
+  187: [
+    "Add yogurt, strawberries, blueberries, and milk to a blender.",
+    "Blend on high until smooth and creamy.",
+    "Pour into a glass.",
+    "Serve cold."
+  ],
+  188: [
+    "Peel and dice the mango; peel the banana.",
+    "Combine mango, banana, and milk in a blender.",
+    "Blend until completely smooth.",
+    "Pour into a glass and enjoy."
+  ],
+  189: [
+    "Peel the banana and place in a blender.",
+    "Add peanut butter and milk.",
+    "Blend until thick and smooth.",
+    "Pour into a glass and serve."
+  ],
+  190: [
+    "Combine strawberries, banana, oats, and milk in a blender.",
+    "Blend on high for 45-60 seconds until oats are fully processed and smooth.",
+    "Pour into a glass.",
+    "Serve immediately."
+  ],
+  191: [
+    "Dice the chicken, potato, bell pepper, and onion.",
+    "Heat oil in a skillet over medium heat; add chicken and cook until browned.",
+    "Add potatoes, bell pepper, and onion to the skillet; cover and cook 15-20 min until potatoes are soft.",
+    "Season and serve straight from the skillet."
+  ],
+  192: [
+    "Dice the potato, bell pepper, and onion.",
+    "Brown the ground beef in a skillet over medium heat; drain excess fat.",
+    "Add potatoes, bell pepper, and onion to the beef.",
+    "Cover and cook for 15-20 min, stirring occasionally, until potatoes are tender."
+  ],
+  193: [
+    "Dice the potato, bell pepper, and onion.",
+    "Brown the ground turkey in a skillet.",
+    "Add diced potatoes, bell pepper, and onion to the skillet.",
+    "Cover and cook over medium heat for 15-20 min until potatoes are tender."
+  ],
+  194: [
+    "Dice the potato and toss with oil; roast at 400°F (200°C) for 20-25 min.",
+    "Bake or pan-sear the salmon until cooked through.",
+    "Sauté or wilt the fresh spinach.",
+    "Assemble salmon, roasted potatoes, and spinach in a bowl."
+  ],
+  195: [
+    "Dice the sweet potato into small cubes; roast at 400°F (200°C) for 20 min until tender.",
+    "Season and pan-sear the chicken breast until cooked through (165°F / 74°C); slice.",
+    "Wilt the spinach in a warm pan.",
+    "Serve sliced chicken over roasted sweet potato and spinach."
+  ]
+  export const additionalMealRecipes: Record<number, string[]> = {
+  196: [
+    "Dice the sweet potato into small cubes and roast at 400°F (200°C) or pan-fry for 18-20 min until tender.",
+    "Brown the ground turkey in a skillet over medium heat with seasoning until fully cooked (6-8 min).",
+    "Steam or sauté the broccoli for 4-5 min until tender-crisp.",
+    "Assemble the ground turkey, roasted sweet potatoes, and broccoli in a serving bowl."
+  ],
+  197: [
+    "Dice the sweet potato and roast or pan-sear until tender (18-20 min).",
+    "In a skillet over medium-high heat, cook and season the beef until browned through.",
+    "Steam or sauté broccoli florets until tender-crisp.",
+    "Combine the seasoned beef, sweet potatoes, and broccoli into a bowl and serve."
+  ],
+  198: [
+    "Dice the potato into small cubes and roast at 400°F (200°C) for 20 min until golden and tender.",
+    "Season the chicken and pan-sear for 5-6 min per side until internal temperature reaches 165°F (74°C); slice.",
+    "Steam the broccoli florets for 4-5 min until tender-crisp.",
+    "Serve the sliced chicken alongside the roasted potatoes and steamed broccoli."
+  ],
+  199: [
+    "Cook the rice according to package directions.",
+    "Brown the ground turkey in a skillet over medium heat until fully cooked.",
+    "Steam or sauté the broccoli until tender-crisp.",
+    "Serve the ground turkey and broccoli over a bed of warm rice."
+  ],
+  200: [
+    "Cook the rice according to package directions.",
+    "Dice and cook the chicken in a skillet until golden and cooked through.",
+    "Dice the fresh tomato and warm the sweet corn.",
+    "Top the rice with cooked chicken, sweet corn, and diced tomatoes."
+  ],
+  201: [
+    "Cook the rice according to package directions.",
+    "Brown and season the beef in a skillet over medium heat.",
+    "Dice the tomato and warm the sweet corn.",
+    "Layer the warm rice with seasoned beef, sweet corn, and fresh tomato."
+  ]
+};
 };
 
 export const getRecipe = (mealId: number): string[] => recipes[mealId] ?? [];
