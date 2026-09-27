@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { meals, Meal, MealIngredient } from "@/data/meals";
+import { createClient } from "@/lib/supabase/client";
 
 type RankedMeal = {
   meal: Meal;
@@ -16,6 +18,33 @@ export default function Home() {
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
 
   const [results, setResults] = useState<RankedMeal[]>([]);
+
+  const router = useRouter();
+  const supabase = createClient();
+
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function getUser() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      setUserEmail(user?.email ?? null);
+    }
+
+    getUser();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserEmail(session?.user?.email ?? null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
 
   // AI Food Analysis
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -79,7 +108,6 @@ const matchedIngredients = meal.ingredients.filter((ingredient) => {
     );
   });
 });
-        );
 
         score += matchedIngredients.length * 5;
 
