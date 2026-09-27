@@ -314,9 +314,12 @@ export default function Home() {
                   ))}
                 </div>
 
-                <button className="secondary-button">
-                  View Meal
-                </button>
+                <button
+  className="secondary-button"
+  onClick={() => setSelectedMeal(meal)}
+>
+  View Meal
+</button>
               </div>
             ))}
           </div>
