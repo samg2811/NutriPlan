@@ -2120,7 +2120,6 @@ export const meals: Meal[] = [
     cost: 6.5,
   },
 ];
-];
 
 /** Every distinct ingredient name used across all meals (handy for batch USDA lookups). */
 export const ingredientNames: string[] = Array.from(
