@@ -667,6 +667,8 @@ export const recipes: Record<number, string[]> = {
     "Wilt the spinach in a warm pan.",
     "Serve sliced chicken over roasted sweet potato and spinach."
   ]
+  };
+
   export const additionalMealRecipes: Record<number, string[]> = {
   196: [
     "Dice the sweet potato into small cubes and roast at 400°F (200°C) or pan-fry for 18-20 min until tender.",
@@ -704,7 +706,6 @@ export const recipes: Record<number, string[]> = {
     "Dice the tomato and warm the sweet corn.",
     "Layer the warm rice with seasoned beef, sweet corn, and fresh tomato."
   ]
-};
 };
 
 export const getRecipe = (mealId: number): string[] => recipes[mealId] ?? [];
