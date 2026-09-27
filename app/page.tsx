@@ -13,7 +13,7 @@ export default function Home() {
   const [ingredients, setIngredients] = useState("");
   const [budget, setBudget] = useState(10);
   const [maxTime, setMaxTime] = useState(30);
-  const [results, setResults] = useState<RankedMeal[]>([]);
+  const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
 
   // AI Food Analysis
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
