@@ -1,61 +1,47 @@
-import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenAI, Type } from "@google/genai";
-import { meals } from "@/data/meals";
+// Send photo to Gemini
+async function analyzeFood() {
+  if (!selectedImage) return;
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  setIsAnalyzing(true);
+  setAnalysisError("");
+  setDetectedFoods([]);
 
-export async function POST(req: NextRequest) {
   try {
-    const { base64Image, mimeType } = await req.json();
+    // Clean base64 string by stripping the "data:image/...;base64," prefix
+    const base64Data = selectedImage.includes(",")
+      ? selectedImage.split(",")[1]
+      : selectedImage;
 
-    if (!base64Image) {
-      return NextResponse.json({ error: "No image provided" }, { status: 400 });
-    }
-
-    // Call Gemini API
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [
-        {
-          inlineData: {
-            mimeType: mimeType || "image/jpeg",
-            data: base64Image,
-          },
-        },
-        {
-          text: "Scan this image and list all recognizable food items or raw ingredients present as a JSON array of strings.",
-        },
-      ],
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            ingredients: {
-              type: Type.ARRAY,
-              items: { type: Type.STRING },
-              description: "List of food items or ingredients detected.",
-            },
-          },
-          required: ["ingredients"],
-        },
+    const response = await fetch("/api/analyze-food", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        base64Image: base64Data,
+        mimeType: imageMimeType,
+      }),
     });
 
-    if (!response.text) {
-      return NextResponse.json({ detectedIngredients: [] });
+    const data = await response.json();
+
+    if (!response.ok) {
+      // THIS WILL DISPLAY THE REAL ERROR MESSAGE FROM THE SERVER
+      throw new Error(data.error || `Server Error ${response.status}: Failed to process image`);
     }
 
-    const { ingredients } = JSON.parse(response.text) as { ingredients: string[] };
+    const foods: string[] = data.detectedIngredients || data.foods || [];
 
-    return NextResponse.json({
-      detectedIngredients: ingredients,
-    });
+    if (foods.length === 0) {
+      setAnalysisError("No identifiable food items found in this photo.");
+    } else {
+      setDetectedFoods(foods);
+    }
   } catch (error: any) {
-    console.error("Gemini API Error:", error);
-    return NextResponse.json(
-      { error: error?.message || "Failed to process image" },
-      { status: 500 }
-    );
+    console.error("Analysis Error:", error);
+    // Display the actual error message on screen instead of generic fallback
+    setAnalysisError(error.message || "We couldn't analyze that photo. Please try another image.");
+  } finally {
+    setIsAnalyzing(false);
   }
 }
