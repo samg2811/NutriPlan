@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
-import { recipes } from "@/data/recipes"; // Import your existing recipe data
+import { recipes } from "@/data/recipes";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -47,9 +47,12 @@ export async function POST(req: NextRequest) {
     // 2. Match detected ingredients against your existing recipes
     const normalizedDetected = ingredients.map((i) => i.toLowerCase());
 
-    const matchedRecipes = recipes
-      .map((recipe) => {
-        const matchCount = recipe.ingredients.reduce((count: number, ing: string) => {
+    const recipeArray = Array.isArray(recipes) ? recipes : Object.values(recipes);
+
+    const matchedRecipes = recipeArray
+      .map((recipe: any) => {
+        const ingredientsList: string[] = recipe.ingredients || [];
+        const matchCount = ingredientsList.reduce((count: number, ing: string) => {
           const isMatch = normalizedDetected.some(
             (detected) => ing.toLowerCase().includes(detected) || detected.includes(ing.toLowerCase())
           );
@@ -57,8 +60,8 @@ export async function POST(req: NextRequest) {
         }, 0);
         return { ...recipe, matchCount };
       })
-      .filter((recipe) => recipe.matchCount > 0)
-      .sort((a, b) => b.matchCount - a.matchCount);
+      .filter((recipe: any) => recipe.matchCount > 0)
+      .sort((a: any, b: any) => b.matchCount - a.matchCount);
 
     return NextResponse.json({
       detectedIngredients: ingredients,
