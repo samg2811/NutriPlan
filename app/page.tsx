@@ -52,6 +52,7 @@ export default function Home() {
 
   // AI Food Analysis
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [imageMimeType, setImageMimeType] = useState<string>("image/jpeg");
   const [detectedFoods, setDetectedFoods] = useState<string[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisError, setAnalysisError] = useState("");
@@ -69,49 +70,39 @@ export default function Home() {
         let score = 0;
 
         const ingredientAliases: Record<string, string> = {
-  "chicken breast": "chicken",
-  "chicken thigh": "chicken",
-  "ground chicken": "chicken",
+          "chicken breast": "chicken",
+          "chicken thigh": "chicken",
+          "ground chicken": "chicken",
+          "white rice": "rice",
+          "brown rice": "rice",
+          "corn tortilla": "tortilla",
+          "cheddar cheese": "cheese",
+          "parmesan cheese": "cheese",
+          "mozzarella cheese": "cheese",
+          "feta cheese": "cheese",
+          "whole wheat bread": "bread",
+          "ground beef": "beef",
+          "beef steak": "beef",
+          "ground turkey": "turkey",
+          "turkey breast": "turkey",
+          "greek yogurt": "yogurt",
+          "bell pepper": "pepper",
+          "olive oil": "oil",
+          "egg white": "egg",
+        };
 
-  "white rice": "rice",
-  "brown rice": "rice",
+        const matchedIngredients = meal.ingredients.filter((ingredient) => {
+          const simplifiedName =
+            ingredientAliases[ingredient.name.toLowerCase()] ||
+            ingredient.name.toLowerCase();
 
-  "corn tortilla": "tortilla",
-
-  "cheddar cheese": "cheese",
-  "parmesan cheese": "cheese",
-  "mozzarella cheese": "cheese",
-  "feta cheese": "cheese",
-
-  "whole wheat bread": "bread",
-
-  "ground beef": "beef",
-  "beef steak": "beef",
-
-  "ground turkey": "turkey",
-  "turkey breast": "turkey",
-
-  "greek yogurt": "yogurt",
-
-  "bell pepper": "pepper",
-
-  "olive oil": "oil",
-
-  "egg white": "egg",
-};
-
-const matchedIngredients = meal.ingredients.filter((ingredient) => {
-  const simplifiedName =
-    ingredientAliases[ingredient.name.toLowerCase()] ||
-    ingredient.name.toLowerCase();
-
-  return userIngredients.some((userIngredient) => {
-    return (
-      userIngredient === simplifiedName ||
-      userIngredient === ingredient.name.toLowerCase()
-    );
-  });
-});
+          return userIngredients.some((userIngredient) => {
+            return (
+              userIngredient === simplifiedName ||
+              userIngredient === ingredient.name.toLowerCase()
+            );
+          });
+        });
 
         score += matchedIngredients.length * 5;
 
@@ -152,6 +143,8 @@ const matchedIngredients = meal.ingredients.filter((ingredient) => {
       return;
     }
 
+    setImageMimeType(file.type);
+
     const reader = new FileReader();
 
     reader.onload = () => {
@@ -172,13 +165,19 @@ const matchedIngredients = meal.ingredients.filter((ingredient) => {
     setDetectedFoods([]);
 
     try {
+      // Clean base64 string by stripping the "data:image/...;base64," prefix
+      const base64Data = selectedImage.includes(",")
+        ? selectedImage.split(",")[1]
+        : selectedImage;
+
       const response = await fetch("/api/analyze-food", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          image: selectedImage,
+          base64Image: base64Data,
+          mimeType: imageMimeType,
         }),
       });
 
@@ -188,20 +187,14 @@ const matchedIngredients = meal.ingredients.filter((ingredient) => {
         throw new Error(data.error || "Food analysis failed.");
       }
 
-      let foods: string[] = [];
+      // Read returned ingredients from API
+      const foods: string[] = data.detectedIngredients || data.foods || [];
 
-      try {
-        foods = JSON.parse(data.foods);
-      } catch {
-        const cleaned = data.foods
-          .replace(/```json/g, "")
-          .replace(/```/g, "")
-          .trim();
-
-        foods = JSON.parse(cleaned);
+      if (foods.length === 0) {
+        setAnalysisError("No identifiable food items found in this photo.");
+      } else {
+        setDetectedFoods(foods);
       }
-
-      setDetectedFoods(foods);
     } catch (error) {
       console.error(error);
 
@@ -413,11 +406,11 @@ const matchedIngredients = meal.ingredients.filter((ingredient) => {
                 </div>
 
                 <button
-  className="secondary-button"
-  onClick={() => setSelectedMeal(meal)}
->
-  View Meal
-</button>
+                  className="secondary-button"
+                  onClick={() => setSelectedMeal(meal)}
+                >
+                  View Meal
+                </button>
               </div>
             ))}
           </div>
@@ -528,74 +521,76 @@ const matchedIngredients = meal.ingredients.filter((ingredient) => {
         </section>
       )}
 
-      {/* FOOTER */}
+      {/* MODAL */}
       {selectedMeal && (
-  <div
-    className="modal-overlay"
-    onClick={() => setSelectedMeal(null)}
-  >
-    <div
-      className="recipe-modal"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <button
-        className="close-button"
-        onClick={() => setSelectedMeal(null)}
-      >
-        ✕
-      </button>
+        <div
+          className="modal-overlay"
+          onClick={() => setSelectedMeal(null)}
+        >
+          <div
+            className="recipe-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="close-button"
+              onClick={() => setSelectedMeal(null)}
+            >
+              ✕
+            </button>
 
-      <div className="recipe-icon">🍽️</div>
+            <div className="recipe-icon">🍽️</div>
 
-      <p className="eyebrow">NUTRIPLAN RECIPE</p>
+            <p className="eyebrow">NUTRIPLAN RECIPE</p>
 
-      <h2>{selectedMeal.name}</h2>
+            <h2>{selectedMeal.name}</h2>
 
-      <p className="recipe-description">
-        {selectedMeal.description}
-      </p>
+            <p className="recipe-description">
+              {selectedMeal.description}
+            </p>
 
-      <div className="recipe-stats">
-        <span>⏱️ {selectedMeal.cookingTime} min</span>
-        <span>💰 ${selectedMeal.cost.toFixed(2)}</span>
-      </div>
+            <div className="recipe-stats">
+              <span>⏱️ {selectedMeal.cookingTime} min</span>
+              <span>💰 ${selectedMeal.cost.toFixed(2)}</span>
+            </div>
 
-      <h3>Ingredients</h3>
+            <h3>Ingredients</h3>
 
-      <ul className="ingredient-list">
-        {selectedMeal.ingredients.map((ingredient) => (
-          <li key={ingredient.name}>
-            <span>✓</span>
-            <strong>{ingredient.name}</strong>
-            <span>{ingredient.grams}g</span>
-          </li>
-        ))}
-      </ul>
+            <ul className="ingredient-list">
+              {selectedMeal.ingredients.map((ingredient) => (
+                <li key={ingredient.name}>
+                  <span>✓</span>
+                  <strong>{ingredient.name}</strong>
+                  <span>{ingredient.grams}g</span>
+                </li>
+              ))}
+            </ul>
 
-      <h3>How to Make It</h3>
+            <h3>How to Make It</h3>
 
-      <ol className="recipe-steps">
-        <li>Prepare and measure all ingredients.</li>
-        <li>
-          Cook the main ingredients according to the recipe.
-        </li>
-        <li>
-          Combine the ingredients and season to taste.
-        </li>
-        <li>
-          Serve immediately and enjoy!
-        </li>
-      </ol>
+            <ol className="recipe-steps">
+              <li>Prepare and measure all ingredients.</li>
+              <li>
+                Cook the main ingredients according to the recipe.
+              </li>
+              <li>
+                Combine the ingredients and season to taste.
+              </li>
+              <li>
+                Serve immediately and enjoy!
+              </li>
+            </ol>
 
-      <button
-        className="primary-button"
-        onClick={() => setSelectedMeal(null)}
-      >
-        Done
-      </button>
-    </div>
-  </div>
-)}
+            <button
+              className="primary-button"
+              onClick={() => setSelectedMeal(null)}
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* FOOTER */}
       <footer>
         <strong>NutriPlan</strong>
 
