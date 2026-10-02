@@ -37,14 +37,15 @@ export default function Home() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      void event;
       setUserEmail(session?.user?.email ?? null);
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase]);
+  }, []);
 
   // AI Food Analysis
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
