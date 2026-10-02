@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
-import { recipes } from "@/data/recipes";
+import { meals } from "@/data/meals";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -8,7 +8,11 @@ export async function POST(req: NextRequest) {
   try {
     const { base64Image, mimeType } = await req.json();
 
-    // 1. Send image to Gemini API
+    if (!base64Image) {
+      return NextResponse.json({ error: "No image provided" }, { status: 400 });
+    }
+
+    // Call Gemini API
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: [
@@ -19,7 +23,7 @@ export async function POST(req: NextRequest) {
           },
         },
         {
-          text: "Scan this image and list all recognizable food items or raw ingredients present.",
+          text: "Scan this image and list all recognizable food items or raw ingredients present as a JSON array of strings.",
         },
       ],
       config: {
@@ -30,7 +34,7 @@ export async function POST(req: NextRequest) {
             ingredients: {
               type: Type.ARRAY,
               items: { type: Type.STRING },
-              description: "List of normalized ingredient names detected.",
+              description: "List of food items or ingredients detected.",
             },
           },
           required: ["ingredients"],
@@ -39,36 +43,19 @@ export async function POST(req: NextRequest) {
     });
 
     if (!response.text) {
-      return NextResponse.json({ ingredients: [], matchedRecipes: [] });
+      return NextResponse.json({ detectedIngredients: [] });
     }
 
     const { ingredients } = JSON.parse(response.text) as { ingredients: string[] };
 
-    // 2. Match detected ingredients against your existing recipes
-    const normalizedDetected = ingredients.map((i) => i.toLowerCase());
-
-    const recipeArray = Array.isArray(recipes) ? recipes : Object.values(recipes);
-
-    const matchedRecipes = recipeArray
-      .map((recipe: any) => {
-        const ingredientsList: string[] = recipe.ingredients || [];
-        const matchCount = ingredientsList.reduce((count: number, ing: string) => {
-          const isMatch = normalizedDetected.some(
-            (detected) => ing.toLowerCase().includes(detected) || detected.includes(ing.toLowerCase())
-          );
-          return isMatch ? count + 1 : count;
-        }, 0);
-        return { ...recipe, matchCount };
-      })
-      .filter((recipe: any) => recipe.matchCount > 0)
-      .sort((a: any, b: any) => b.matchCount - a.matchCount);
-
     return NextResponse.json({
       detectedIngredients: ingredients,
-      matchedRecipes,
     });
-  } catch (error) {
-    console.error("Error analyzing food:", error);
-    return NextResponse.json({ error: "Failed to process image" }, { status: 500 });
+  } catch (error: any) {
+    console.error("Gemini API Error:", error);
+    return NextResponse.json(
+      { error: error?.message || "Failed to process image" },
+      { status: 500 }
+    );
   }
 }
