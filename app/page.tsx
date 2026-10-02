@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { meals, Meal, MealIngredient } from "@/data/meals";
 import { createClient } from "@/lib/supabase/client";
+import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 
 type RankedMeal = {
   meal: Meal;
@@ -37,10 +38,12 @@ export default function Home() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      void event;
-      setUserEmail(session?.user?.email ?? null);
-    });
+    } = supabase.auth.onAuthStateChange(
+      (event: AuthChangeEvent, session: Session | null) => {
+        void event;
+        setUserEmail(session?.user?.email ?? null);
+      }
+    );
 
     return () => {
       subscription.unsubscribe();
