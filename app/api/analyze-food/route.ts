@@ -12,35 +12,39 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = await request.json();
-    const image = body?.image;
-
-    if (typeof image !== "string") {
-      return NextResponse.json(
-        { error: "Please upload a photo." },
-        { status: 400 }
-      );
-    }
-
-    const match = image.match(
-      /^data:(image\/(?:jpeg|png|webp));base64,(.+)$/
+    
+  const body = await request.json();
+  const base64Image = body?.base64Image;
+  const mimeType = body?.mimeType;
+  
+  if (
+    typeof base64Image !== "string" ||
+    typeof mimeType !== "string"
+  ) {
+    return NextResponse.json(
+      { error: "Photo data is missing." },
+      { status: 400 }
     );
-
-    if (!match) {
-      return NextResponse.json(
-        { error: "Use a JPEG, PNG, or WebP image." },
-        { status: 400 }
-      );
-    }
-
-    const [, mimeType, base64Data] = match;
-
-    if (base64Data.length > 12_000_000) {
-      return NextResponse.json(
-        { error: "Image is too large. Please upload a smaller photo." },
-        { status: 413 }
-      );
-    }
+  }
+  
+  if (!["image/jpeg", "image/png", "image/webp"].includes(mimeType)) {
+    return NextResponse.json(
+      { error: "Use a JPEG, PNG, or WebP image." },
+      { status: 400 }
+    );
+  }
+  
+  const base64Data = base64Image.replace(
+    /^data:image\/[^;]+;base64,/,
+    ""
+  );
+  
+  if (!base64Data || base64Data.length > 12_000_000) {
+    return NextResponse.json(
+      { error: "Image is missing or too large." },
+      { status: 413 }
+    );
+  }
 
     const ai = new GoogleGenAI({ apiKey });
 
