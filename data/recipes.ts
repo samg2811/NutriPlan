@@ -1185,7 +1185,7 @@ export const recipes: Record<number, string[]> = {
   270: [
     "Cube and pan-sear pressed tofu until golden.",
     "Whisk peanut butter with lime juice, soy sauce, grated ginger, and warm water.",
-    "Serve tofu over rice with cucumber and carrots, drizzizzled with peanut sauce."
+    "Serve tofu over rice with cucumber and carrots, drizzled with peanut sauce."
   ],
 
   // 271 — Chicken Orzo Soup
