@@ -705,7 +705,705 @@ export const recipes: Record<number, string[]> = {
     "Brown and season the beef in a skillet over medium heat.",
     "Dice the tomato and warm the sweet corn.",
     "Layer the warm rice with seasoned beef, sweet corn, and fresh tomato."
-  ]
+  ],
+  202: [
+    "Season chicken breast with salt, pepper, garlic, lemon juice, and olive oil.",
+    "Cook in a skillet over medium heat for 6–8 minutes per side, until fully cooked.",
+    "Serve with roasted vegetables and rice."
+  ],
+
+  // 203 — Chicken Fajita Bowl
+  203: [
+    "Slice chicken, bell peppers, and onion; season with cumin, paprika, and garlic.",
+    "Cook chicken in a skillet until fully cooked, then add peppers and onion and sauté until tender.",
+    "Serve over rice with black beans, salsa, and avocado."
+  ],
+
+  // 204 — Honey Garlic Chicken
+  204: [
+    "Cut chicken into bite-sized pieces and season lightly with pepper.",
+    "Cook in a skillet until fully cooked; add honey, minced garlic, and low-sodium soy sauce.",
+    "Simmer until the sauce thickens and serve with rice and broccoli."
+  ],
+
+  // 205 — Chicken Pesto Pasta
+  205: [
+    "Boil pasta according to package directions and reserve a little pasta water.",
+    "Cook diced chicken in a skillet until fully cooked, then stir in pesto.",
+    "Toss with pasta, a splash of pasta water, and halved cherry tomatoes."
+  ],
+
+  // 206 — Chicken Fried Rice
+  206: [
+    "Cook diced chicken in a lightly oiled skillet until fully cooked.",
+    "Add mixed vegetables, cooked rice, and a beaten egg; stir-fry until heated through.",
+    "Season with low-sodium soy sauce and sliced green onions."
+  ],
+
+  // 207 — Chicken Parmesan
+  207: [
+    "Coat chicken cutlets in egg and seasoned breadcrumbs.",
+    "Bake at 400°F until cooked through, adding marinara and mozzarella near the end.",
+    "Serve with whole-wheat pasta or a side salad."
+  ],
+
+  // 208 — Chicken Lettuce Wraps
+  208: [
+    "Cook finely diced chicken with garlic and ginger until fully cooked.",
+    "Stir in diced carrots, water chestnuts, and a little low-sodium soy sauce.",
+    "Spoon the mixture into washed lettuce leaves and garnish with green onions."
+  ],
+
+  // 209 — Chicken and Sweet Potato Tray Bake
+  209: [
+    "Cut sweet potatoes into cubes and toss with olive oil, paprika, and pepper.",
+    "Arrange with seasoned chicken on a baking tray and roast at 400°F until everything is cooked through and tender.",
+    "Serve with steamed green beans."
+  ],
+
+  // 210 — Chicken Tikka Rice Bowl
+  210: [
+    "Marinate diced chicken in plain yogurt, curry spices, garlic, and lemon juice.",
+    "Cook in a skillet until fully cooked; add tomato sauce and simmer briefly.",
+    "Serve over rice with cucumber and a spoonful of yogurt."
+  ],
+
+  // 211 — Turkey Taco Bowl
+  211: [
+    "Cook ground turkey in a skillet, breaking it apart as it browns.",
+    "Add taco seasoning, a splash of water, and black beans; simmer until hot.",
+    "Serve over rice with lettuce, salsa, corn, and avocado."
+  ],
+
+  // 212 — Turkey Stuffed Peppers
+  212: [
+    "Halve bell peppers and place them in a baking dish.",
+    "Cook ground turkey with onion, cooked rice, diced tomatoes, and seasoning; fill the peppers.",
+    "Cover and bake at 375°F until the peppers are tender and the filling reaches a safe temperature."
+  ],
+
+  // 213 — Turkey Meatballs with Rice
+  213: [
+    "Mix ground turkey with breadcrumbs, egg, garlic, and Italian seasoning; shape into meatballs.",
+    "Bake at 400°F until fully cooked, or simmer them in tomato sauce until done.",
+    "Serve with rice and steamed vegetables."
+  ],
+
+  // 214 — Turkey and Avocado Wrap
+  214: [
+    "Spread hummus or Greek yogurt on a whole-wheat tortilla.",
+    "Layer sliced cooked turkey, avocado, lettuce, tomato, and shredded carrots.",
+    "Roll tightly, slice in half, and serve with fruit."
+  ],
+
+  // 215 — Turkey Chili
+  215: [
+    "Cook ground turkey with diced onion and garlic in a large pot.",
+    "Add beans, diced tomatoes, chili powder, cumin, and a little broth; simmer for 20–30 minutes.",
+    "Serve with a spoonful of Greek yogurt and whole-grain bread."
+  ],
+
+  // 216 — Turkey Burger
+  216: [
+    "Season ground turkey with garlic, pepper, and paprika; shape into patties.",
+    "Cook in a skillet or grill until the center reaches 165°F.",
+    "Serve on a whole-grain bun with lettuce, tomato, and baked potato wedges."
+  ],
+
+  // 217 — Turkey Sausage Breakfast Bowl
+  217: [
+    "Cook turkey sausage thoroughly in a skillet and set aside.",
+    "Scramble eggs with spinach and serve alongside roasted breakfast potatoes.",
+    "Combine in a bowl and season with pepper and herbs."
+  ],
+
+  // 218 — Turkey Bolognese
+  218: [
+    "Cook ground turkey with diced onion, carrot, and garlic.",
+    "Add crushed tomatoes, Italian herbs, and a splash of broth; simmer for 15–20 minutes.",
+    "Serve over cooked whole-wheat spaghetti."
+  ],
+
+  // 219 — Turkey and Hummus Pita
+  219: [
+    "Warm a whole-wheat pita and spread hummus inside.",
+    "Add cooked sliced turkey, cucumber, tomato, and shredded lettuce.",
+    "Season with lemon juice and serve with fresh fruit."
+  ],
+
+  // 220 — Turkey Stuffed Zucchini
+  220: [
+    "Halve zucchini lengthwise and scoop out the centers.",
+    "Cook ground turkey with the chopped zucchini centers, tomato sauce, and herbs; fill the zucchini halves.",
+    "Bake at 375°F until the zucchini is tender and the filling is fully cooked."
+  ],
+
+  // 221 — Baked Salmon and Rice
+  221: [
+    "Place salmon on a lined baking tray and season with lemon, garlic, pepper, and olive oil.",
+    "Bake at 400°F for about 12–15 minutes, depending on thickness, until it reaches 145°F.",
+    "Serve with rice and steamed broccoli."
+  ],
+
+  // 222 — Teriyaki Salmon
+  222: [
+    "Season salmon lightly and bake at 400°F until nearly cooked through.",
+    "Brush with teriyaki sauce and return to the oven until the salmon reaches 145°F.",
+    "Serve over rice with steamed edamame and carrots."
+  ],
+
+  // 223 — Salmon Avocado Bowl
+  223: [
+    "Bake or pan-cook salmon with lemon, pepper, and garlic until it reaches 145°F.",
+    "Prepare rice and slice avocado, cucumber, and carrots.",
+    "Arrange everything in a bowl and drizzle with a little soy sauce and lemon."
+  ],
+
+  // 224 — Tuna Salad Sandwich
+  224: [
+    "Drain canned tuna and mix with Greek yogurt, mustard, diced celery, and pepper.",
+    "Layer the tuna mixture on whole-grain bread with lettuce and tomato.",
+    "Serve with carrot sticks and fruit."
+  ],
+
+  // 225 — Tuna Pasta Salad
+  225: [
+    "Cook pasta, drain, and allow it to cool slightly.",
+    "Mix with drained tuna, cucumber, cherry tomatoes, peas, and a lemon-yogurt dressing.",
+    "Chill briefly and toss before serving."
+  ],
+
+  // 226 — Garlic Shrimp Rice Bowl
+  226: [
+    "Season peeled shrimp with garlic, paprika, lemon, and pepper.",
+    "Sauté until opaque and cooked through, about 2–3 minutes per side depending on size.",
+    "Serve over rice with sautéed zucchini and bell peppers."
+  ],
+
+  // 227 — Shrimp Tacos
+  227: [
+    "Season shrimp with cumin, paprika, garlic, and lime juice.",
+    "Sauté until opaque and cooked through.",
+    "Fill warm tortillas with shrimp, shredded cabbage, avocado, and yogurt-lime sauce."
+  ],
+
+  // 228 — Shrimp Garlic Pasta
+  228: [
+    "Boil pasta according to package directions and reserve a little cooking water.",
+    "Sauté garlic in olive oil, add shrimp, and cook until opaque; stir in lemon juice.",
+    "Toss with pasta, spinach, and a splash of pasta water."
+  ],
+
+  // 229 — Baked Cod with Potatoes
+  229: [
+    "Cut potatoes into wedges, season with olive oil and herbs, and roast at 400°F until tender.",
+    "Season cod with lemon, garlic, and pepper; bake until it reaches 145°F.",
+    "Serve the fish with potatoes and green beans."
+  ],
+
+  // 230 — Fish Taco Bowl
+  230: [
+    "Season white fish with paprika, cumin, lime, and pepper.",
+    "Bake at 400°F until it flakes easily and reaches 145°F.",
+    "Serve over rice with cabbage, corn, salsa, and avocado."
+  ],
+
+  // 231 — Chickpea Coconut Curry
+  231: [
+    "Sauté diced onion, garlic, and ginger until fragrant.",
+    "Add chickpeas, curry powder, diced tomatoes, and light coconut milk; simmer for 15 minutes.",
+    "Stir in spinach and serve over rice."
+  ],
+
+  // 232 — Chickpea Greek Salad
+  232: [
+    "Rinse and drain canned chickpeas.",
+    "Combine with cucumber, tomatoes, red onion, olives, and crumbled feta.",
+    "Dress with lemon juice, olive oil, oregano, and black pepper."
+  ],
+
+  // 233 — Crispy Chickpea Wrap
+  233: [
+    "Season drained chickpeas with paprika, cumin, and olive oil; roast at 400°F until lightly crisp.",
+    "Spread hummus on a whole-wheat wrap and add lettuce, cucumber, and tomatoes.",
+    "Add the chickpeas, roll tightly, and serve."
+  ],
+
+  // 234 — Lentil Tomato Soup
+  234: [
+    "Sauté onion, carrot, and garlic in a pot until softened.",
+    "Add rinsed lentils, diced tomatoes, broth, and Italian herbs; simmer until the lentils are tender.",
+    "Season to taste and serve with whole-grain bread."
+  ],
+
+  // 235 — Lentil Curry Bowl
+  235: [
+    "Sauté onion, garlic, and ginger with curry powder.",
+    "Add rinsed lentils, diced tomatoes, and broth; simmer until the lentils are tender.",
+    "Serve over rice with a spoonful of plain yogurt."
+  ],
+
+  // 236 — Black Bean Quesadillas
+  236: [
+    "Mash black beans lightly with cumin, garlic, and a spoonful of salsa.",
+    "Spread on a whole-wheat tortilla, add shredded cheese, fold, and cook in a skillet until crisp.",
+    "Slice and serve with salsa, avocado, and a side salad."
+  ],
+
+  // 237 — Black Bean Sweet Potato Bowl
+  237: [
+    "Cube sweet potatoes, season with paprika and olive oil, and roast at 400°F until tender.",
+    "Warm black beans with cumin and a little salsa.",
+    "Serve together over rice with avocado and lime."
+  ],
+
+  // 238 — Three-Bean Chili
+  238: [
+    "Sauté diced onion, bell pepper, and garlic in a large pot.",
+    "Add kidney beans, black beans, pinto beans, tomatoes, broth, and chili spices; simmer for 25 minutes.",
+    "Serve with whole-grain toast or brown rice."
+  ],
+
+  // 239 — Tofu Stir-Fry
+  239: [
+    "Press tofu dry, cube it, and pan-sear until golden on several sides.",
+    "Add broccoli, bell pepper, carrots, and a little garlic-ginger sauce; cook until vegetables are tender-crisp.",
+    "Serve over rice or noodles."
+  ],
+
+  // 240 — Peanut Tofu Noodles
+  240: [
+    "Cook noodles according to package directions and drain.",
+    "Pan-sear cubed tofu; mix peanut butter, lime juice, soy sauce, and warm water into a smooth sauce.",
+    "Toss noodles and tofu with the sauce and shredded carrots."
+  ],
+
+  // 241 — Tofu Scramble
+  241: [
+    "Crumble firm tofu into a lightly oiled skillet.",
+    "Add turmeric, pepper, garlic powder, spinach, and diced bell pepper; cook until heated through.",
+    "Serve with whole-grain toast and sliced avocado."
+  ],
+
+  // 242 — Vegetable Fried Rice
+  242: [
+    "Heat a little oil in a skillet and sauté carrots, peas, and diced onion.",
+    "Add cooked rice and a beaten egg; stir-fry until the egg is cooked.",
+    "Season with low-sodium soy sauce and green onions."
+  ],
+
+  // 243 — Egg and Spinach Breakfast Wrap
+  243: [
+    "Scramble eggs with spinach and diced tomatoes in a skillet.",
+    "Warm a whole-wheat tortilla and add the egg mixture and a little shredded cheese.",
+    "Roll tightly and serve with fruit."
+  ],
+
+  // 244 — Veggie Omelet
+  244: [
+    "Whisk eggs with a splash of milk and black pepper.",
+    "Cook in a nonstick skillet; add spinach, mushrooms, tomatoes, and cheese.",
+    "Fold the omelet when the eggs are set and serve with whole-grain toast."
+  ],
+
+  // 245 — Shakshuka
+  245: [
+    "Sauté onion and bell pepper with garlic, paprika, and cumin.",
+    "Add crushed tomatoes and simmer until thickened; make small wells and crack eggs into them.",
+    "Cover and cook until the egg whites are set; serve with whole-grain bread."
+  ],
+
+  // 246 — Breakfast Sweet Potato Hash
+  246: [
+    "Dice sweet potato and cook in a covered skillet with a little oil and water until almost tender.",
+    "Add diced bell pepper, onion, and seasoning; cook until softened.",
+    "Top with a cooked egg or serve with black beans."
+  ],
+
+  // 247 — Banana Oat Pancakes
+  247: [
+    "Blend ripe banana, oats, eggs, milk, and cinnamon into a batter.",
+    "Cook small pancakes in a lightly oiled skillet over medium-low heat until bubbles form, then flip.",
+    "Serve with berries and plain yogurt."
+  ],
+
+  // 248 — Apple Cinnamon Overnight Oats
+  248: [
+    "Combine rolled oats, milk, plain yogurt, cinnamon, and diced apple in a container.",
+    "Stir well, cover, and refrigerate overnight.",
+    "Top with chopped nuts or seeds before eating."
+  ],
+
+  // 249 — Berry Yogurt Parfait
+  249: [
+    "Spoon plain Greek yogurt into a glass or bowl.",
+    "Layer with berries, rolled oats or granola, and a little cinnamon.",
+    "Finish with nuts or seeds and serve chilled."
+  ],
+
+  // 250 — Peanut Butter Banana Oatmeal
+  250: [
+    "Simmer rolled oats in milk or water until creamy.",
+    "Stir in sliced banana, peanut butter, and cinnamon.",
+    "Top with seeds or chopped nuts and serve warm."
+  ],
+
+  // 251 — Mango Yogurt Smoothie Bowl
+  251: [
+    "Blend frozen mango, plain yogurt, and milk until thick and smooth.",
+    "Pour into a bowl.",
+    "Top with sliced banana, oats, and chia seeds."
+  ],
+
+  // 252 — Strawberry Banana Smoothie
+  252: [
+    "Add strawberries, banana, milk, and plain yogurt to a blender.",
+    "Blend until smooth, adding more milk if needed.",
+    "Pour into a glass and serve immediately."
+  ],
+
+  // 253 — Blueberry Spinach Smoothie
+  253: [
+    "Add blueberries, a handful of spinach, banana, yogurt, and milk to a blender.",
+    "Blend until smooth.",
+    "Adjust the thickness with milk or water and serve chilled."
+  ],
+
+  // 254 — Apple Walnut Salad
+  254: [
+    "Wash and slice an apple; chop lettuce, cucumber, and celery.",
+    "Toss with walnuts and a little crumbled cheese if desired.",
+    "Dress with olive oil, lemon juice, and black pepper."
+  ],
+
+  // 255 — Mediterranean Quinoa Bowl
+  255: [
+    "Rinse quinoa and cook according to package directions.",
+    "Combine with chickpeas, cucumber, tomatoes, olives, and feta.",
+    "Dress with lemon juice, olive oil, and oregano."
+  ],
+
+  // 256 — Quinoa Black Bean Salad
+  256: [
+    "Cook quinoa and let it cool slightly.",
+    "Mix with black beans, corn, diced bell pepper, and chopped cilantro.",
+    "Dress with lime juice, olive oil, cumin, and pepper."
+  ],
+
+  // 257 — Mushroom Spinach Risotto
+  257: [
+    "Sauté sliced mushrooms and onion in olive oil until softened.",
+    "Add arborio rice and gradually stir in warm broth until the rice is creamy and tender.",
+    "Fold in spinach and a little Parmesan before serving."
+  ],
+
+  // 258 — Tomato Basil Pasta
+  258: [
+    "Cook pasta according to package directions.",
+    "Sauté garlic and cherry tomatoes in olive oil until the tomatoes soften.",
+    "Toss with pasta, fresh basil, black pepper, and a little Parmesan."
+  ],
+
+  // 259 — Roasted Vegetable Pasta
+  259: [
+    "Toss zucchini, bell pepper, onion, and cherry tomatoes with olive oil and Italian seasoning.",
+    "Roast at 400°F until tender while cooking whole-wheat pasta.",
+    "Combine the vegetables and pasta with a little pasta water and Parmesan."
+  ],
+
+  // 260 — Spinach Ricotta Stuffed Shells
+  260: [
+    "Cook jumbo pasta shells until just tender and drain.",
+    "Mix ricotta, chopped spinach, egg, and Italian seasoning; fill the shells and place in a baking dish with marinara.",
+    "Top with mozzarella and bake at 375°F until hot and bubbling."
+  ],
+
+  // 261 — Vegetable Lasagna
+  261: [
+    "Sauté mushrooms, zucchini, spinach, and onion until softened.",
+    "Layer lasagna noodles with marinara, the vegetables, ricotta, and mozzarella in a baking dish.",
+    "Cover and bake at 375°F until tender; uncover near the end to brown the cheese."
+  ],
+
+  // 262 — Creamy Pumpkin Pasta
+  262: [
+    "Cook whole-wheat pasta and reserve some pasta water.",
+    "Warm pumpkin purée with garlic, milk, Italian seasoning, and Parmesan until smooth.",
+    "Toss with pasta, adding pasta water until the sauce coats it well."
+  ],
+
+  // 263 — Broccoli Cheddar Baked Potato
+  263: [
+    "Bake a scrubbed potato at 400°F until soft in the center.",
+    "Steam broccoli until tender and warm it with a little shredded cheddar.",
+    "Split the potato and fill with broccoli, cheese, and plain Greek yogurt."
+  ],
+
+  // 264 — Cauliflower Chickpea Tray Bake
+  264: [
+    "Cut cauliflower into florets and rinse and drain chickpeas.",
+    "Toss with olive oil, cumin, paprika, and garlic; roast at 400°F until golden and tender.",
+    "Serve with couscous or rice and a lemon-yogurt sauce."
+  ],
+
+  // 265 — Eggplant Tomato Stew
+  265: [
+    "Cube eggplant and sauté with onion and garlic until beginning to soften.",
+    "Add diced tomatoes, chickpeas, and herbs; cover and simmer until the eggplant is tender.",
+    "Serve over couscous or whole-grain bread."
+  ],
+
+  // 266 — Vegetable Coconut Curry
+  266: [
+    "Sauté onion, garlic, and curry powder in a pot.",
+    "Add mixed vegetables, chickpeas, light coconut milk, and a little broth; simmer until tender.",
+    "Serve over rice and garnish with cilantro."
+  ],
+
+  // 267 — Paneer Tikka Rice Bowl
+  267: [
+    "Cube paneer and coat with yogurt, paprika, cumin, turmeric, and lemon juice.",
+    "Bake at 400°F or pan-sear until lightly golden and hot throughout.",
+    "Serve over rice with cucumber, tomatoes, and mint yogurt sauce."
+  ],
+
+  // 268 — Vegetable Soba Noodles
+  268: [
+    "Cook soba noodles according to package directions and rinse briefly.",
+    "Stir-fry broccoli, carrots, mushrooms, and bell pepper until tender-crisp.",
+    "Toss with noodles, ginger, and a low-sodium soy-lime dressing."
+  ],
+
+  // 269 — Sesame Edamame Rice Bowl
+  269: [
+    "Cook rice and prepare shelled edamame according to package directions.",
+    "Sauté carrots and broccoli with garlic and a splash of low-sodium soy sauce.",
+    "Serve over rice with edamame, sesame seeds, and lime."
+  ],
+
+  // 270 — Peanut Butter Tofu Bowl
+  270: [
+    "Cube and pan-sear pressed tofu until golden.",
+    "Whisk peanut butter with lime juice, soy sauce, grated ginger, and warm water.",
+    "Serve tofu over rice with cucumber and carrots, drizzizzled with peanut sauce."
+  ],
+
+  // 271 — Chicken Orzo Soup
+  271: [
+    "Sauté diced onion, carrot, and celery in a pot.",
+    "Add broth, cooked chicken, and orzo; simmer until the orzo is tender.",
+    "Stir in spinach and lemon juice, then season and serve."
+  ],
+
+  // 272 — Chicken and Vegetable Soup
+  272: [
+    "Sauté onion, carrots, and celery until softened.",
+    "Add cooked chicken, broth, peas, and herbs; simmer until the vegetables are tender.",
+    "Season with pepper and serve with whole-grain bread."
+  ],
+
+  // 273 — Chicken Couscous Bowl
+  273: [
+    "Season chicken with paprika, garlic, lemon, and pepper; cook until fully cooked.",
+    "Prepare couscous according to package directions and fluff with a fork.",
+    "Serve chicken over couscous with roasted zucchini and chickpeas."
+  ],
+
+  // 274 — Chicken and Black Bean Enchiladas
+  274: [
+    "Mix shredded cooked chicken with black beans, corn, and a little enchilada sauce.",
+    "Fill tortillas, roll them into a baking dish, and cover with sauce and shredded cheese.",
+    "Bake at 375°F until hot and bubbling."
+  ],
+
+  // 275 — Chicken Greek Pita
+  275: [
+    "Season chicken with oregano, garlic, lemon juice, and pepper; cook until fully cooked.",
+    "Fill a whole-wheat pita with chicken, cucumber, tomatoes, lettuce, and feta.",
+    "Add a yogurt-cucumber sauce and serve."
+  ],
+
+  // 276 — Chicken and Broccoli Noodles
+  276: [
+    "Cook noodles according to package directions.",
+    "Stir-fry sliced chicken until fully cooked, then add broccoli and garlic.",
+    "Toss with noodles and a light low-sodium soy sauce."
+  ],
+
+  // 277 — Chicken Burrito Wrap
+  277: [
+    "Cook diced chicken with cumin, paprika, and garlic until fully cooked.",
+    "Layer chicken, rice, black beans, corn, salsa, and lettuce in a whole-wheat tortilla.",
+    "Fold in the sides, roll tightly, and serve."
+  ],
+
+  // 278 — Chicken Shawarma Bowl
+  278: [
+    "Coat chicken strips with cumin, paprika, turmeric, garlic, lemon, and olive oil.",
+    "Bake or pan-cook until fully cooked and lightly browned.",
+    "Serve with rice, cucumber-tomato salad, and yogurt sauce."
+  ],
+
+  // 279 — Turkey Shepherd's Pie
+  279: [
+    "Cook ground turkey with onion, carrots, peas, and broth until the vegetables soften.",
+    "Transfer to a baking dish and spread mashed potatoes evenly over the top.",
+    "Bake at 375°F until the filling is bubbling and the topping is lightly golden."
+  ],
+
+  // 280 — Turkey and Rice Stuffed Cabbage
+  280: [
+    "Soften cabbage leaves in boiling water and prepare cooked rice.",
+    "Mix cooked rice with ground turkey, onion, and tomato sauce; fill and roll the cabbage leaves.",
+    "Place in a baking dish with extra tomato sauce and bake covered at 375°F until fully cooked."
+  ],
+
+  // 281 — Salmon Cakes
+  281: [
+    "Mix cooked flaked salmon with egg, breadcrumbs, chopped green onion, and lemon juice.",
+    "Shape into patties and pan-cook with a little oil until golden and hot throughout.",
+    "Serve with roasted potatoes and a cucumber salad."
+  ],
+
+  // 282 — Mediterranean Tuna Bowl
+  282: [
+    "Prepare couscous or quinoa according to package directions.",
+    "Top with drained tuna, chickpeas, cucumber, tomatoes, and olives.",
+    "Dress with lemon juice, olive oil, and oregano."
+  ],
+
+  // 283 — Lemon Dill White Fish
+  283: [
+    "Place white fish fillets in a baking dish and season with lemon, dill, garlic, and pepper.",
+    "Bake at 400°F until the fish reaches 145°F and flakes easily.",
+    "Serve with roasted potatoes and steamed peas."
+  ],
+
+  // 284 — Shrimp Quinoa Salad
+  284: [
+    "Cook quinoa and let it cool slightly.",
+    "Season shrimp with garlic and paprika, then sauté until opaque and cooked through.",
+    "Combine quinoa, shrimp, cucumber, tomatoes, and lemon dressing."
+  ],
+
+  // 285 — Red Lentil Dahl
+  285: [
+    "Sauté onion, garlic, ginger, and curry spices in a pot.",
+    "Add rinsed red lentils, diced tomatoes, and broth; simmer until soft and creamy.",
+    "Serve with rice and a squeeze of lemon."
+  ],
+
+  // 286 — White Bean Spinach Stew
+  286: [
+    "Sauté garlic and onion in olive oil until fragrant.",
+    "Add drained white beans, diced tomatoes, broth, and Italian herbs; simmer for 15 minutes.",
+    "Stir in spinach until wilted and serve with whole-grain toast."
+  ],
+
+  // 287 — Hummus Veggie Grain Bowl
+  287: [
+    "Cook quinoa or brown rice and set aside.",
+    "Roast broccoli, carrots, and bell peppers with olive oil and seasoning.",
+    "Serve grains and vegetables with hummus, cucumber, and lemon juice."
+  ],
+
+  // 288 — Baked Falafel Bowl
+  288: [
+    "Pulse chickpeas with parsley, onion, garlic, cumin, and breadcrumbs until the mixture holds together.",
+    "Shape into small patties and bake at 400°F, turning once, until golden and heated through.",
+    "Serve with rice, cucumber, tomatoes, and yogurt-tahini sauce."
+  ],
+
+  // 289 — Greek Yogurt Chicken Salad
+  289: [
+    "Dice cooked chicken and combine with plain Greek yogurt, celery, grapes, and a little mustard.",
+    "Season with pepper, lemon juice, and chopped herbs.",
+    "Serve in a whole-wheat wrap or over lettuce."
+  ],
+
+  // 290 — Avocado Egg Toast
+  290: [
+    "Toast whole-grain bread until crisp.",
+    "Mash avocado with lemon juice and black pepper, then spread over the toast.",
+    "Top with a cooked egg and serve with sliced tomatoes."
+  ],
+
+  // 291 — Cottage Cheese Veggie Toast
+  291: [
+    "Toast whole-grain bread.",
+    "Spread cottage cheese over the toast and top with cucumber, tomatoes, and black pepper.",
+    "Finish with herbs and serve with fruit."
+  ],
+
+  // 292 — Savory Oatmeal with Egg
+  292: [
+    "Cook rolled oats in water or broth until creamy.",
+    "Stir in spinach and season with garlic powder and pepper.",
+    "Top with a cooked egg and a sprinkle of cheese if desired."
+  ],
+
+  // 293 — Baked Apple Cinnamon Oats
+  293: [
+    "Mix rolled oats, milk, diced apple, egg, cinnamon, and baking powder in a bowl.",
+    "Pour into a lightly greased baking dish and bake at 350°F until set.",
+    "Serve warm with plain yogurt."
+  ],
+
+  // 294 — Chia Berry Pudding
+  294: [
+    "Mix chia seeds with milk, vanilla, and a little maple syrup if desired.",
+    "Refrigerate for at least 3 hours or overnight, stirring once after the first few minutes.",
+    "Top with berries and chopped nuts before serving."
+  ],
+
+  // 295 — Chocolate Banana Overnight Oats
+  295: [
+    "Mix rolled oats, milk, plain yogurt, mashed banana, and unsweetened cocoa powder.",
+    "Cover and refrigerate overnight.",
+    "Stir before serving and top with banana slices or seeds."
+  ],
+
+  // 296 — Peanut Butter Apple Toast
+  296: [
+    "Toast whole-grain bread.",
+    "Spread peanut butter over the toast and arrange thin apple slices on top.",
+    "Sprinkle with cinnamon and serve."
+  ],
+
+  // 297 — Roasted Chickpea Salad Wrap
+  297: [
+    "Season drained chickpeas with cumin, paprika, and olive oil; roast at 400°F until lightly crisp.",
+    "Toss lettuce, cucumber, tomatoes, and shredded carrots with lemon dressing.",
+    "Wrap the salad and chickpeas in a whole-wheat tortilla."
+  ],
+
+  // 298 — Sweet Potato Black Bean Tacos
+  298: [
+    "Roast cubed sweet potato with olive oil, cumin, and paprika at 400°F until tender.",
+    "Warm black beans with garlic and a little salsa.",
+    "Fill tortillas with sweet potato and beans; add cabbage, lime, and avocado."
+  ],
+
+  // 299 — Pesto White Bean Pasta
+  299: [
+    "Cook whole-wheat pasta according to package directions.",
+    "Warm drained white beans with cherry tomatoes and a little pesto in a skillet.",
+    "Toss with pasta, spinach, and a splash of pasta water."
+  ],
+
+  // 300 — Vegetable Enchilada Bake
+  300: [
+    "Sauté zucchini, bell pepper, corn, and black beans with cumin.",
+    "Layer tortillas, vegetables, enchilada sauce, and shredded cheese in a baking dish.",
+    "Bake at 375°F until bubbling and serve with lettuce and plain yogurt."
+  ],
+
+  // 301 — Lemon Herb Couscous Bowl
+  301: [
+    "Prepare couscous according to package directions and fluff with a fork.",
+    "Toss with chickpeas, cucumber, tomatoes, parsley, lemon juice, and olive oil.",
+    "Serve with feta or grilled chicken if desired."
+  ], 
 };
 
 export const getRecipe = (mealId: number): string[] =>
