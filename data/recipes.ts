@@ -708,4 +708,5 @@ export const recipes: Record<number, string[]> = {
   ]
 };
 
-export const getRecipe = (mealId: number): string[] => recipes[mealId] ?? [];
+export const getRecipe = (mealId: number): string[] =>
+  recipes[mealId] ?? additionalMealRecipes[mealId] ?? [];
