@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import styles from "./log.module.css";
+import styles from "./food-log.module.css";
 
 type Per100g = { calories: number; protein: number; carbs: number; fat: number };
 type Item = {
