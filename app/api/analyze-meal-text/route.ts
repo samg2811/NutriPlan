@@ -1,7 +1,7 @@
 
 import { NextResponse } from "next/server";
 import { parseMeal } from "@/lib/parseMeal";
-import { lookupPer100g } from "@/lib/usda";
+import { lookupPer100g } from "@/lib/logusda";
 
 export async function POST(req: Request) {
   try {
