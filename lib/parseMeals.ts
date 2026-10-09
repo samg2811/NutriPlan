@@ -1,4 +1,3 @@
-
 export type ParsedItem = {
   name: string;       // what to show the user
   searchTerm: string; // what to search USDA for
