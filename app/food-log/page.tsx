@@ -32,7 +32,7 @@ export default function LogPage() {
     }
     setLoading(true);
     try {
-      const res = await fetch("/api/analyze-food", {
+         const res = await fetch("/api/analyze-meal-text", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
