@@ -32,6 +32,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ items: results.filter(Boolean) });
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: String(err) },
+      { status: 500 }
+    );
   }
 }
