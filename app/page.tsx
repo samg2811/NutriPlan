@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { meals, Meal, MealIngredient } from "@/data/meals";
 import { createClient } from "@/lib/supabase/client";
 import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
+import { getRecipe } from "@/data/recipes";
 
 type RankedMeal = {
   meal: Meal;
@@ -565,19 +566,13 @@ export default function Home() {
               ))}
             </ul>
 
+            
             <h3>How to Make It</h3>
 
             <ol className="recipe-steps">
-              <li>Prepare and measure all ingredients.</li>
-              <li>
-                Cook the main ingredients according to the recipe.
-              </li>
-              <li>
-                Combine the ingredients and season to taste.
-              </li>
-              <li>
-                Serve immediately and enjoy!
-              </li>
+              {getRecipe(selectedMeal.id).map((step, index) => (
+              <li key={index}>{step}</li>
+              ))}
             </ol>
 
             <button
