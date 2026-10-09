@@ -1,89 +1,88 @@
 
 import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 export async function POST(request: Request) {
   try {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      console.error("GEMINI_API_KEY is missing.");
       return NextResponse.json(
-        { error: "Food analyzer is not configured. Please contact the app administrator." },
+        { error: "Missing GEMINI_API_KEY in Vercel settings." },
         { status: 500 }
       );
     }
 
-    const body = await request.json();
-    const image = body.image;
+    const { image } = await request.json();
 
-    if (typeof image !== "string" || !image.startsWith("data:image/")) {
+    if (typeof image !== "string") {
       return NextResponse.json(
-        { error: "Please upload a valid food photo." },
+        { error: "Please upload a photo." },
         { status: 400 }
       );
     }
 
     const match = image.match(
-      /^data:(image\/(?:jpeg|png|webp|heic|heif));base64,(.+)$/
+      /^data:(image\/(?:jpeg|png|webp));base64,(.+)$/
     );
 
     if (!match) {
       return NextResponse.json(
-        { error: "Unsupported image format. Please use a JPEG, PNG, or WebP photo." },
+        { error: "Use a JPEG, PNG, or WebP image." },
         { status: 400 }
       );
     }
 
-    const mimeType = match[1];
-    const base64Data = match[2];
+    const [, mimeType, base64Data] = match;
 
     if (base64Data.length > 12_000_000) {
       return NextResponse.json(
-        { error: "Image is too large. Please choose a smaller photo." },
+        { error: "Image is too large. Please upload a smaller photo." },
         { status: 413 }
       );
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
-      generationConfig: {
-        responseMimeType: "application/json",
-      },
+    const ai = new GoogleGenAI({ apiKey });
+
+    const result = await ai.interactions.create({
+      model: "gemini-3.8-flash",
+      input: [
+        {
+          type: "image",
+          mime_type: mimeType,
+          data: base64Data,
+        },
+        {
+          type: "text",
+          text: `
+Identify the foods visibly present in this photo.
+
+Return only a valid JSON array of food names.
+Example: ["rice", "chicken", "broccoli"]
+
+Only include foods you can reasonably recognize.
+Do not guess hidden ingredients.
+Do not estimate calories, portion sizes, or nutrition.
+If no food is recognizable, return [].
+`,
+        },
+      ],
     });
 
-    const result = await model.generateContent([
-      {
-        inlineData: {
-          data: base64Data,
-          mimeType,
-        },
-      },
-      {
-        text: `
-Identify the food items clearly visible in this photo.
+    const responseText = result.output_text.trim();
+    const cleanedText = responseText
+      .replace(/^```(?:json)?\s*/i, "")
+      .replace(/\s*```$/, "");
 
-Return only a JSON array of short food names, for example:
-["grilled chicken", "rice", "broccoli"]
-
-Rules:
-- Include only foods you can reasonably identify.
-- Do not guess ingredients that cannot be seen.
-- Do not estimate calories, nutrition, or portion sizes.
-- If no food is recognizable, return [].
-`,
-      },
-    ]);
-
-    const responseText = result.response.text();
-    const foods: unknown = JSON.parse(responseText);
+    const foods: unknown = JSON.parse(cleanedText);
 
     if (
       !Array.isArray(foods) ||
-      !foods.every((food) => typeof food === "string")
+      !foods.every(
+        (food) => typeof food === "string"
+      )
     ) {
-      throw new Error("Gemini returned an unexpected response format.");
+      throw new Error("The AI returned an invalid food list.");
     }
 
     return NextResponse.json({
@@ -98,4 +97,5 @@ Rules:
     );
   }
 }
+
 
