@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 
@@ -13,7 +12,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const { image } = await request.json();
+    const body = await request.json();
+    const image = body?.image;
 
     if (typeof image !== "string") {
       return NextResponse.json(
@@ -44,18 +44,14 @@ export async function POST(request: Request) {
 
     const ai = new GoogleGenAI({ apiKey });
 
-    const result = await ai.interactions.create({
+    const result = await ai.models.generateContent({
       model: "gemini-3.8-flash",
-      input: [
+      contents: [
         {
-          type: "image",
-          mime_type: mimeType,
-          data: base64Data,
-        },
-        {
-          type: "text",
-          text: `
-Identify the foods visibly present in this photo.
+          role: "user",
+          parts: [
+            {
+              text: `Identify the foods visibly present in this photo.
 
 Return only a valid JSON array of food names.
 Example: ["rice", "chicken", "broccoli"]
@@ -63,24 +59,33 @@ Example: ["rice", "chicken", "broccoli"]
 Only include foods you can reasonably recognize.
 Do not guess hidden ingredients.
 Do not estimate calories, portion sizes, or nutrition.
-If no food is recognizable, return [].
-`,
+If no food is recognizable, return [].`,
+            },
+            {
+              inlineData: {
+                mimeType,
+                data: base64Data,
+              },
+            },
+          ],
         },
       ],
+      config: {
+        responseMimeType: "application/json",
+      },
     });
 
-    const responseText = result.output_text.trim();
-    const cleanedText = responseText
-      .replace(/^```(?:json)?\s*/i, "")
-      .replace(/\s*```$/, "");
+    const responseText = result.text?.trim();
 
-    const foods: unknown = JSON.parse(cleanedText);
+    if (!responseText) {
+      throw new Error("The AI returned an empty response.");
+    }
+
+    const foods: unknown = JSON.parse(responseText);
 
     if (
       !Array.isArray(foods) ||
-      !foods.every(
-        (food) => typeof food === "string"
-      )
+      !foods.every((food) => typeof food === "string")
     ) {
       throw new Error("The AI returned an invalid food list.");
     }
@@ -97,5 +102,6 @@ If no food is recognizable, return [].
     );
   }
 }
+
 
 
