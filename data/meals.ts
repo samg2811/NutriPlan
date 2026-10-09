@@ -2119,10 +2119,6 @@ export const meals: Meal[] = [
     cost: 6.5,
   },
   {
-    
-    cost: 6.5,
-  },
-  {
     id: 202,
     name: "Lemon Garlic Chicken",
     description: "Lemon garlic chicken with rice and broccoli.",
