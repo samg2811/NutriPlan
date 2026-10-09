@@ -1,4 +1,3 @@
-
 export type Per100g = {
   calories: number;
   protein: number;
