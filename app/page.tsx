@@ -2,6 +2,7 @@
 
    import HeroWithPhone from "@/components/HeroWithPhone";
    import StatsSection from "@/components/StatsSection";
+   import StatsPhone from "@/components/StatsPhone";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -423,7 +424,7 @@ export default function Home() {
       {/* HERO */}
       <HeroWithPhone />
    <StatsSection />
-
+<StatsPhone />
       {/* MEAL PLANNER */}
       <section className="planner" id="planner">
         <h2>Find Your Meal</h2>
