@@ -9,96 +9,118 @@ const NUTRIENT_IDS = {
   sodium: 1093,
 } as const;
 
-export type IngredientNutrition = {
+export type NutritionValues = {
   calories: number;
   protein: number;
-  fat: number;
   carbs: number;
+  fat: number;
   fiber: number;
   sugar: number;
   sodium: number;
 };
 
-type USDAFood = {
-  fdcId: number;
-  description: string;
+const EMPTY_NUTRITION: NutritionValues = {
+  calories: 0,
+  protein: 0,
+  carbs: 0,
+  fat: 0,
+  fiber: 0,
+  sugar: 0,
+  sodium: 0,
 };
 
-const normalize = (value: string) =>
-  value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+type USDAFood = {
+  fdcId: number;
+  description?: string;
+};
 
-async function usdaFetch(path: string, init?: RequestInit) {
+type USDANutrient = {
+  amount?: number;
+  nutrient?: {
+    id?: number;
+    number?: string;
+    name?: string;
+    unitName?: string;
+  };
+};
+
+function getApiKey(): string {
   const apiKey = process.env.USDA_API_KEY;
 
   if (!apiKey) {
-    throw new Error("USDA_API_KEY is missing from the server environment.");
+    throw new Error("USDA_API_KEY is missing from environment variables.");
   }
 
-  const separator = path.includes("?") ? "&" : "?";
-  const url =
-    `https://api.nal.usda.gov/fdc/v1/${path}` +
-    `${separator}api_key=${encodeURIComponent(apiKey)}`;
-
-  const response = await fetch(url, {
-    ...init,
-    next: { revalidate: 2592000 },
-  } as RequestInit);
-
-  if (!response.ok) {
-    throw new Error(`USDA request failed (${response.status}).`);
-  }
-
-  return response.json();
+  return apiKey;
 }
 
 async function searchIngredient(name: string): Promise<number> {
-  const data = await usdaFetch("foods/search", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      query: name,
-      dataType: ["Foundation", "SR Legacy"],
-      pageSize: 10,
-    }),
+  const apiKey = getApiKey();
+
+  const url = new URL(
+    "https://api.nal.usda.gov/fdc/v1/foods/search"
+  );
+
+  url.searchParams.set("api_key", apiKey);
+  url.searchParams.set("query", name);
+  url.searchParams.set("pageSize", "10");
+  url.searchParams.set("dataType", "Foundation,SR Legacy");
+
+  const response = await fetch(url.toString(), {
+    next: { revalidate: 2592000 },
   });
 
-  const foods: USDAFood[] = data.foods ?? [];
+  if (!response.ok) {
+    throw new Error(`USDA food search failed for "${name}".`);
+  }
 
-  if (!foods.length) {
+  const data: { foods?: USDAFood[] } = await response.json();
+  const foods = data.foods ?? [];
+
+  if (foods.length === 0) {
     throw new Error(`No USDA match found for "${name}".`);
   }
 
-  const query = normalize(name);
+  const normalizedQuery = name.toLowerCase().trim();
 
-  // Prefer an exact description match when available.
-  const exact = foods.find(
-    (food) => normalize(food.description) === query
+  // Prefer an exact description match when one exists.
+  const exactMatch = foods.find(
+    (food) =>
+      food.description?.toLowerCase().trim() === normalizedQuery
   );
 
-  if (exact) return exact.fdcId;
+  const selectedFood = exactMatch ?? foods[0];
 
-  // Otherwise prefer a result whose description contains the query.
-  const closeMatch = foods.find((food) =>
-    normalize(food.description).includes(query)
-  );
+  if (!selectedFood?.fdcId) {
+    throw new Error(`No usable USDA match found for "${name}".`);
+  }
 
-  return (closeMatch ?? foods[0]).fdcId;
+  return selectedFood.fdcId;
 }
 
 async function getNutrientsPer100g(
   fdcId: number
-): Promise<IngredientNutrition> {
-  const data = await usdaFetch(`food/${fdcId}`);
+): Promise<NutritionValues> {
+  const apiKey = getApiKey();
 
-  const nutrients: IngredientNutrition = {
-    calories: 0,
-    protein: 0,
-    fat: 0,
-    carbs: 0,
-    fiber: 0,
-    sugar: 0,
-    sodium: 0,
-  };
+  const url = new URL(
+    `https://api.nal.usda.gov/fdc/v1/food/${fdcId}`
+  );
+
+  url.searchParams.set("api_key", apiKey);
+
+  const response = await fetch(url.toString(), {
+    next: { revalidate: 2592000 },
+  });
+
+  if (!response.ok) {
+    throw new Error(`USDA nutrition lookup failed for food ${fdcId}.`);
+  }
+
+  const data: { foodNutrients?: USDANutrient[] } =
+    await response.json();
+
+  const nutrients = { ...EMPTY_NUTRITION };
 
   for (const item of data.foodNutrients ?? []) {
     const id = item.nutrient?.id;
@@ -108,11 +130,13 @@ async function getNutrientsPer100g(
       continue;
     }
 
-    for (const [key, nutrientId] of Object.entries(NUTRIENT_IDS)) {
-      if (id === nutrientId) {
-        nutrients[key as keyof IngredientNutrition] = amount;
-      }
-    }
+    if (id === NUTRIENT_IDS.calories) nutrients.calories = amount;
+    if (id === NUTRIENT_IDS.protein) nutrients.protein = amount;
+    if (id === NUTRIENT_IDS.fat) nutrients.fat = amount;
+    if (id === NUTRIENT_IDS.carbs) nutrients.carbs = amount;
+    if (id === NUTRIENT_IDS.fiber) nutrients.fiber = amount;
+    if (id === NUTRIENT_IDS.sugar) nutrients.sugar = amount;
+    if (id === NUTRIENT_IDS.sodium) nutrients.sodium = amount;
   }
 
   return nutrients;
@@ -121,7 +145,18 @@ async function getNutrientsPer100g(
 export async function getIngredientNutritionPer100g(
   name: string,
   fdcId?: number
-): Promise<IngredientNutrition> {
-  const id = fdcId ?? (await searchIngredient(name));
+): Promise<NutritionValues> {
+  const cleanName = name.trim();
+
+  if (!cleanName) {
+    throw new Error("Ingredient name cannot be empty.");
+  }
+
+  const id = fdcId ?? (await searchIngredient(cleanName));
+
+  if (!Number.isInteger(id) || id <= 0) {
+    throw new Error(`Invalid USDA food ID for "${cleanName}".`);
+  }
+
   return getNutrientsPer100g(id);
 }
