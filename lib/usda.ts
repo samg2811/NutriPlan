@@ -1,43 +1,118 @@
+
 const NUTRIENT_IDS = {
   calories: 1008,
   protein: 1003,
   fat: 1004,
   carbs: 1005,
+  fiber: 1079,
+  sugar: 2000,
+  sodium: 1093,
+} as const;
+
+export type IngredientNutrition = {
+  calories: number;
+  protein: number;
+  fat: number;
+  carbs: number;
+  fiber: number;
+  sugar: number;
+  sodium: number;
 };
 
-async function searchIngredient(name: string): Promise<number> {
+type USDAFood = {
+  fdcId: number;
+  description: string;
+};
+
+const normalize = (value: string) =>
+  value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+async function usdaFetch(path: string, init?: RequestInit) {
   const apiKey = process.env.USDA_API_KEY;
-  const url = `https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(
-    name
-  )}&dataType=Foundation,SR%20Legacy&pageSize=1&api_key=${apiKey}`;
 
-  const res = await fetch(url, { next: { revalidate: 2592000 } }); // cache 30 days
-  if (!res.ok) throw new Error(`USDA search failed for "${name}"`);
+  if (!apiKey) {
+    throw new Error("USDA_API_KEY is missing from the server environment.");
+  }
 
-  const data = await res.json();
-  const food = data.foods?.[0];
-  if (!food) throw new Error(`No USDA match found for "${name}"`);
+  const separator = path.includes("?") ? "&" : "?";
+  const url =
+    `https://api.nal.usda.gov/fdc/v1/${path}` +
+    `${separator}api_key=${encodeURIComponent(apiKey)}`;
 
-  return food.fdcId as number;
+  const response = await fetch(url, {
+    ...init,
+    next: { revalidate: 2592000 },
+  } as RequestInit);
+
+  if (!response.ok) {
+    throw new Error(`USDA request failed (${response.status}).`);
+  }
+
+  return response.json();
 }
 
-async function getNutrientsPer100g(fdcId: number) {
-  const apiKey = process.env.USDA_API_KEY;
-  const url = `https://api.nal.usda.gov/fdc/v1/food/${fdcId}?api_key=${apiKey}`;
+async function searchIngredient(name: string): Promise<number> {
+  const data = await usdaFetch("foods/search", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      query: name,
+      dataType: ["Foundation", "SR Legacy"],
+      pageSize: 10,
+    }),
+  });
 
-  const res = await fetch(url, { next: { revalidate: 2592000 } });
-  if (!res.ok) throw new Error(`USDA lookup failed for fdcId ${fdcId}`);
+  const foods: USDAFood[] = data.foods ?? [];
 
-  const data = await res.json();
-  const nutrients = { calories: 0, protein: 0, fat: 0, carbs: 0 };
+  if (!foods.length) {
+    throw new Error(`No USDA match found for "${name}".`);
+  }
 
-  for (const n of data.foodNutrients ?? []) {
-    const id = n.nutrient?.id;
-    const amount = n.amount ?? 0;
-    if (id === NUTRIENT_IDS.calories) nutrients.calories = amount;
-    if (id === NUTRIENT_IDS.protein) nutrients.protein = amount;
-    if (id === NUTRIENT_IDS.fat) nutrients.fat = amount;
-    if (id === NUTRIENT_IDS.carbs) nutrients.carbs = amount;
+  const query = normalize(name);
+
+  // Prefer an exact description match when available.
+  const exact = foods.find(
+    (food) => normalize(food.description) === query
+  );
+
+  if (exact) return exact.fdcId;
+
+  // Otherwise prefer a result whose description contains the query.
+  const closeMatch = foods.find((food) =>
+    normalize(food.description).includes(query)
+  );
+
+  return (closeMatch ?? foods[0]).fdcId;
+}
+
+async function getNutrientsPer100g(
+  fdcId: number
+): Promise<IngredientNutrition> {
+  const data = await usdaFetch(`food/${fdcId}`);
+
+  const nutrients: IngredientNutrition = {
+    calories: 0,
+    protein: 0,
+    fat: 0,
+    carbs: 0,
+    fiber: 0,
+    sugar: 0,
+    sodium: 0,
+  };
+
+  for (const item of data.foodNutrients ?? []) {
+    const id = item.nutrient?.id;
+    const amount = item.amount;
+
+    if (typeof amount !== "number" || !Number.isFinite(amount)) {
+      continue;
+    }
+
+    for (const [key, nutrientId] of Object.entries(NUTRIENT_IDS)) {
+      if (id === nutrientId) {
+        nutrients[key as keyof IngredientNutrition] = amount;
+      }
+    }
   }
 
   return nutrients;
@@ -46,7 +121,7 @@ async function getNutrientsPer100g(fdcId: number) {
 export async function getIngredientNutritionPer100g(
   name: string,
   fdcId?: number
-) {
+): Promise<IngredientNutrition> {
   const id = fdcId ?? (await searchIngredient(name));
   return getNutrientsPer100g(id);
 }
