@@ -641,3 +641,55 @@ footer {
     grid-template-columns: 1fr;
   }
 }
+
+/* Add these styles to app/globals.css (or your existing global stylesheet). */
+
+.nutrition-panel {
+  margin: 24px 0;
+  padding: 18px;
+  border: 1px solid #e0e5df;
+  border-radius: 16px;
+  background: #f8faf7;
+}
+
+.nutrition-panel h3 {
+  margin-top: 0;
+}
+
+.nutrition-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.nutrition-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.nutrition-item span {
+  color: #647067;
+  font-size: 0.9rem;
+}
+
+.nutrition-item strong {
+  font-size: 1.15rem;
+}
+
+.nutrition-note {
+  margin-bottom: 0;
+  color: #647067;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 420px) {
+  .nutrition-grid {
+    grid-template-columns: 1fr;
+  }
+}
