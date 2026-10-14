@@ -183,10 +183,21 @@ useEffect(() => {
                 <p className={styles.muted}>Plan smarter. Eat better. Waste less.</p>
                 <button type="button" className={styles.start} onClick={() => router.push("/login")}>
                   Get started with NutriPlan →
-                <button
+                
+  <button
   type="button"
   className={styles.start}
   onClick={() => router.push(loggedIn ? "/food-log" : "/login")}
+>
+  {loggedIn ? "Open your food log →" : "Get started with NutriPlan →"}
+</button>
+<button
+  type="button"
+  className={styles.top}
+  onClick={() => scrollerRef.current?.scrollTo({ top: 0, behavior: smooth() })}
+>
+  ↑ Back to top
+</button>
 >
   {loggedIn ? "Open your food log →" : "Get started with NutriPlan →"}
 </button>
