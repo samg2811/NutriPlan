@@ -1,8 +1,11 @@
-
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 import styles from "./food-log.module.css";
+
+// Change these to whatever daily targets you want
+const GOALS = { calories: 2000, protein: 100 };
 
 type Per100g = { calories: number; protein: number; carbs: number; fat: number };
 type Item = {
@@ -13,16 +16,75 @@ type Item = {
   matchedFood?: string;
   per100g: Per100g;
 };
+type LogRow = {
+  id: string;
+  created_at: string;
+  meal_text: string | null;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+};
+type Suggestion = {
+  id: string | number;
+  name: string;
+  description: string;
+  cookingTime: number;
+  cost: number;
+  macros: { calories: number; protein: number; carbs: number; fat: number };
+};
 
 const scale = (item: Item, key: keyof Per100g) => item.per100g[key] * (item.grams / 100);
 
-export default function LogPage() {
+export default function FoodLogPage() {
+  const [supabase] = useState(() => createClient());
+
   const [text, setText] = useState("");
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
+  const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
+  const [today, setToday] = useState<LogRow[]>([]);
+
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [suggestNote, setSuggestNote] = useState("");
+  const [suggesting, setSuggesting] = useState(false);
+
+  // ---- Load today's saved meals ----
+  const loadToday = useCallback(async () => {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const { data, error } = await supabase
+      .from("food_logs")
+      .select("id, created_at, meal_text, calories, protein, carbs, fat")
+      .gte("created_at", start.toISOString())
+      .order("created_at", { ascending: false });
+    if (!error && data) setToday(data as LogRow[]);
+  }, [supabase]);
+
+  useEffect(() => {
+    async function init() {
+      const { data } = await supabase.auth.getUser();
+      setLoggedIn(!!data.user);
+      if (data.user) loadToday();
+    }
+    init();
+  }, [supabase, loadToday]);
+
+  const eaten = today.reduce(
+    (t, r) => ({
+      calories: t.calories + Number(r.calories),
+      protein: t.protein + Number(r.protein),
+      carbs: t.carbs + Number(r.carbs),
+      fat: t.fat + Number(r.fat),
+    }),
+    { calories: 0, protein: 0, carbs: 0, fat: 0 }
+  );
+
+  // ---- Analyze typed meal ----
   async function analyze() {
     setError("");
     setMessage("");
@@ -32,12 +94,12 @@ export default function LogPage() {
     }
     setLoading(true);
     try {
-         const res = await fetch("/api/analyze-meal-text", {
+      const res = await fetch("/api/analyze-meal-text", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
       });
-      if (!res.ok) throw new Error(String(res.status));
+      if (!res.ok) throw new Error("Status " + res.status);
       const data = await res.json();
       if (!data.items?.length) {
         setError("No foods recognized. Try listing each food with a rough amount.");
@@ -45,7 +107,8 @@ export default function LogPage() {
       } else {
         setItems(data.items);
       }
-    } catch {
+    } catch (err) {
+      console.error("analyze failed:", err);
       setError("Couldn't get nutrition facts. Check your connection and try again.");
     } finally {
       setLoading(false);
@@ -60,14 +123,6 @@ export default function LogPage() {
     setItems((prev) => prev.filter((_, idx) => idx !== i));
   }
 
-  function save() {
-    // TODO: connect this to however NutriPlan stores data (database, localStorage, etc.)
-    console.log("Saving meal:", items);
-    setMessage("Saved to your food log.");
-    setItems([]);
-    setText("");
-  }
-
   const totals = items.reduce(
     (t, it) => ({
       calories: t.calories + scale(it, "calories"),
@@ -78,8 +133,142 @@ export default function LogPage() {
     { calories: 0, protein: 0, carbs: 0, fat: 0 }
   );
 
+  // ---- Save to Supabase ----
+  async function save() {
+    if (!loggedIn) {
+      setError("Log in to save meals to your food log.");
+      return;
+    }
+    setSaving(true);
+    setError("");
+    const { error } = await supabase.from("food_logs").insert({
+      meal_text: text,
+      items,
+      calories: Math.round(totals.calories),
+      protein: Math.round(totals.protein * 10) / 10,
+      carbs: Math.round(totals.carbs * 10) / 10,
+      fat: Math.round(totals.fat * 10) / 10,
+    });
+    setSaving(false);
+
+    if (error) {
+      console.error("save failed:", error);
+      setError("Couldn't save this meal. Try again.");
+      return;
+    }
+    setMessage("Saved to your food log.");
+    setItems([]);
+    setText("");
+    setSuggestions([]);
+    setSuggestNote("");
+    loadToday();
+  }
+
+  async function deleteLog(id: string) {
+    const { error } = await supabase.from("food_logs").delete().eq("id", id);
+    if (!error) {
+      setSuggestions([]);
+      setSuggestNote("");
+      loadToday();
+    }
+  }
+
+  // ---- What should I eat next? ----
+  async function getNextMeal() {
+    setSuggesting(true);
+    setSuggestNote("");
+    setSuggestions([]);
+    try {
+      const res = await fetch("/api/next-meal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          remainingCalories: GOALS.calories - eaten.calories,
+          remainingProtein: GOALS.protein - eaten.protein,
+          hour: new Date().getHours(),
+        }),
+      });
+      if (!res.ok) throw new Error("Status " + res.status);
+      const data = await res.json();
+      setSuggestions(data.suggestions ?? []);
+      if (data.note) setSuggestNote(data.note);
+      else if (!data.suggestions?.length) setSuggestNote("No meals found that fit right now.");
+    } catch (err) {
+      console.error("next meal failed:", err);
+      setSuggestNote("Couldn't get suggestions. Try again.");
+    } finally {
+      setSuggesting(false);
+    }
+  }
+
+  const calPct = Math.min(100, (eaten.calories / GOALS.calories) * 100);
+  const proPct = Math.min(100, (eaten.protein / GOALS.protein) * 100);
+
   return (
     <main className={styles.main}>
+      <a href="/" className={styles.back}>← Back to NutriPlan</a>
+
+      {loggedIn === false && (
+        <p className={styles.notice}>
+          You're not logged in, so meals can't be saved. <a href="/login">Log in</a>
+        </p>
+      )}
+
+      {loggedIn && (
+        <section className={styles.today}>
+          <h2 className={styles.heading} style={{ marginTop: 0 }}>Today so far</h2>
+
+          <div className={styles.goalRow}>
+            <span>Calories</span>
+            <span>{Math.round(eaten.calories)} / {GOALS.calories}</span>
+          </div>
+          <div className={styles.track}><div className={styles.fill} style={{ width: calPct + "%" }} /></div>
+
+          <div className={styles.goalRow}>
+            <span>Protein</span>
+            <span>{Math.round(eaten.protein)} / {GOALS.protein} g</span>
+          </div>
+          <div className={styles.track}><div className={styles.fill} style={{ width: proPct + "%" }} /></div>
+
+          {today.length > 0 && (
+            <ul className={styles.todayList}>
+              {today.map((r) => (
+                <li key={r.id}>
+                  <span>
+                    {new Date(r.created_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                    {" · "}
+                    {r.meal_text || "Meal"}
+                    {" · "}
+                    {Math.round(Number(r.calories))} cal
+                  </span>
+                  <button className={styles.remove} onClick={() => deleteLog(r.id)} aria-label="Delete this entry">×</button>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <button className="primary-button" onClick={getNextMeal} disabled={suggesting} style={{ marginTop: 14 }}>
+            {suggesting ? "Finding meals…" : "What should I eat next? →"}
+          </button>
+          {suggestNote && <p className={styles.sub} style={{ marginTop: 10 }}>{suggestNote}</p>}
+
+          {suggestions.length > 0 && (
+            <ul className={styles.suggestions}>
+              {suggestions.map((s) => (
+                <li key={s.id}>
+                  <div className={styles.name}>{s.name}</div>
+                  <div className={styles.detail}>{s.description}</div>
+                  <div className={styles.detail}>
+                    {s.macros.calories} cal · {s.macros.protein}g protein · {s.macros.carbs}g carbs · {s.macros.fat}g fat
+                    {" · "}⏱️ {s.cookingTime} min · 💰 ${Number(s.cost).toFixed(2)}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
+
       <h1 className={styles.title}>What did you eat?</h1>
       <p className={styles.sub}>
         Describe your meal in plain words, like "2 scrambled eggs, a slice of toast and a banana".
@@ -94,7 +283,7 @@ export default function LogPage() {
       />
 
       <div className={styles.actions}>
-        <button className={styles.primary} onClick={analyze} disabled={loading}>
+        <button className="primary-button" onClick={analyze} disabled={loading}>
           Get nutrition facts
         </button>
         <span className={styles.status} role="status">
@@ -147,8 +336,8 @@ export default function LogPage() {
             ))}
           </ul>
 
-          <button className={`${styles.primary} ${styles.save}`} onClick={save}>
-            Save to my food log
+          <button className={`primary-button ${styles.save}`} onClick={save} disabled={saving}>
+            {saving ? "Saving…" : "Save to my food log"}
           </button>
         </section>
       )}
