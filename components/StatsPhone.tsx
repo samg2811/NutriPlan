@@ -1,5 +1,5 @@
 "use client";
-
+import { createClient } from "@/lib/supabase/client";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./StatsPhone.module.css";
@@ -18,7 +18,13 @@ export default function StatsPhone() {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
   const [seen, setSeen] = useState<Record<string, boolean>>({});
+const [loggedIn, setLoggedIn] = useState(false);
 
+useEffect(() => {
+  createClient()
+    .auth.getUser()
+    .then(({ data }) => setLoggedIn(!!data.user));
+}, []);
   // Scroll progress bar at the top of the phone
   useEffect(() => {
     const el = scrollerRef.current;
@@ -172,11 +178,13 @@ export default function StatsPhone() {
                 <p className={styles.muted}>Plan smarter. Eat better. Waste less.</p>
                 <button type="button" className={styles.start} onClick={() => router.push("/login")}>
                   Get started with NutriPlan →
-                </button>
                 <button
-                  type="button"
-                  className={styles.top}
-                  onClick={() => scrollerRef.current?.scrollTo({ top: 0, behavior: smooth() })}
+  type="button"
+  className={styles.start}
+  onClick={() => router.push(loggedIn ? "/food-log" : "/login")}
+>
+  {loggedIn ? "Open your food log →" : "Get started with NutriPlan →"}
+</button>
                 >
                   ↑ Back to top
                 </button>
