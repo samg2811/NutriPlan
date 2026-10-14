@@ -1,0 +1,23 @@
+.hero {
+  display: grid;
+  grid-template-columns: 1.1fr .9fr;
+  align-items: center;
+  gap: 40px;
+  padding: 48px 0 32px;
+}
+.eyebrow { letter-spacing: .12em; font-size: .8rem; font-weight: 700; color: #2f7d55; margin: 0 0 12px; }
+.title { font-size: clamp(2.6rem, 6vw, 4.4rem); line-height: 1.02; margin: 0 0 18px; }
+.title span { color: #2f7d55; }
+.sub { font-size: 1.1rem; max-width: 34ch; line-height: 1.55; margin: 0 0 26px; opacity: .8; }
+.buttons { display: flex; flex-wrap: wrap; gap: 12px; }
+.primary, .secondary {
+  padding: 12px 20px; border-radius: 12px; font-weight: 600; text-decoration: none; font-size: 1rem;
+}
+.primary { background: #2f7d55; color: #fff; }
+.secondary { border: 1.5px solid #2f7d55; color: #2f7d55; }
+
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; text-align: center; padding-top: 28px; }
+  .sub { margin-left: auto; margin-right: auto; }
+  .buttons { justify-content: center; }
+}
