@@ -375,8 +375,8 @@ export default function Home() {
 
       {/* HERO */}
       <HeroWithPhone />
-   <StatsSection />
-
+      <StatsSection />
+      <StatsPhone />
       {/* MEAL PLANNER */}
       <section className="planner" id="planner">
         <h2>Find Your Meal</h2>
