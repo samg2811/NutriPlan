@@ -7,7 +7,7 @@ export type ParsedItem = {
 };
 
 // Use the same model name your existing photo route uses.
-const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_MODEL = "gemini-3.8-flash";
 
 const PROMPT = `You convert a description of a meal into JSON.
 Return ONLY valid JSON in this exact shape:
