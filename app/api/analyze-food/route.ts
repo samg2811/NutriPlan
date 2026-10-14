@@ -1,5 +1,26 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
+import { getIngredientNutritionPer100g } from "@/lib/usda";
+
+export const runtime = "nodejs";
+
+const emptyNutrition = () => ({
+  calories: 0,
+  protein: 0,
+  carbs: 0,
+  fat: 0,
+  fiber: 0,
+  sugar: 0,
+  sodium: 0,
+});
+
+type Nutrition = ReturnType<typeof emptyNutrition>;
+
+type FoodPortion = {
+  name: string;
+  grams: number;
+  nutrition: Nutrition | null;
+};
 
 export async function POST(request: Request) {
   try {
@@ -12,42 +33,47 @@ export async function POST(request: Request) {
       );
     }
 
-    
-  const body = await request.json();
-  const base64Image = body?.base64Image;
-  const mimeType = body?.mimeType;
-  
-  if (
-    typeof base64Image !== "string" ||
-    typeof mimeType !== "string"
-  ) {
-    return NextResponse.json(
-      { error: "Photo data is missing." },
-      { status: 400 }
+    if (!process.env.USDA_API_KEY) {
+      return NextResponse.json(
+        { error: "Missing USDA_API_KEY in Vercel settings." },
+        { status: 500 }
+      );
+    }
+
+    const body = await request.json();
+    const base64Image = body?.base64Image;
+    const mimeType = body?.mimeType;
+
+    if (
+      typeof base64Image !== "string" ||
+      typeof mimeType !== "string"
+    ) {
+      return NextResponse.json(
+        { error: "Photo data is missing." },
+        { status: 400 }
+      );
+    }
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(mimeType)) {
+      return NextResponse.json(
+        { error: "Use a JPEG, PNG, or WebP image." },
+        { status: 400 }
+      );
+    }
+
+    const base64Data = base64Image.replace(
+      /^data:image\/[^;]+;base64,/,
+      ""
     );
-  }
-  
-  if (!["image/jpeg", "image/png", "image/webp"].includes(mimeType)) {
-    return NextResponse.json(
-      { error: "Use a JPEG, PNG, or WebP image." },
-      { status: 400 }
-    );
-  }
-  
-  const base64Data = base64Image.replace(
-    /^data:image\/[^;]+;base64,/,
-    ""
-  );
-  
-  if (!base64Data || base64Data.length > 12_000_000) {
-    return NextResponse.json(
-      { error: "Image is missing or too large." },
-      { status: 413 }
-    );
-  }
+
+    if (!base64Data || base64Data.length > 12_000_000) {
+      return NextResponse.json(
+        { error: "Image is missing or too large." },
+        { status: 413 }
+      );
+    }
 
     const ai = new GoogleGenAI({ apiKey });
-
     const result = await ai.models.generateContent({
       model: "gemini-3.8-flash",
       contents: [
@@ -55,15 +81,7 @@ export async function POST(request: Request) {
           role: "user",
           parts: [
             {
-              text: `Identify the foods visibly present in this photo.
-
-Return only a valid JSON array of food names.
-Example: ["rice", "chicken", "broccoli"]
-
-Only include foods you can reasonably recognize.
-Do not guess hidden ingredients.
-Do not estimate calories, portion sizes, or nutrition.
-If no food is recognizable, return [].`,
+              text: `Inspect this photo of food. Identify each distinct food item that is visibly present and estimate the edible portion size in grams for each item. Use reasonable visual estimates; do not claim exact measurements. Do not include hidden ingredients, drinks, plates, or utensils. If the photo contains a mixed dish, list visible components separately only when reasonably distinguishable. Return only a valid JSON array, with each item shaped like {"name":"cooked white rice","grams":150}. Use specific descriptions when visible (for example, cooked chicken breast rather than just chicken). Grams must be a number from 1 to 2000. If no food is recognizable, return [].`,
             },
             {
               inlineData: {
@@ -80,32 +98,103 @@ If no food is recognizable, return [].`,
     });
 
     const responseText = result.text?.trim();
-
     if (!responseText) {
       throw new Error("The AI returned an empty response.");
     }
 
-    const foods: unknown = JSON.parse(responseText);
-
-    if (
-      !Array.isArray(foods) ||
-      !foods.every((food) => typeof food === "string")
-    ) {
+    const parsed: unknown = JSON.parse(responseText);
+    if (!Array.isArray(parsed)) {
       throw new Error("The AI returned an invalid food list.");
     }
 
+    const portions: { name: string; grams: number }[] = parsed
+      .filter(
+        (item): item is { name: unknown; grams: unknown } =>
+          typeof item === "object" && item !== null && "name" in item && "grams" in item
+      )
+      .map((item) => ({
+        name: typeof item.name === "string" ? item.name.trim() : "",
+        grams: typeof item.grams === "number" ? item.grams : Number(item.grams),
+      }))
+      .filter(
+        (item) =>
+          item.name.length > 0 &&
+          Number.isFinite(item.grams) &&
+          item.grams >= 1 &&
+          item.grams <= 2000
+      )
+      .slice(0, 20);
+
+    if (portions.length === 0) {
+      return NextResponse.json({
+        foods: [],
+        detectedIngredients: [],
+        foodPortions: [],
+        nutrition: emptyNutrition(),
+        nutritionMatchedCount: 0,
+        nutritionNote: "No recognizable food portions were found in this photo.",
+      });
+    }
+
+    // Look up each item independently so one unavailable USDA match does not
+    // prevent the rest of the photo analysis from succeeding.
+    const foodPortions: FoodPortion[] = await Promise.all(
+      portions.map(async (food) => {
+        try {
+          const per100g = await getIngredientNutritionPer100g(food.name);
+          const factor = food.grams / 100;
+          return {
+            ...food,
+            nutrition: {
+              calories: per100g.calories * factor,
+              protein: per100g.protein * factor,
+              carbs: per100g.carbs * factor,
+              fat: per100g.fat * factor,
+              fiber: per100g.fiber * factor,
+              sugar: per100g.sugar * factor,
+              sodium: per100g.sodium * factor,
+            },
+          };
+        } catch (error) {
+          console.warn(`USDA nutrition lookup failed for ${food.name}:`, error);
+          return { ...food, nutrition: null };
+        }
+      })
+    );
+
+    const totals = foodPortions.reduce((sum, food) => {
+      if (!food.nutrition) return sum;
+      for (const key of Object.keys(sum) as (keyof Nutrition)[]) {
+        sum[key] += food.nutrition[key];
+      }
+      return sum;
+    }, emptyNutrition());
+
+    const nutritionMatchedCount = foodPortions.filter(
+      (food) => food.nutrition !== null
+    ).length;
+
     return NextResponse.json({
-      foods: foods.map((food) => food.trim()).filter(Boolean),
+      // Keep these fields for compatibility with the existing frontend.
+      foods: foodPortions.map((food) => food.name),
+      detectedIngredients: foodPortions.map((food) => food.name),
+      foodPortions,
+      nutrition: Object.fromEntries(
+        Object.entries(totals).map(([key, value]) => [key, Math.round(value * 10) / 10])
+      ),
+      nutritionMatchedCount,
+      nutritionNote:
+        nutritionMatchedCount === 0
+          ? "Foods were identified, but USDA nutrition data could not be matched. Try a clearer photo or review the food names."
+          : nutritionMatchedCount < foodPortions.length
+          ? "Nutrition totals include only foods matched to USDA data. One or more items could not be matched."
+          : "Portion sizes are visual estimates. Nutrition values depend on the USDA food matches and may differ from the actual meal.",
     });
   } catch (error) {
     console.error("Food analyzer error:", error);
-
     return NextResponse.json(
       { error: "Food analysis failed. Please try another photo." },
       { status: 500 }
     );
   }
 }
-
-
-
