@@ -2,7 +2,6 @@
 
    import HeroWithPhone from "@/components/HeroWithPhone";
    import StatsSection from "@/components/StatsSection";
-   import StatsPhone from "@/components/StatsPhone";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -25,6 +24,12 @@ type NutritionData = {
   fiber: number;
   sugar: number;
   sodium: number;
+};
+
+type PhotoFoodPortion = {
+  name: string;
+  grams: number;
+  nutrition: NutritionData | null;
 };
 
 export default function Home() {
@@ -73,6 +78,9 @@ export default function Home() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageMimeType, setImageMimeType] = useState<string>("image/jpeg");
   const [detectedFoods, setDetectedFoods] = useState<string[]>([]);
+  const [photoFoodPortions, setPhotoFoodPortions] = useState<PhotoFoodPortion[]>([]);
+  const [photoNutrition, setPhotoNutrition] = useState<NutritionData | null>(null);
+  const [photoNutritionNote, setPhotoNutritionNote] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisError, setAnalysisError] = useState("");
 
@@ -237,6 +245,9 @@ export default function Home() {
     reader.onload = () => {
       setSelectedImage(reader.result as string);
       setDetectedFoods([]);
+      setPhotoFoodPortions([]);
+      setPhotoNutrition(null);
+      setPhotoNutritionNote("");
       setAnalysisError("");
     };
 
@@ -250,6 +261,9 @@ export default function Home() {
     setIsAnalyzing(true);
     setAnalysisError("");
     setDetectedFoods([]);
+    setPhotoFoodPortions([]);
+    setPhotoNutrition(null);
+    setPhotoNutritionNote("");
 
     try {
       // Clean base64 string by stripping the "data:image/...;base64," prefix
@@ -274,13 +288,46 @@ export default function Home() {
         throw new Error(data.error || "Food analysis failed.");
       }
 
-      // Read returned ingredients from API
-      const foods: string[] = data.detectedIngredients || data.foods || [];
+      // The API returns food names, estimated portion sizes, and USDA nutrition totals.
+      const foods: string[] = Array.isArray(data.detectedIngredients)
+        ? data.detectedIngredients.filter((food: unknown): food is string => typeof food === "string")
+        : Array.isArray(data.foods)
+        ? data.foods.filter((food: unknown): food is string => typeof food === "string")
+        : [];
 
       if (foods.length === 0) {
         setAnalysisError("No identifiable food items found in this photo.");
       } else {
         setDetectedFoods(foods);
+        setPhotoFoodPortions(
+          Array.isArray(data.foodPortions)
+            ? data.foodPortions.filter(
+                (food: unknown): food is PhotoFoodPortion =>
+                  typeof food === "object" && food !== null &&
+                  "name" in food && typeof food.name === "string" &&
+                  "grams" in food && typeof food.grams === "number"
+              )
+            : []
+        );
+        if (data.nutrition && typeof data.nutrition === "object") {
+          const n = data.nutrition;
+          const values = [n.calories, n.protein, n.carbs, n.fat, n.fiber, n.sugar, n.sodium];
+          if (values.every((value: unknown) => typeof value === "number" && Number.isFinite(value))) {
+            setPhotoNutrition({
+              calories: n.calories,
+              protein: n.protein,
+              carbs: n.carbs,
+              fat: n.fat,
+              fiber: n.fiber,
+              sugar: n.sugar,
+              sodium: n.sodium,
+            });
+          }
+        }
+        setPhotoNutritionNote(
+          typeof data.nutritionNote === "string" ? data.nutritionNote :
+          "Portion sizes and nutrition values are estimates."
+        );
       }
     } catch (error) {
       console.error(error);
@@ -375,8 +422,8 @@ export default function Home() {
 
       {/* HERO */}
       <HeroWithPhone />
-      <StatsSection />
-      <StatsPhone />
+   <StatsSection />
+
       {/* MEAL PLANNER */}
       <section className="planner" id="planner">
         <h2>Find Your Meal</h2>
@@ -574,17 +621,43 @@ export default function Home() {
           </p>
 
           <div className="food-list">
-            {detectedFoods.map((food, index) => (
-              <div className="food-item" key={index}>
-                <span>✓</span>
-                {food}
-              </div>
-            ))}
+            {detectedFoods.map((food, index) => {
+              const portion = photoFoodPortions.find(
+                (item) => item.name.toLowerCase() === food.toLowerCase()
+              );
+              return (
+                <div className="food-item" key={`${food}-${index}`}>
+                  <span>✓</span>
+                  <span>{food}</span>
+                  {portion && <strong>{Math.round(portion.grams)} g (estimated)</strong>}
+                </div>
+              );
+            })}
           </div>
 
+          {photoNutrition && (
+            <section className="nutrition-panel photo-nutrition-panel" aria-live="polite">
+              <h3>Estimated Nutrition From Photo</h3>
+              <p className="section-description">
+                Calculated from estimated portions and USDA FoodData Central matches.
+              </p>
+              <div className="nutrition-grid">
+                <div className="nutrition-item"><span>Calories</span><strong>{Math.round(photoNutrition.calories)} kcal</strong></div>
+                <div className="nutrition-item"><span>Protein</span><strong>{photoNutrition.protein.toFixed(1)} g</strong></div>
+                <div className="nutrition-item"><span>Carbs</span><strong>{photoNutrition.carbs.toFixed(1)} g</strong></div>
+                <div className="nutrition-item"><span>Fat</span><strong>{photoNutrition.fat.toFixed(1)} g</strong></div>
+                <div className="nutrition-item"><span>Fiber</span><strong>{photoNutrition.fiber.toFixed(1)} g</strong></div>
+                <div className="nutrition-item"><span>Sugar</span><strong>{photoNutrition.sugar.toFixed(1)} g</strong></div>
+                <div className="nutrition-item"><span>Sodium</span><strong>{Math.round(photoNutrition.sodium)} mg</strong></div>
+              </div>
+              <p className="nutrition-note">
+                {photoNutritionNote} Photo-based portion sizes can be inaccurate, and sauces, oils, seasonings, or hidden ingredients may not be counted.
+              </p>
+            </section>
+          )}
+
           <p className="confirmation-text">
-            AI identification can make mistakes. Check the
-            results before continuing.
+            AI identification and portion estimates can make mistakes. Review the foods and amounts before relying on the results.
           </p>
 
           <button
