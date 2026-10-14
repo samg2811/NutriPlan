@@ -291,20 +291,8 @@ export default function Home() {
       </nav>
 
       {/* HERO */}
-      <section className="hero">
-        <p className="eyebrow">SMARTER MEAL PLANNING</p>
-
-        <h1>
-          What should
-          <br />
-          <span>you eat?</span>
-        </h1>
-
-        <p className="hero-text">
-          NutriPlan uses your ingredients, budget, and available
-          time to help you find meals that fit your needs.
-        </p>
-      </section>
+      <HeroWithPhone />
+   <StatsSection />
 
       {/* MEAL PLANNER */}
       <section className="planner" id="planner">
