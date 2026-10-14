@@ -1,5 +1,8 @@
 "use client";
 
+   import HeroWithPhone from "@/components/HeroWithPhone";
+   import StatsSection from "@/components/StatsSection";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { meals, Meal, MealIngredient } from "@/data/meals";
