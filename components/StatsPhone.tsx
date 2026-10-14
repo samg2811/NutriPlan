@@ -21,9 +21,14 @@ export default function StatsPhone() {
 const [loggedIn, setLoggedIn] = useState(false);
 
 useEffect(() => {
-  createClient()
-    .auth.getUser()
-    .then(({ data }) => setLoggedIn(!!data.user));
+  async function checkUser() {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    setLoggedIn(!!user);
+  }
+  checkUser();
 }, []);
   // Scroll progress bar at the top of the phone
   useEffect(() => {
