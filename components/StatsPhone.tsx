@@ -1,7 +1,8 @@
 "use client";
-import { createClient } from "@/lib/supabase/client";
+
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import styles from "./StatsPhone.module.css";
 
 function smooth(): ScrollBehavior {
@@ -18,18 +19,20 @@ export default function StatsPhone() {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
   const [seen, setSeen] = useState<Record<string, boolean>>({});
-const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
 
-useEffect(() => {
-  async function checkUser() {
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    setLoggedIn(!!user);
-  }
-  checkUser();
-}, []);
+  // Check whether the visitor is already logged in
+  useEffect(() => {
+    async function checkUser() {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setLoggedIn(!!user);
+    }
+    checkUser();
+  }, []);
+
   // Scroll progress bar at the top of the phone
   useEffect(() => {
     const el = scrollerRef.current;
@@ -181,26 +184,17 @@ useEffect(() => {
                 <div className={styles.logo}>🍽️</div>
                 <h3>Ready to eat smarter?</h3>
                 <p className={styles.muted}>Plan smarter. Eat better. Waste less.</p>
-                <button type="button" className={styles.start} onClick={() => router.push("/login")}>
-                  Get started with NutriPlan →
-                
-  <button
-  type="button"
-  className={styles.start}
-  onClick={() => router.push(loggedIn ? "/food-log" : "/login")}
->
-  {loggedIn ? "Open your food log →" : "Get started with NutriPlan →"}
-</button>
-<button
-  type="button"
-  className={styles.top}
-  onClick={() => scrollerRef.current?.scrollTo({ top: 0, behavior: smooth() })}
->
-  ↑ Back to top
-</button>
->
-  {loggedIn ? "Open your food log →" : "Get started with NutriPlan →"}
-</button>
+                <button
+                  type="button"
+                  className={styles.start}
+                  onClick={() => router.push(loggedIn ? "/food-log" : "/login")}
+                >
+                  {loggedIn ? "Open your food log →" : "Get started with NutriPlan →"}
+                </button>
+                <button
+                  type="button"
+                  className={styles.top}
+                  onClick={() => scrollerRef.current?.scrollTo({ top: 0, behavior: smooth() })}
                 >
                   ↑ Back to top
                 </button>
