@@ -46,7 +46,7 @@ export default function Home() {
   const [results, setResults] = useState<RankedMeal[]>([]);
 
   const router = useRouter();
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
 
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
@@ -73,7 +73,7 @@ export default function Home() {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [supabase]);
 
   // AI Food Analysis
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -84,6 +84,152 @@ export default function Home() {
   const [photoNutritionNote, setPhotoNutritionNote] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisError, setAnalysisError] = useState("");
+  
+  const [savingPhoto, setSavingPhoto] = useState(false);
+  const [photoSaveMessage, setPhotoSaveMessage] = useState("");
+  const [photoSaveError, setPhotoSaveError] = useState("");
+
+  const [savingRecipe, setSavingRecipe] = useState(false);
+  const [recipeSaveMessage, setRecipeSaveMessage] = useState("");
+  const [recipeSaveError, setRecipeSaveError] = useState("");
+
+  const [mealNutritionItems, setMealNutritionItems] = useState<
+    {
+      name: string;
+      grams: number;
+      per100g: {
+        calories: number;
+        protein: number;
+        carbs: number;
+        fat: number;
+      };
+    }[]
+  >([]);
+
+  
+  async function saveEntryToFoodTracker(entry: {
+    mealText: string;
+    items: {
+      name: string;
+      grams: number;
+      per100g: {
+        calories: number;
+        protein: number;
+        carbs: number;
+        fat: number;
+      };
+    }[];
+    nutrition: NutritionData;
+  }) {
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      router.push("/login");
+      throw new Error("Please log in to save food to your tracker.");
+    }
+
+    const { error } = await supabase.from("food_logs").insert({
+      meal_text: entry.mealText,
+      items: entry.items,
+      calories: Math.round(entry.nutrition.calories),
+      protein: Math.round(entry.nutrition.protein * 10) / 10,
+      carbs: Math.round(entry.nutrition.carbs * 10) / 10,
+      fat: Math.round(entry.nutrition.fat * 10) / 10,
+    });
+
+    if (error) {
+      console.error("Food Tracker save error:", error);
+      throw new Error("Couldn't save this entry. Please try again.");
+    }
+  }
+
+  async function savePhotoToTracker() {
+    if (!photoNutrition || detectedFoods.length === 0) {
+      setPhotoSaveError("Analyze the photo and load nutrition estimates first.");
+      return;
+    }
+
+    setSavingPhoto(true);
+    setPhotoSaveError("");
+    setPhotoSaveMessage("");
+
+    try {
+      const portions = photoFoodPortions.length
+        ? photoFoodPortions
+        : detectedFoods.map((name) => ({
+            name,
+            grams: 100,
+            nutrition: null,
+          }));
+
+      const items = portions.map((food) => {
+        const grams = food.grams;
+        const n = food.nutrition;
+        const factor = grams > 0 ? 100 / grams : 0;
+
+        return {
+          name: food.name,
+          grams,
+          per100g: {
+            calories: n ? n.calories * factor : 0,
+            protein: n ? n.protein * factor : 0,
+            carbs: n ? n.carbs * factor : 0,
+            fat: n ? n.fat * factor : 0,
+          },
+        };
+      });
+
+      await saveEntryToFoodTracker({
+        mealText: `Photo scan: ${detectedFoods.join(", ")}`,
+        items,
+        nutrition: photoNutrition,
+      });
+
+      setPhotoSaveMessage("Scanned meal saved to your Food Tracker!");
+    } catch (error) {
+      setPhotoSaveError(
+        error instanceof Error
+          ? error.message
+          : "Couldn't save the scanned meal."
+      );
+    } finally {
+      setSavingPhoto(false);
+    }
+  }
+
+  async function saveRecipeToTracker() {
+    if (!selectedMeal || !mealNutrition) {
+      setRecipeSaveError("Wait for nutrition information to finish loading.");
+      return;
+    }
+
+    setSavingRecipe(true);
+    setRecipeSaveError("");
+    setRecipeSaveMessage("");
+
+    try {
+      await saveEntryToFoodTracker({
+        mealText: `Recipe: ${selectedMeal.name}`,
+        items: mealNutritionItems,
+        nutrition: mealNutrition,
+      });
+
+      setRecipeSaveMessage("Recipe saved to your Food Tracker!");
+    } catch (error) {
+      setRecipeSaveError(
+        error instanceof Error
+          ? error.message
+          : "Couldn't save the recipe."
+      );
+    } finally {
+      setSavingRecipe(false);
+    }
+  }
+
+
 
   // Open a meal and calculate its estimated nutrition using the USDA endpoint.
   async function openMealDetails(meal: Meal) {
@@ -132,15 +278,54 @@ export default function Home() {
         );
       }
 
-      setMealNutrition({
-        calories: data.calories,
-        protein: data.protein,
-        carbs: data.carbs,
-        fat: data.fat,
-        fiber: data.fiber,
-        sugar: data.sugar,
-        sodium: data.sodium,
-      });
+      
+  setMealNutrition({
+    calories: data.calories,
+    protein: data.protein,
+    carbs: data.carbs,
+    fat: data.fat,
+    fiber: data.fiber,
+    sugar: data.sugar,
+    sodium: data.sodium,
+  });
+
+  const ingredientResults = Array.isArray(data.ingredients)
+    ? data.ingredients
+    : [];
+
+  setMealNutritionItems(
+    ingredientResults
+      .filter(
+        (item: any) =>
+          item &&
+          typeof item.name === "string" &&
+          typeof item.grams === "number" &&
+          item.grams > 0 &&
+          item.nutrition &&
+          typeof item.nutrition.calories === "number" &&
+          typeof item.nutrition.protein === "number" &&
+          typeof item.nutrition.carbs === "number" &&
+          typeof item.nutrition.fat === "number"
+      )
+      .map((item: any) => {
+        const factor = 100 / item.grams;
+
+        return {
+          name: item.name,
+          grams: item.grams,
+          per100g: {
+            calories: item.nutrition.calories * factor,
+            protein: item.nutrition.protein * factor,
+            carbs: item.nutrition.carbs * factor,
+            fat: item.nutrition.fat * factor,
+          },
+        };
+      })
+  );
+
+  setRecipeSaveMessage("");
+  setRecipeSaveError("");
+
     } catch (error) {
       console.error("Meal nutrition error:", error);
       setNutritionError(
@@ -342,6 +527,7 @@ export default function Home() {
   }
 
   // Use AI-detected foods in recipe finder
+  
   function useDetectedFoods() {
     if (detectedFoods.length === 0) return;
 
@@ -353,26 +539,21 @@ export default function Home() {
 
     const rankedMeals = meals
       .map((meal) => {
-        let score = 0;
+        const matchedIngredients = meal.ingredients.filter((ingredient) => {
+          const name = ingredient.name.toLowerCase();
 
-        const matchedIngredients = meal.ingredients.filter(
-          (ingredient) =>
-            userIngredients.includes(ingredient.name.toLowerCase())
-        );
+          return userIngredients.some(
+            (food) =>
+              food === name ||
+              food.includes(name) ||
+              name.includes(food)
+          );
+        });
 
-        score += matchedIngredients.length * 5;
+        let score = matchedIngredients.length * 5;
 
-        if (meal.cookingTime <= maxTime) {
-          score += 3;
-        } else {
-          score -= 2;
-        }
-
-        if (meal.cost <= budget) {
-          score += 3;
-        } else {
-          score -= 2;
-        }
+        score += meal.cookingTime <= maxTime ? 3 : -2;
+        score += meal.cost <= budget ? 3 : -2;
 
         return {
           meal,
@@ -384,6 +565,13 @@ export default function Home() {
       .sort((a, b) => b.score - a.score);
 
     setResults(rankedMeals.slice(0, 3));
+
+    window.setTimeout(() => {
+      document.getElementById("planner")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 100);
   }
 
   return (
@@ -657,6 +845,30 @@ export default function Home() {
             </section>
           )}
 
+           
+          <div className="tracker-actions">
+             <button
+               className="primary-button"
+               onClick={savePhotoToTracker}
+               disabled={savingPhoto || !photoNutrition}
+             >
+               {savingPhoto
+                 ? "Saving..."
+                 : "＋ Add Scanned Meal to Food Tracker"}
+            </button>
+         
+            {photoSaveMessage && (
+              <p role="status">{photoSaveMessage}</p>
+            )}
+         
+            {photoSaveError && (
+              <p className="error-message" role="alert">
+                {photoSaveError}
+              </p>
+             )}
+          </div>
+
+
           <p className="confirmation-text">
             AI identification and portion estimates can make mistakes. Review the foods and amounts before relying on the results.
           </p>
@@ -757,6 +969,34 @@ export default function Home() {
                       unlisted ingredients are not included. Actual nutrition
                       may differ depending on the exact food and preparation.
                     </p>
+                    
+                    <div className="tracker-actions">
+                      <button
+                        className="primary-button"
+                        onClick={saveRecipeToTracker}
+                        disabled={savingRecipe || nutritionLoading || mealNutritionItems.length === 0}
+                      >
+                        {savingRecipe
+                          ? "Saving..."
+                          : "＋ Add This Recipe to Food Tracker"}
+                      </button>
+                  
+                      {recipeSaveMessage && (
+                        <p role="status">{recipeSaveMessage}</p>
+                      )}
+                  
+                      {recipeSaveError && (
+                        <p className="error-message" role="alert">
+                          {recipeSaveError}
+                        </p>
+                      )}
+                  
+                      {mealNutritionItems.length === 0 && (
+                        <p className="nutrition-note">
+                          Ingredient-level nutrition data is needed to save this recipe.
+                        </p>
+                      )}
+                    </div>
                   </>
                 )}
             </section>
