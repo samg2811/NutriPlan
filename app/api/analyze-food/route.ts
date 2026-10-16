@@ -222,12 +222,17 @@ export async function POST(request: Request) {
       nutritionMatchedCount,
       nutritionNote,
     });
-  } catch (error) {
-    // Keep detailed errors in Vercel logs, not in the public response.
+    } catch (error) {
     console.error("Food analyzer error:", error);
 
+    const details =
+      error instanceof Error ? error.message : String(error);
+
     return NextResponse.json(
-      { error: "Food analysis failed. Please try another photo." },
+      {
+        error: "Food analysis failed.",
+        details,
+      },
       { status: 500 }
     );
   }
