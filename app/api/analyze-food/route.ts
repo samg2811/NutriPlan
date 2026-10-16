@@ -74,7 +74,9 @@ export async function POST(request: Request) {
     }
 
     const ai = new GoogleGenAI({ apiKey });
+
     const result = await ai.models.generateContent({
+      // Verify that this model ID is available to your Gemini API key.
       model: "gemini-3.8-flash",
       contents: [
         {
@@ -98,11 +100,13 @@ export async function POST(request: Request) {
     });
 
     const responseText = result.text?.trim();
+
     if (!responseText) {
       throw new Error("The AI returned an empty response.");
     }
 
     const parsed: unknown = JSON.parse(responseText);
+
     if (!Array.isArray(parsed)) {
       throw new Error("The AI returned an invalid food list.");
     }
@@ -110,11 +114,17 @@ export async function POST(request: Request) {
     const portions: { name: string; grams: number }[] = parsed
       .filter(
         (item): item is { name: unknown; grams: unknown } =>
-          typeof item === "object" && item !== null && "name" in item && "grams" in item
+          typeof item === "object" &&
+          item !== null &&
+          "name" in item &&
+          "grams" in item
       )
       .map((item) => ({
         name: typeof item.name === "string" ? item.name.trim() : "",
-        grams: typeof item.grams === "number" ? item.grams : Number(item.grams),
+        grams:
+          typeof item.grams === "number"
+            ? item.grams
+            : Number(item.grams),
       }))
       .filter(
         (item) =>
@@ -132,17 +142,18 @@ export async function POST(request: Request) {
         foodPortions: [],
         nutrition: emptyNutrition(),
         nutritionMatchedCount: 0,
-        nutritionNote: "No recognizable food portions were found in this photo.",
+        nutritionNote:
+          "No recognizable food portions were found in this photo.",
       });
     }
 
-    // Look up each item independently so one unavailable USDA match does not
-    // prevent the rest of the photo analysis from succeeding.
+    // A failed USDA lookup for one food won't stop the other lookups.
     const foodPortions: FoodPortion[] = await Promise.all(
       portions.map(async (food) => {
         try {
           const per100g = await getIngredientNutritionPer100g(food.name);
           const factor = food.grams / 100;
+
           return {
             ...food,
             nutrition: {
@@ -156,17 +167,25 @@ export async function POST(request: Request) {
             },
           };
         } catch (error) {
-          console.warn(`USDA nutrition lookup failed for ${food.name}:`, error);
+          console.warn(
+            `USDA nutrition lookup failed for ${food.name}:`,
+            error
+          );
+
           return { ...food, nutrition: null };
         }
       })
     );
 
     const totals = foodPortions.reduce((sum, food) => {
-      if (!food.nutrition) return sum;
+      if (!food.nutrition) {
+        return sum;
+      }
+
       for (const key of Object.keys(sum) as (keyof Nutrition)[]) {
         sum[key] += food.nutrition[key];
       }
+
       return sum;
     }, emptyNutrition());
 
@@ -174,24 +193,39 @@ export async function POST(request: Request) {
       (food) => food.nutrition !== null
     ).length;
 
+    const roundedNutrition = Object.fromEntries(
+      Object.entries(totals).map(([key, value]) => [
+        key,
+        Math.round(value * 10) / 10,
+      ])
+    ) as Nutrition;
+
+    let nutritionNote: string;
+
+    if (nutritionMatchedCount === 0) {
+      nutritionNote =
+        "Foods were identified, but USDA nutrition data could not be matched. Try a clearer photo or review the food names.";
+    } else if (nutritionMatchedCount < foodPortions.length) {
+      nutritionNote =
+        "Nutrition totals include only foods matched to USDA data. One or more items could not be matched.";
+    } else {
+      nutritionNote =
+        "Portion sizes are visual estimates. Nutrition values depend on the USDA food matches and may differ from the actual meal.";
+    }
+
     return NextResponse.json({
-      // Keep these fields for compatibility with the existing frontend.
+      // Preserve the existing frontend response fields.
       foods: foodPortions.map((food) => food.name),
       detectedIngredients: foodPortions.map((food) => food.name),
       foodPortions,
-      nutrition: Object.fromEntries(
-        Object.entries(totals).map(([key, value]) => [key, Math.round(value * 10) / 10])
-      ),
+      nutrition: roundedNutrition,
       nutritionMatchedCount,
-      nutritionNote:
-        nutritionMatchedCount === 0
-          ? "Foods were identified, but USDA nutrition data could not be matched. Try a clearer photo or review the food names."
-          : nutritionMatchedCount < foodPortions.length
-          ? "Nutrition totals include only foods matched to USDA data. One or more items could not be matched."
-          : "Portion sizes are visual estimates. Nutrition values depend on the USDA food matches and may differ from the actual meal.",
+      nutritionNote,
     });
   } catch (error) {
+    // Keep detailed errors in Vercel logs, not in the public response.
     console.error("Food analyzer error:", error);
+
     return NextResponse.json(
       { error: "Food analysis failed. Please try another photo." },
       { status: 500 }
