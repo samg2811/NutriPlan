@@ -77,7 +77,7 @@ export async function POST(request: Request) {
 
     const result = await ai.models.generateContent({
       // Verify that this model ID is available to your Gemini API key.
-      model: "gemini-3.8-flash",
+      model: "gemini-3.5-flash",
       contents: [
         {
           role: "user",
