@@ -1,45 +1,57 @@
+
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
-    request,
-  });
+  let response = NextResponse.next({ request });
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-          response = NextResponse.next({
-            request,
-          });
+  if (!supabaseUrl || !supabaseKey) {
+    console.error("Missing Supabase environment variables.");
+    return NextResponse.json(
+      { error: "Authentication is temporarily unavailable." },
+      { status: 500 }
+    );
+  }
 
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          );
-        },
+  const supabase = createServerClient(supabaseUrl, supabaseKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
       },
-    }
-  );
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value }) => {
+          request.cookies.set(name, value);
+        });
+
+        response = NextResponse.next({ request });
+
+        cookiesToSet.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, options);
+        });
+      },
+    },
+  });
 
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
+
+  if (authError) {
+    console.warn("Middleware session check failed:", authError.message);
+  }
 
   const pathname = request.nextUrl.pathname;
 
-  // Login page: only for visitors who are not logged in
+  // The home page and login page are public.
+  if (pathname === "/") {
+    return response;
+  }
+
   if (pathname === "/login") {
-    // If already logged in, send user to the app
     if (user) {
       return NextResponse.redirect(new URL("/", request.url));
     }
@@ -47,14 +59,14 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // Home page is public, so visitors see the phones and statistics first
-  if (pathname === "/") {
+  // Public photo-analysis endpoint. It does not access private user data.
+  // Rate-limit this endpoint before exposing it to unauthenticated traffic.
+  if (pathname === "/api/analyze-food" && request.method === "POST") {
     return response;
   }
 
-  // Everything else requires login
+  // Other API routes and pages still require authentication.
   if (!user) {
-    // API calls get a JSON error instead of a redirect to an HTML page
     if (pathname.startsWith("/api/")) {
       return NextResponse.json(
         { error: "Please log in to use this feature." },
@@ -73,3 +85,4 @@ export const config = {
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
+
