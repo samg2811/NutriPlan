@@ -75,7 +75,48 @@ export async function POST(request: Request) {
 
     const ai = new GoogleGenAI({ apiKey });
 
-    const result = await ai.models.generateContent({
+    const sleep = (ms: number) =>
+      new Promise((resolve) => setTimeout(resolve, ms));
+    
+    let result;
+    
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        result = await ai.models.generateContent({
+          model: "gemini-3.5-flash",
+          contents: [
+            {
+              role: "user",
+              parts: [
+                {
+                  text: `Inspect this photo of food. Identify each distinct food item that is visibly present and estimate the edible portion size in grams for each item. Use reasonable visual estimates; do not claim exact measurements. Do not include hidden ingredients, drinks, plates, or utensils. If the photo contains a mixed dish, list visible components separately only when reasonably distinguishable. Return only a valid JSON array, with each item shaped like {"name":"cooked white rice","grams":150}. Use specific descriptions when visible (for example, cooked chicken breast rather than just chicken). Grams must be a number from 1 to 2000. If no food is recognizable, return [].`,
+                },
+                {
+                  inlineData: {
+                    mimeType,
+                    data: base64Data,
+                  },
+                },
+              ],
+            },
+          ],
+          config: {
+            responseMimeType: "application/json",
+          },
+        });
+    
+        break;
+      } catch (error) {
+        if (attempt === 2) throw error;
+    
+        await sleep(1000 * (attempt + 1));
+      }
+    }
+    
+    if (!result) {
+      throw new Error("Gemini did not return a result after retries.");
+    }
+
       // Verify that this model ID is available to your Gemini API key.
       model: "gemini-3.5-flash",
       contents: [
@@ -222,17 +263,12 @@ export async function POST(request: Request) {
       nutritionMatchedCount,
       nutritionNote,
     });
-    } catch (error) {
+    
+  } catch (error) {
     console.error("Food analyzer error:", error);
 
-    const details =
-      error instanceof Error ? error.message : String(error);
-
     return NextResponse.json(
-      {
-        error: "Food analysis failed.",
-        details,
-      },
+      { error: "Food analysis failed. Please try again." },
       { status: 500 }
     );
   }
