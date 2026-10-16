@@ -1,11 +1,13 @@
 
 import { NextResponse } from "next/server";
-import { GoogleGenAI } from "@google/genai";
 import { getIngredientNutritionPer100g } from "@/lib/usda";
 
 export const runtime = "nodejs";
 
-const MODEL = "gemini-3.8-flash";
+const MODEL = "nvidia/cosmos3-nano-reasoner";
+const NVIDIA_API_URL =
+  "https://integrate.api.nvidia.com/v1/chat/completions";
+
 const MAX_IMAGE_LENGTH = 12_000_000;
 const MAX_RETRIES = 3;
 
@@ -32,17 +34,19 @@ type DetectedPortion = {
   grams: number;
 };
 
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function isRetryableError(error: unknown): boolean {
   const message =
     error instanceof Error ? error.message : String(error);
 
-  return /\b(429|500|502|503|504)\b|UNAVAILABLE|RESOURCE_EXHAUSTED|high demand|overloaded|timed out|timeout/i.test(
-    message
+  // Do not retry authentication failures, invalid requests, or 429s.
+  return (
+    /NVIDIA API error (500|502|503|504)\b/i.test(message) ||
+    /fetch failed|network error|timed out|timeout/i.test(message)
   );
-}
-
-function wait(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function identifyFood(
@@ -50,58 +54,82 @@ async function identifyFood(
   mimeType: string,
   base64Data: string
 ): Promise<DetectedPortion[]> {
-  const ai = new GoogleGenAI({ apiKey });
-
   const prompt = `
-Inspect this photo of food.
+Identify the foods visible in this photo.
 
-Identify each distinct food item that is visibly present and estimate
-the edible portion size in grams for each item. These are visual
-estimates, not exact measurements.
+Estimate the edible portion size in grams for each distinct food item.
+These are visual estimates, not exact measurements.
 
 Rules:
-- Do not include plates, utensils, or non-food objects.
-- Do not invent hidden ingredients.
-- For mixed dishes, separate components only when reasonably distinguishable.
-- Use specific food names when possible, including cooking method.
-- Grams must be a number between 1 and 2000.
-- Return at most 20 food items.
+- Do not include plates, utensils, or other non-food objects.
+- Do not invent ingredients that cannot reasonably be identified.
+- For mixed dishes, separate components only when distinguishable.
+- Use specific food names and cooking methods when possible.
+- Grams must be a number from 1 to 2000.
+- Return no more than 20 items.
 - If no food is recognizable, return an empty array.
 
-Return only a valid JSON array in this format:
+Return ONLY a JSON array, with no markdown or explanation:
 [{"name":"cooked white rice","grams":150}]
 `;
 
-  let responseText: string | undefined;
+  let responseText = "";
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
-      const result = await ai.models.generateContent({
-        model: MODEL,
-        contents: [
-          {
-            role: "user",
-            parts: [
-              { text: prompt },
-              {
-                inlineData: {
-                  mimeType,
-                  data: base64Data,
-                },
-              },
-            ],
-          },
-        ],
-        config: {
-          responseMimeType: "application/json",
+      const response = await fetch(NVIDIA_API_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
+        body: JSON.stringify({
+          model: MODEL,
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: prompt,
+                },
+                {
+                  type: "image_url",
+                  image_url: {
+                    url: `data:${mimeType};base64,${base64Data}`,
+                  },
+                },
+              ],
+            },
+          ],
+          max_tokens: 1200,
+          temperature: 0.1,
+          stream: false,
+        }),
       });
 
-      responseText = result.text?.trim();
+      if (!response.ok) {
+        const details = await response.text();
+
+        throw new Error(
+          `NVIDIA API error ${response.status}: ${details.slice(0, 500)}`
+        );
+      }
+
+      const data = await response.json();
+
+      const content = data?.choices?.[0]?.message?.content;
+
+      if (typeof content !== "string" || !content.trim()) {
+        throw new Error("NVIDIA returned an empty response.");
+      }
+
+      responseText = content.trim();
       break;
     } catch (error) {
       console.error(
-        `Gemini food analysis attempt ${attempt + 1} failed:`,
+        `NVIDIA food analysis attempt ${attempt + 1} failed:`,
         error
       );
 
@@ -112,13 +140,25 @@ Return only a valid JSON array in this format:
         throw error;
       }
 
-      // Wait 1 second, then 2 seconds before retrying.
       await wait(1000 * (attempt + 1));
     }
   }
 
   if (!responseText) {
-    throw new Error("Gemini returned an empty response.");
+    throw new Error("NVIDIA returned an empty response.");
+  }
+
+  // Remove optional markdown fences and recover a JSON array.
+  responseText = responseText
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
+
+  const arrayStart = responseText.indexOf("[");
+  const arrayEnd = responseText.lastIndexOf("]");
+
+  if (arrayStart !== -1 && arrayEnd > arrayStart) {
+    responseText = responseText.slice(arrayStart, arrayEnd + 1);
   }
 
   let parsed: unknown;
@@ -126,11 +166,11 @@ Return only a valid JSON array in this format:
   try {
     parsed = JSON.parse(responseText);
   } catch {
-    throw new Error("Gemini returned invalid JSON.");
+    throw new Error("NVIDIA returned invalid JSON.");
   }
 
   if (!Array.isArray(parsed)) {
-    throw new Error("Gemini returned an invalid food list.");
+    throw new Error("NVIDIA returned an invalid food list.");
   }
 
   return parsed
@@ -160,12 +200,12 @@ Return only a valid JSON array in this format:
 
 export async function POST(request: Request) {
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.NVIDIA_API_KEY;
     const usdaApiKey = process.env.USDA_API_KEY;
 
     if (!apiKey) {
       return NextResponse.json(
-        { error: "GEMINI_API_KEY is missing from Vercel settings." },
+        { error: "NVIDIA_API_KEY is missing from Vercel settings." },
         { status: 500 }
       );
     }
@@ -232,7 +272,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Step 1: Identify the foods and estimate their portions.
+    // Step 1: Identify foods and estimate portions with NVIDIA.
     const portions = await identifyFood(
       apiKey,
       mimeType,
@@ -251,7 +291,7 @@ export async function POST(request: Request) {
       });
     }
 
-    // Step 2: Look up nutrition independently for each food.
+    // Step 2: Look up each food independently using USDA.
     const foodPortions: FoodPortion[] = await Promise.all(
       portions.map(async (food) => {
         try {
@@ -287,7 +327,7 @@ export async function POST(request: Request) {
       })
     );
 
-    // Step 3: Total the nutrition values that were matched.
+    // Step 3: Total only successfully matched nutrition values.
     const totals = foodPortions.reduce((sum, food) => {
       if (!food.nutrition) {
         return sum;
@@ -335,6 +375,29 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Food analyzer error:", error);
+
+    const message =
+      error instanceof Error ? error.message : String(error);
+
+    if (/NVIDIA API error 429\b/i.test(message)) {
+      return NextResponse.json(
+        {
+          error:
+            "NVIDIA's API is currently rate-limited. Please wait a little and try again.",
+        },
+        { status: 429 }
+      );
+    }
+
+    if (/NVIDIA API error 401\b/i.test(message)) {
+      return NextResponse.json(
+        {
+          error:
+            "NVIDIA rejected the API key. Check NVIDIA_API_KEY in Vercel settings.",
+        },
+        { status: 502 }
+      );
+    }
 
     if (isRetryableError(error)) {
       return NextResponse.json(
