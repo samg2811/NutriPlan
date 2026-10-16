@@ -441,6 +441,8 @@ export default function Home() {
   }
 
   // Send photo to Gemini
+  
+
   async function analyzeFood() {
     if (!selectedImage) return;
 
@@ -452,7 +454,6 @@ export default function Home() {
     setPhotoNutritionNote("");
 
     try {
-      // Clean base64 string by stripping the "data:image/...;base64," prefix
       const base64Data = selectedImage.includes(",")
         ? selectedImage.split(",")[1]
         : selectedImage;
@@ -474,47 +475,80 @@ export default function Home() {
         throw new Error(data.error || "Food analysis failed.");
       }
 
-      // The API returns food names, estimated portion sizes, and USDA nutrition totals.
       const foods: string[] = Array.isArray(data.detectedIngredients)
-        ? data.detectedIngredients.filter((food: unknown): food is string => typeof food === "string")
+        ? data.detectedIngredients.filter(
+            (food: unknown): food is string =>
+              typeof food === "string"
+          )
         : Array.isArray(data.foods)
-        ? data.foods.filter((food: unknown): food is string => typeof food === "string")
+        ? data.foods.filter(
+            (food: unknown): food is string =>
+              typeof food === "string"
+          )
         : [];
 
       if (foods.length === 0) {
-        setAnalysisError("No identifiable food items found in this photo.");
-      } else {
-        setDetectedFoods(foods);
-        setPhotoFoodPortions(
-          Array.isArray(data.foodPortions)
-            ? data.foodPortions.filter(
-                (food: unknown): food is PhotoFoodPortion =>
-                  typeof food === "object" && food !== null &&
-                  "name" in food && typeof food.name === "string" &&
-                  "grams" in food && typeof food.grams === "number"
-              )
-            : []
+        setAnalysisError(
+          "No identifiable food items found in this photo."
         );
-        if (data.nutrition && typeof data.nutrition === "object") {
-          const n = data.nutrition;
-          const values = [n.calories, n.protein, n.carbs, n.fat, n.fiber, n.sugar, n.sodium];
-          if (values.every((value: unknown) => typeof value === "number" && Number.isFinite(value))) {
-            setPhotoNutrition({
-              calories: n.calories,
-              protein: n.protein,
-              carbs: n.carbs,
-              fat: n.fat,
-              fiber: n.fiber,
-              sugar: n.sugar,
-              sodium: n.sodium,
-            });
-          }
-        }
-        setPhotoNutritionNote(
-          typeof data.nutritionNote === "string" ? data.nutritionNote :
-          "Portion sizes and nutrition values are estimates."
-        );
+        return;
       }
+
+      setDetectedFoods(foods);
+
+      setPhotoFoodPortions(
+        Array.isArray(data.foodPortions)
+          ? data.foodPortions.filter(
+              (food: unknown): food is PhotoFoodPortion =>
+                typeof food === "object" &&
+                food !== null &&
+                "name" in food &&
+                typeof food.name === "string" &&
+                "grams" in food &&
+                typeof food.grams === "number"
+            )
+          : []
+      );
+
+      if (data.nutrition && typeof data.nutrition === "object") {
+        const n = data.nutrition;
+        const values = [
+          n.calories,
+          n.protein,
+          n.carbs,
+          n.fat,
+          n.fiber,
+          n.sugar,
+          n.sodium,
+        ];
+
+        if (
+          values.every(
+            (value: unknown) =>
+              typeof value === "number" &&
+              Number.isFinite(value)
+          )
+        ) {
+          setPhotoNutrition({
+            calories: n.calories,
+            protein: n.protein,
+            carbs: n.carbs,
+            fat: n.fat,
+            fiber: n.fiber,
+            sugar: n.sugar,
+            sodium: n.sodium,
+          });
+        }
+      }
+
+      setPhotoNutritionNote(
+        typeof data.nutritionNote === "string"
+          ? data.nutritionNote
+          : "Portion sizes and nutrition values are estimates."
+      );
+
+      // Redirect to Analytics after successful food analysis.
+      window.location.href = "/analytics";
     } catch (error) {
       console.error(error);
 
@@ -525,6 +559,7 @@ export default function Home() {
       setIsAnalyzing(false);
     }
   }
+
 
   // Use AI-detected foods in recipe finder
   
