@@ -1,4 +1,3 @@
-
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -46,11 +45,7 @@ export async function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  // The home page and login page are public.
-  if (pathname === "/") {
-    return response;
-  }
-
+  // Only the login page is public. Everything else requires an account.
   if (pathname === "/login") {
     if (user) {
       return NextResponse.redirect(new URL("/", request.url));
@@ -59,13 +54,7 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // Public photo-analysis endpoint. It does not access private user data.
-  // Rate-limit this endpoint before exposing it to unauthenticated traffic.
-  if (pathname === "/api/analyze-food" && request.method === "POST") {
-    return response;
-  }
-
-  // Other API routes and pages still require authentication.
+  // Every other page and API route requires authentication.
   if (!user) {
     if (pathname.startsWith("/api/")) {
       return NextResponse.json(
