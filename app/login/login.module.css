@@ -1,0 +1,86 @@
+.hero {
+  display: grid;
+  grid-template-columns: 1.1fr .9fr;
+  align-items: center;
+  gap: 40px;
+  padding: 24px 0 32px;
+}
+.formSide { display: flex; justify-content: flex-start; }
+.brandLink { text-decoration: none; color: inherit; }
+
+.card {
+  width: 100%;
+  max-width: 440px;
+  padding: 36px;
+  border-radius: 24px;
+  background: #fff;
+  border: 1px solid #e1e8e1;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.06);
+}
+.card h1 { font-size: 30px; line-height: 1.15; margin-bottom: 8px; color: #1f2a24; }
+.lead { color: #66726b; line-height: 1.55; margin-bottom: 24px; }
+
+.field { margin-bottom: 16px; }
+.label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; color: #1f2a24; }
+.inputWrap { position: relative; }
+.input {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1.5px solid #e1e8e1;
+  border-radius: 12px;
+  font-size: 16px; /* 16px stops iOS from zooming on focus */
+  font-family: inherit;
+  background: #f8faf7;
+  color: #1f2a24;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+}
+.input:hover { border-color: #b9c8bd; }
+.input:focus-visible { outline: none; background: #fff; border-color: #2f7d55; box-shadow: 0 0 0 3px rgba(47, 125, 85, .2); }
+.input[aria-invalid="true"] { border-color: #b3261e; }
+.withToggle { padding-right: 68px; }
+
+.toggle {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  min-height: 36px; padding: 0 10px; border: 0; background: none; border-radius: 8px;
+  color: #2f7d55; font-weight: 600; font-size: 14px; cursor: pointer; font-family: inherit;
+}
+.toggle:focus-visible { outline: 2px solid #2f7d55; outline-offset: 1px; }
+
+.fieldError { color: #b3261e; font-size: 13px; margin-top: 6px; }
+.hint { color: #66726b; font-size: 13px; margin-top: 6px; }
+
+.banner { padding: 12px 14px; border-radius: 12px; font-size: 14px; line-height: 1.45; margin-bottom: 16px; }
+.bannerError { background: #fdf0ee; border: 1px solid #e8b4af; color: #8c1d16; }
+.bannerInfo { background: #e9f4ed; border: 1px solid #b7d9c3; color: #1d5a3a; }
+
+.submit {
+  width: 100%; min-height: 50px; margin-top: 8px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: #2f7d55; color: #fff; border: 0; border-radius: 12px;
+  font-size: 16px; font-weight: 600; font-family: inherit; cursor: pointer;
+  transition: background .15s;
+}
+.submit:hover { background: #266a47; }
+.submit:focus-visible { outline: 3px solid #2f7d55; outline-offset: 2px; }
+.submit:disabled { opacity: .65; cursor: not-allowed; }
+.spinner {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, .4); border-top-color: #fff;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.switch { margin-top: 22px; text-align: center; color: #66726b; font-size: 15px; }
+.switchBtn { border: 0; background: none; color: #2f7d55; font-weight: 700; font-size: inherit; font-family: inherit; cursor: pointer; padding: 4px; border-radius: 6px; }
+.switchBtn:focus-visible { outline: 2px solid #2f7d55; outline-offset: 2px; }
+
+/* ---------- right: phone preview (same placement as the home hero) ---------- */
+.previewSide { display: flex; justify-content: center; }
+
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; gap: 32px; padding-top: 12px; }
+  .formSide { justify-content: center; }
+}
+@media (max-width: 480px) { .card { padding: 26px 20px; } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2s; } .input, .submit { transition: none; } }
