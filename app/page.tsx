@@ -2,9 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import HeroWithPhone from "@/components/HeroWithPhone";
-import StatsSection from "@/components/StatsSection";
-import StatsPhone from "@/components/StatsPhone";
 import { meals, Meal, MealIngredient } from "@/data/meals";
 import { createClient } from "@/lib/supabase/client";
 import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
@@ -678,11 +675,6 @@ export default function Home() {
           )}
         </div>
       </nav>
-
-      {/* HERO */}
-      <HeroWithPhone />
-      <StatsSection />
-      <StatsPhone />
 
       {/* MEAL PLANNER */}
       <section className="planner" id="planner">
