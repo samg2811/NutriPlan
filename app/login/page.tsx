@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import PhoneDemo from "@/components/PhoneDemo";
+import HeroWithPhone from "@/components/HeroWithPhone";
 import StatsSection from "@/components/StatsSection";
 import StatsPhone from "@/components/StatsPhone";
+import { scrollToLogin } from "@/lib/scrollToLogin";
 import styles from "./login.module.css";
 
 type Mode = "login" | "signup";
@@ -35,13 +36,6 @@ export default function LoginPage() {
   const lockedUntil = useRef(0);
 
   const isSignUp = mode === "signup";
-
-  // Phone cards and "Get started" all lead here: scroll up and focus the form
-  const focusForm = useCallback(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
-    window.setTimeout(() => document.getElementById("email")?.focus({ preventScroll: true }), reduce ? 0 : 450);
-  }, []);
 
   function validate(): boolean {
     const cleanEmail = email.trim();
@@ -169,7 +163,7 @@ export default function LoginPage() {
       router.refresh();
     } catch (err) {
       console.error("Authentication error:", err);
-      setError("Can't reach NutriPlan. Check your connection and try again.");
+      setError("Can't reach NutriGoal. Check your connection and try again.");
       setLoading(false);
     }
   }
@@ -177,20 +171,23 @@ export default function LoginPage() {
   return (
     <main className="container">
       <nav className="navbar">
-        <a href="/" className={`logo ${styles.brandLink}`}>🍽️ NutriPlan</a>
+        <a href="/login" className={`logo ${styles.brandLink}`}>🍽️ NutriGoal</a>
         <div className="nav-links">
-          <a href="/">Back to home</a>
+          <a href="#login" onClick={(e) => { e.preventDefault(); scrollToLogin(); }}>Log in</a>
         </div>
       </nav>
 
-      <section className={styles.hero}>
-        <div className={styles.formSide}>
-          <div className={styles.card}>
+      <HeroWithPhone />
+      <StatsSection />
+      <StatsPhone onGetStarted={scrollToLogin} />
+
+      <section className={styles.loginSection} id="login">
+        <div className={styles.card}>
           <h1>{isSignUp ? "Create your account" : "Welcome back"}</h1>
           <p className={styles.lead}>
             {isSignUp
               ? "Save your meals, your plans and your daily log."
-              : "Log in to continue using NutriPlan."}
+              : "Log in to continue using NutriGoal."}
           </p>
 
           <div aria-live="polite">
@@ -267,19 +264,10 @@ export default function LoginPage() {
             </button>
           </p>
         </div>
-
-        </div>
-
-        <div className={styles.previewSide}>
-          <PhoneDemo onOpen={focusForm} />
-        </div>
       </section>
 
-      <StatsSection />
-      <StatsPhone onGetStarted={focusForm} />
-
       <footer>
-        <strong>NutriPlan</strong>
+        <strong>NutriGoal</strong>
         <span>Plan smarter. Eat better. Waste less.</span>
       </footer>
     </main>
