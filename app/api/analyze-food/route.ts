@@ -1,15 +1,16 @@
-
 import { NextResponse } from "next/server";
+import { GoogleGenAI } from "@google/genai";
 import { getIngredientNutritionPer100g } from "@/lib/usda";
 
 export const runtime = "nodejs";
+export const maxDuration = 30;
 
-const MODEL = "nvidia/cosmos3-nano-reasoner";
-const NVIDIA_API_URL =
-  "https://integrate.api.nvidia.com/v1/chat/completions";
+// Models are tried in order. Add a second model name here (one that is listed
+// in Google AI Studio) to use it as a fallback when the first is overloaded.
+const GEMINI_MODELS = ["gemini-3.8-flash"];
 
 const MAX_IMAGE_LENGTH = 12_000_000;
-const MAX_RETRIES = 3;
+const RETRIES_PER_MODEL = 3;
 
 const emptyNutrition = () => ({
   calories: 0,
@@ -38,23 +39,18 @@ function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function isRetryableError(error: unknown): boolean {
-  const message =
-    error instanceof Error ? error.message : String(error);
+// Google is busy (503) or rate limiting (429)
+function isBusyError(error: unknown): boolean {
+  const status = (error as { status?: number })?.status;
+  if (status === 503 || status === 429) return true;
 
-  // Do not retry authentication failures, invalid requests, or 429s.
-  return (
-    /NVIDIA API error (500|502|503|504)\b/i.test(message) ||
-    /fetch failed|network error|timed out|timeout/i.test(message)
+  const message = error instanceof Error ? error.message : String(error);
+  return /UNAVAILABLE|RESOURCE_EXHAUSTED|high demand|\b503\b|\b429\b/i.test(
+    message
   );
 }
 
-async function identifyFood(
-  apiKey: string,
-  mimeType: string,
-  base64Data: string
-): Promise<DetectedPortion[]> {
-  const prompt = `
+const PROMPT = `
 Identify the foods visible in this photo.
 
 Estimate the edible portion size in grams for each distinct food item.
@@ -73,79 +69,63 @@ Return ONLY a JSON array, with no markdown or explanation:
 [{"name":"cooked white rice","grams":150}]
 `;
 
-  let responseText = "";
+async function identifyFood(
+  apiKey: string,
+  mimeType: string,
+  base64Data: string
+): Promise<DetectedPortion[]> {
+  const ai = new GoogleGenAI({ apiKey });
 
-  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-    try {
-      const response = await fetch(NVIDIA_API_URL, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          model: MODEL,
-          messages: [
+  let responseText = "";
+  let lastError: unknown;
+
+  outer: for (const model of GEMINI_MODELS) {
+    for (let attempt = 0; attempt < RETRIES_PER_MODEL; attempt++) {
+      try {
+        const result = await ai.models.generateContent({
+          model,
+          contents: [
             {
               role: "user",
-              content: [
-                {
-                  type: "text",
-                  text: prompt,
-                },
-                {
-                  type: "image_url",
-                  image_url: {
-                    url: `data:${mimeType};base64,${base64Data}`,
-                  },
-                },
+              parts: [
+                { text: PROMPT },
+                { inlineData: { mimeType, data: base64Data } },
               ],
             },
           ],
-          max_tokens: 1200,
-          temperature: 0.1,
-          stream: false,
-        }),
-      });
+          config: {
+            responseMimeType: "application/json",
+            temperature: 0.1,
+          },
+        });
 
-      if (!response.ok) {
-        const details = await response.text();
+        const text = result.text?.trim();
 
-        throw new Error(
-          `NVIDIA API error ${response.status}: ${details.slice(0, 500)}`
+        if (!text) {
+          throw new Error("Gemini returned an empty response.");
+        }
+
+        responseText = text;
+        break outer;
+      } catch (error) {
+        lastError = error;
+        console.error(
+          `Gemini (${model}) attempt ${attempt + 1} failed:`,
+          error
         );
+
+        // Only retry when Google is busy; anything else is a real error
+        if (!isBusyError(error)) throw error;
+
+        if (attempt < RETRIES_PER_MODEL - 1) {
+          await wait(1000 * 2 ** attempt); // 1s, then 2s
+        }
       }
-
-      const data = await response.json();
-
-      const content = data?.choices?.[0]?.message?.content;
-
-      if (typeof content !== "string" || !content.trim()) {
-        throw new Error("NVIDIA returned an empty response.");
-      }
-
-      responseText = content.trim();
-      break;
-    } catch (error) {
-      console.error(
-        `NVIDIA food analysis attempt ${attempt + 1} failed:`,
-        error
-      );
-
-      if (
-        !isRetryableError(error) ||
-        attempt === MAX_RETRIES - 1
-      ) {
-        throw error;
-      }
-
-      await wait(1000 * (attempt + 1));
     }
   }
 
   if (!responseText) {
-    throw new Error("NVIDIA returned an empty response.");
+    throw lastError ?? new Error("Gemini returned an empty response.");
   }
 
   // Remove optional markdown fences and recover a JSON array.
@@ -166,11 +146,11 @@ Return ONLY a JSON array, with no markdown or explanation:
   try {
     parsed = JSON.parse(responseText);
   } catch {
-    throw new Error("NVIDIA returned invalid JSON.");
+    throw new Error("Gemini returned invalid JSON.");
   }
 
   if (!Array.isArray(parsed)) {
-    throw new Error("NVIDIA returned an invalid food list.");
+    throw new Error("Gemini returned an invalid food list.");
   }
 
   return parsed
@@ -200,12 +180,12 @@ Return ONLY a JSON array, with no markdown or explanation:
 
 export async function POST(request: Request) {
   try {
-    const apiKey = process.env.NVIDIA_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
     const usdaApiKey = process.env.USDA_API_KEY;
 
     if (!apiKey) {
       return NextResponse.json(
-        { error: "NVIDIA_API_KEY is missing from Vercel settings." },
+        { error: "GEMINI_API_KEY is missing from Vercel settings." },
         { status: 500 }
       );
     }
@@ -272,12 +252,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Step 1: Identify foods and estimate portions with NVIDIA.
-    const portions = await identifyFood(
-      apiKey,
-      mimeType,
-      base64Data
-    );
+    // Step 1: Identify foods and estimate portions with Gemini.
+    const portions = await identifyFood(apiKey, mimeType, base64Data);
 
     if (portions.length === 0) {
       return NextResponse.json({
@@ -295,9 +271,7 @@ export async function POST(request: Request) {
     const foodPortions: FoodPortion[] = await Promise.all(
       portions.map(async (food) => {
         try {
-          const per100g = await getIngredientNutritionPer100g(
-            food.name
-          );
+          const per100g = await getIngredientNutritionPer100g(food.name);
 
           const factor = food.grams / 100;
 
@@ -376,34 +350,10 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Food analyzer error:", error);
 
-    const message =
-      error instanceof Error ? error.message : String(error);
-
-    if (/NVIDIA API error 429\b/i.test(message)) {
+    if (isBusyError(error)) {
       return NextResponse.json(
         {
-          error:
-            "NVIDIA's API is currently rate-limited. Please wait a little and try again.",
-        },
-        { status: 429 }
-      );
-    }
-
-    if (/NVIDIA API error 401\b/i.test(message)) {
-      return NextResponse.json(
-        {
-          error:
-            "NVIDIA rejected the API key. Check NVIDIA_API_KEY in Vercel settings.",
-        },
-        { status: 502 }
-      );
-    }
-
-    if (isRetryableError(error)) {
-      return NextResponse.json(
-        {
-          error:
-            "The food analyzer is temporarily busy. Please try again shortly.",
+          error: "The AI is busy right now. Please try again in a moment.",
         },
         { status: 503 }
       );
@@ -411,8 +361,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       {
-        error:
-          "Food analysis failed. Check the photo and try again.",
+        error: "Food analysis failed. Check the photo and try again.",
       },
       { status: 500 }
     );
