@@ -1,11 +1,10 @@
 "use client";
 
-   import HeroWithPhone from "@/components/HeroWithPhone";
-   import StatsSection from "@/components/StatsSection";
-   import StatsPhone from "@/components/StatsPhone";
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import HeroWithPhone from "@/components/HeroWithPhone";
+import StatsSection from "@/components/StatsSection";
+import StatsPhone from "@/components/StatsPhone";
 import { meals, Meal, MealIngredient } from "@/data/meals";
 import { createClient } from "@/lib/supabase/client";
 import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
@@ -32,6 +31,43 @@ type PhotoFoodPortion = {
   grams: number;
   nutrition: NutritionData | null;
 };
+
+// Shrinks big photos and screenshots so they upload reliably
+function compressImage(file: File, maxSize = 1280, quality = 0.8): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+
+    img.onload = () => {
+      const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+
+      const ctx = canvas.getContext("2d");
+      URL.revokeObjectURL(url);
+
+      if (!ctx) {
+        reject(new Error("Canvas not supported"));
+        return;
+      }
+
+      // White background so transparent PNG screenshots don't turn black
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      resolve(canvas.toDataURL("image/jpeg", quality));
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Could not read image"));
+    };
+
+    img.src = url;
+  });
+}
 
 export default function Home() {
   const [ingredients, setIngredients] = useState("");
@@ -84,7 +120,7 @@ export default function Home() {
   const [photoNutritionNote, setPhotoNutritionNote] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisError, setAnalysisError] = useState("");
-  
+
   const [savingPhoto, setSavingPhoto] = useState(false);
   const [photoSaveMessage, setPhotoSaveMessage] = useState("");
   const [photoSaveError, setPhotoSaveError] = useState("");
@@ -106,7 +142,6 @@ export default function Home() {
     }[]
   >([]);
 
-  
   async function saveEntryToFoodTracker(entry: {
     mealText: string;
     items: {
@@ -229,8 +264,6 @@ export default function Home() {
     }
   }
 
-
-
   // Open a meal and calculate its estimated nutrition using the USDA endpoint.
   async function openMealDetails(meal: Meal) {
     setSelectedMeal(meal);
@@ -278,54 +311,52 @@ export default function Home() {
         );
       }
 
-      
-  setMealNutrition({
-    calories: data.calories,
-    protein: data.protein,
-    carbs: data.carbs,
-    fat: data.fat,
-    fiber: data.fiber,
-    sugar: data.sugar,
-    sodium: data.sodium,
-  });
+      setMealNutrition({
+        calories: data.calories,
+        protein: data.protein,
+        carbs: data.carbs,
+        fat: data.fat,
+        fiber: data.fiber,
+        sugar: data.sugar,
+        sodium: data.sodium,
+      });
 
-  const ingredientResults = Array.isArray(data.ingredients)
-    ? data.ingredients
-    : [];
+      const ingredientResults = Array.isArray(data.ingredients)
+        ? data.ingredients
+        : [];
 
-  setMealNutritionItems(
-    ingredientResults
-      .filter(
-        (item: any) =>
-          item &&
-          typeof item.name === "string" &&
-          typeof item.grams === "number" &&
-          item.grams > 0 &&
-          item.nutrition &&
-          typeof item.nutrition.calories === "number" &&
-          typeof item.nutrition.protein === "number" &&
-          typeof item.nutrition.carbs === "number" &&
-          typeof item.nutrition.fat === "number"
-      )
-      .map((item: any) => {
-        const factor = 100 / item.grams;
+      setMealNutritionItems(
+        ingredientResults
+          .filter(
+            (item: any) =>
+              item &&
+              typeof item.name === "string" &&
+              typeof item.grams === "number" &&
+              item.grams > 0 &&
+              item.nutrition &&
+              typeof item.nutrition.calories === "number" &&
+              typeof item.nutrition.protein === "number" &&
+              typeof item.nutrition.carbs === "number" &&
+              typeof item.nutrition.fat === "number"
+          )
+          .map((item: any) => {
+            const factor = 100 / item.grams;
 
-        return {
-          name: item.name,
-          grams: item.grams,
-          per100g: {
-            calories: item.nutrition.calories * factor,
-            protein: item.nutrition.protein * factor,
-            carbs: item.nutrition.carbs * factor,
-            fat: item.nutrition.fat * factor,
-          },
-        };
-      })
-  );
+            return {
+              name: item.name,
+              grams: item.grams,
+              per100g: {
+                calories: item.nutrition.calories * factor,
+                protein: item.nutrition.protein * factor,
+                carbs: item.nutrition.carbs * factor,
+                fat: item.nutrition.fat * factor,
+              },
+            };
+          })
+      );
 
-  setRecipeSaveMessage("");
-  setRecipeSaveError("");
-
+      setRecipeSaveMessage("");
+      setRecipeSaveError("");
     } catch (error) {
       console.error("Meal nutrition error:", error);
       setNutritionError(
@@ -411,38 +442,42 @@ export default function Home() {
     setResults(rankedMeals.slice(0, 3));
   }
 
-  // Handle photo upload
-  function handleImageUpload(
+  // Handle photo / screenshot upload (shrinks the image before it is sent)
+  async function handleImageUpload(
     event: React.ChangeEvent<HTMLInputElement>
   ) {
-    const file = event.target.files?.[0];
+    const input = event.target;
+    const file = input.files?.[0];
 
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
       setAnalysisError("Please upload an image file.");
+      input.value = "";
       return;
     }
 
-    setImageMimeType(file.type);
+    try {
+      const dataUrl = await compressImage(file);
 
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      setSelectedImage(reader.result as string);
+      setImageMimeType("image/jpeg");
+      setSelectedImage(dataUrl);
       setDetectedFoods([]);
       setPhotoFoodPortions([]);
       setPhotoNutrition(null);
       setPhotoNutritionNote("");
+      setPhotoSaveMessage("");
+      setPhotoSaveError("");
       setAnalysisError("");
-    };
-
-    reader.readAsDataURL(file);
+    } catch {
+      setAnalysisError("Couldn't read that image. Try a JPEG or PNG.");
+    } finally {
+      // Lets the same file be chosen again if the first try fails
+      input.value = "";
+    }
   }
 
   // Send photo to Gemini
-  
-
   async function analyzeFood() {
     if (!selectedImage) return;
 
@@ -546,23 +581,23 @@ export default function Home() {
           ? data.nutritionNote
           : "Portion sizes and nutrition values are estimates."
       );
-
-      // Redirect to Analytics after successful food analysis.
-      window.location.href = "/analytics";
     } catch (error) {
       console.error(error);
 
+      const message = error instanceof Error ? error.message : "";
+
       setAnalysisError(
-        "We couldn't analyze that photo. Please try another image."
+        message.startsWith("Please log in") ||
+          message.startsWith("The AI is busy")
+          ? message
+          : "We couldn't analyze that photo. Please try another image."
       );
     } finally {
       setIsAnalyzing(false);
     }
   }
 
-
   // Use AI-detected foods in recipe finder
-  
   function useDetectedFoods() {
     if (detectedFoods.length === 0) return;
 
@@ -646,8 +681,9 @@ export default function Home() {
 
       {/* HERO */}
       <HeroWithPhone />
-   <StatsSection />
-<StatsPhone />
+      <StatsSection />
+      <StatsPhone />
+
       {/* MEAL PLANNER */}
       <section className="planner" id="planner">
         <h2>Find Your Meal</h2>
@@ -880,29 +916,27 @@ export default function Home() {
             </section>
           )}
 
-           
           <div className="tracker-actions">
-             <button
-               className="primary-button"
-               onClick={savePhotoToTracker}
-               disabled={savingPhoto || !photoNutrition}
-             >
-               {savingPhoto
-                 ? "Saving..."
-                 : "＋ Add Scanned Meal to Food Tracker"}
+            <button
+              className="primary-button"
+              onClick={savePhotoToTracker}
+              disabled={savingPhoto || !photoNutrition}
+            >
+              {savingPhoto
+                ? "Saving..."
+                : "＋ Add Scanned Meal to Food Tracker"}
             </button>
-         
+
             {photoSaveMessage && (
               <p role="status">{photoSaveMessage}</p>
             )}
-         
+
             {photoSaveError && (
               <p className="error-message" role="alert">
                 {photoSaveError}
               </p>
-             )}
+            )}
           </div>
-
 
           <p className="confirmation-text">
             AI identification and portion estimates can make mistakes. Review the foods and amounts before relying on the results.
@@ -930,6 +964,7 @@ export default function Home() {
             <button
               className="close-button"
               onClick={() => setSelectedMeal(null)}
+              aria-label="Close recipe"
             >
               ✕
             </button>
@@ -1004,7 +1039,7 @@ export default function Home() {
                       unlisted ingredients are not included. Actual nutrition
                       may differ depending on the exact food and preparation.
                     </p>
-                    
+
                     <div className="tracker-actions">
                       <button
                         className="primary-button"
@@ -1015,17 +1050,17 @@ export default function Home() {
                           ? "Saving..."
                           : "＋ Add This Recipe to Food Tracker"}
                       </button>
-                  
+
                       {recipeSaveMessage && (
                         <p role="status">{recipeSaveMessage}</p>
                       )}
-                  
+
                       {recipeSaveError && (
                         <p className="error-message" role="alert">
                           {recipeSaveError}
                         </p>
                       )}
-                  
+
                       {mealNutritionItems.length === 0 && (
                         <p className="nutrition-note">
                           Ingredient-level nutrition data is needed to save this recipe.
@@ -1048,12 +1083,11 @@ export default function Home() {
               ))}
             </ul>
 
-            
             <h3>How to Make It</h3>
 
             <ol className="recipe-steps">
               {getRecipe(selectedMeal.id).map((step, index) => (
-              <li key={index}>{step}</li>
+                <li key={index}>{step}</li>
               ))}
             </ol>
 
