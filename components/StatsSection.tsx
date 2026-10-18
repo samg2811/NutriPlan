@@ -39,7 +39,7 @@ const HELPS = [
   {
     icon: "➡️",
     title: "Always know what is next",
-    text: "Your daily log shows what you have left, and NutriPlan suggests the next meal to fit it.",
+    text: "Your daily log shows what you have left, and NutriGoal suggests the next meal to fit it.",
   },
 ];
 
@@ -70,7 +70,7 @@ export default function StatsSection() {
       </div>
 
       <div className={styles.help}>
-        <h3 className={styles.helpTitle}>NutriPlan is here to help</h3>
+        <h3 className={styles.helpTitle}>NutriGoal is here to help</h3>
         <div className={styles.helpGrid}>
           {HELPS.map((h) => (
             <div key={h.title} className={styles.helpItem}>
