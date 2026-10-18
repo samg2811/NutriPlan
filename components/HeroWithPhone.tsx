@@ -1,7 +1,15 @@
+"use client";
+
 import PhoneDemo from "./PhoneDemo";
+import { scrollToLogin } from "@/lib/scrollToLogin";
 import styles from "./HeroWithPhone.module.css";
 
 export default function HeroWithPhone() {
+  function go(e: React.MouseEvent) {
+    e.preventDefault();
+    scrollToLogin();
+  }
+
   return (
     <section className={styles.hero}>
       <div className={styles.text}>
@@ -12,17 +20,17 @@ export default function HeroWithPhone() {
           <span>you eat?</span>
         </h1>
         <p className={styles.sub}>
-          NutriPlan uses your ingredients, budget, and available time to help you find
+          NutriGoal uses your ingredients, budget, and available time to help you find
           meals that fit your needs, then tracks what you eat so you always know what
           comes next.
         </p>
         <div className={styles.buttons}>
-          <a href="#planner" className={styles.primary}>Find my meal →</a>
-          <a href="/food-log" className={styles.secondary}>Log what I ate</a>
+          <a href="#login" onClick={go} className={styles.primary}>Get started →</a>
+          <a href="#login" onClick={go} className={styles.secondary}>Log in</a>
         </div>
       </div>
 
-      <PhoneDemo />
+      <PhoneDemo onOpen={scrollToLogin} />
     </section>
   );
 }
