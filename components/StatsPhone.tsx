@@ -83,7 +83,7 @@ export default function StatsPhone({ onGetStarted }: { onGetStarted?: () => void
         <p className={styles.eyebrow}>THE NUMBERS</p>
         <h2 className={styles.title}>Scroll through why a plan matters.</h2>
         <p className={styles.lead}>
-          Swipe through the phone to see the numbers behind NutriPlan. At the end,
+          Swipe through the phone to see the numbers behind NutriGoal. At the end,
           tap Get started to create your account.
         </p>
         <p className={styles.fine}>
@@ -98,7 +98,7 @@ export default function StatsPhone({ onGetStarted }: { onGetStarted?: () => void
           <div className={styles.screen}>
             <div className={styles.statusBar}>
               <span>9:41</span>
-              <span className={styles.brand}>🍽️ NutriPlan</span>
+              <span className={styles.brand}>🍽️ NutriGoal</span>
               <span>●●●</span>
             </div>
             <div className={styles.progressTrack} aria-hidden>
@@ -169,9 +169,9 @@ export default function StatsPhone({ onGetStarted }: { onGetStarted?: () => void
                 </p>
               </div>
 
-              {/* How NutriPlan helps */}
+              {/* How NutriGoal helps */}
               <div className={`${styles.block} ${styles.helps}`}>
-                <h3>NutriPlan is here to help</h3>
+                <h3>NutriGoal is here to help</h3>
                 <ul>
                   <li><span>🥘</span><div><b>Plan around what you have</b><p>Ingredients, budget and time in. Meals out.</p></div></li>
                   <li><span>📸</span><div><b>Know what is in your food</b><p>Photo or text to calories and macros.</p></div></li>
@@ -196,7 +196,7 @@ export default function StatsPhone({ onGetStarted }: { onGetStarted?: () => void
                     router.push(loggedIn ? "/food-log" : "/login");
                   }}
                 >
-                  {loggedIn ? "Open your food log →" : "Get started with NutriPlan →"}
+                  {loggedIn ? "Open your food log →" : "Get started with NutriGoal →"}
                 </button>
                 <button
                   type="button"
