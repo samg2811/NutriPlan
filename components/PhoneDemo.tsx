@@ -89,7 +89,7 @@ export default function PhoneDemo({ onOpen }: { onOpen?: () => void }) {
         <div className={styles.screen}>
           <div className={styles.statusBar}>
             <span>9:41</span>
-            <span className={styles.brand}>🍽️ NutriPlan</span>
+            <span className={styles.brand}>🍽️ NutriGoal</span>
             <span>●●●</span>
           </div>
 
