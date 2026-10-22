@@ -1,0 +1,53 @@
+.main { max-width: 680px; margin: 0 auto; padding: 32px 16px 72px; color: #1f2a24; }
+.back { display: inline-block; margin-bottom: 16px; color: #66726b; text-decoration: none; }
+.title { font-size: 1.8rem; margin: 0 0 4px; }
+.sub { color: #66726b; margin: 0 0 20px; line-height: 1.5; }
+
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 22px; }
+.stats div { background: #fff; border: 1px solid #e1e8e1; border-radius: 14px; padding: 12px 14px; }
+.stats b { display: block; font-size: 1.5rem; line-height: 1.2; }
+.stats span { color: #66726b; font-size: .82rem; }
+.good { color: #2f7d55; } .bad { color: #b3392f; }
+
+.add { display: grid; grid-template-columns: 1fr 170px auto; gap: 10px; align-items: end; background: #fff; border: 1px solid #e1e8e1; border-radius: 16px; padding: 16px; }
+.addField label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: 5px; }
+.addField input { width: 100%; min-height: 44px; padding: 10px 12px; font: inherit; font-size: 16px; border: 1.5px solid #e1e8e1; border-radius: 10px; background: #f8faf7; }
+.addField input:focus-visible { outline: none; border-color: #2f7d55; box-shadow: 0 0 0 3px rgba(47, 125, 85, .2); background: #fff; }
+.primary { min-height: 44px; padding: 0 20px; background: #2f7d55; color: #fff; border: 0; border-radius: 10px; font: inherit; font-weight: 600; cursor: pointer; }
+.primary:hover { background: #266a47; } .primary:disabled { opacity: .6; cursor: wait; }
+.primary:focus-visible, .ghost:focus-visible, .small:focus-visible, .smallDanger:focus-visible { outline: 3px solid #2f7d55; outline-offset: 2px; }
+
+.error { color: #8c1d16; background: #fdf0ee; border: 1px solid #e8b4af; border-radius: 10px; padding: 10px 14px; margin: 14px 0 0; }
+.noteOk { color: #1d5a3a; background: #e9f4ed; border: 1px solid #b7d9c3; border-radius: 10px; padding: 10px 14px; margin: 14px 0 0; }
+.notice { background: #fff6e0; border: 1px solid #ecd9a0; border-radius: 10px; padding: 10px 14px; margin: 0 0 12px; color: #6b5514; font-size: .9rem; }
+.heading { font-size: 1.15rem; margin: 30px 0 10px; }
+.empty { color: #66726b; }
+
+.list, .items { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.meal { background: #fff; border: 1px solid #e1e8e1; border-radius: 16px; padding: 14px 16px; }
+.mealHead { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.meta { color: #66726b; font-size: .85rem; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 12px; }
+.tags span { font-size: .8rem; padding: 4px 10px; border-radius: 999px; }
+.tag { background: #e9f4ed; color: #1d5a3a; }
+.tagUrgent { background: #fff0d6; color: #8a5a00; font-weight: 600; }
+.tagMissing { background: #f1f2f0; color: #66726b; }
+.ghost { background: none; border: 1.5px solid #2f7d55; color: #2f7d55; border-radius: 10px; padding: 8px 14px; font: inherit; font-weight: 600; font-size: .9rem; cursor: pointer; }
+.ghost:hover { background: #e9f4ed; }
+
+.item { display: flex; justify-content: space-between; align-items: center; gap: 12px; background: #fff; border: 1px solid #e1e8e1; border-radius: 14px; padding: 10px 14px; }
+.iname { font-weight: 600; text-transform: capitalize; margin-right: 10px; }
+.badge { font-size: .78rem; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.expired { background: #fdf0ee; color: #8c1d16; } .today { background: #ffe3cc; color: #8a3a00; }
+.soon { background: #fff0d6; color: #8a5a00; } .fresh { background: #e9f4ed; color: #1d5a3a; }
+.none { background: #f1f2f0; color: #66726b; }
+.row { display: flex; gap: 6px; flex-shrink: 0; }
+.small, .smallDanger { min-height: 36px; padding: 0 12px; border-radius: 8px; font: inherit; font-size: .85rem; font-weight: 600; cursor: pointer; background: #fff; }
+.small { border: 1.5px solid #2f7d55; color: #2f7d55; } .small:hover { background: #e9f4ed; }
+.smallDanger { border: 1.5px solid #d9b3ae; color: #8c1d16; } .smallDanger:hover { background: #fdf0ee; }
+
+@media (max-width: 560px) {
+  .add { grid-template-columns: 1fr; }
+  .stats b { font-size: 1.25rem; }
+  .item { flex-direction: column; align-items: flex-start; }
+}
