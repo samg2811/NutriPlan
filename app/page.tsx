@@ -8,6 +8,7 @@ import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import { getRecipe } from "@/data/recipes";
 import FoodLogSection from "@/components/FoodLogSection";
 import MobileNav from "@/components/MobileNav";
+import PantrySection from "@/components/PantrySection";
 
 type RankedMeal = {
   meal: Meal;
@@ -656,7 +657,6 @@ export default function Home() {
           {userEmail ? (
             <>
               <a href="/food-log">Food Log</a>
-              <a href="/pantry">Pantry</a>
 
               <button
                 className="login-button"
@@ -740,6 +740,7 @@ export default function Home() {
             Find My Meals →
           </button>
         </div>
+        <PantrySection onUse={(names) => setIngredients(names.join(", "))} />
       </section>
 
       {/* RECOMMENDATIONS */}
@@ -1095,6 +1096,11 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* FOOD LOG */}
+      <FoodLogSection />
+
+      <MobileNav />
 
       {/* FOOTER */}
       <footer>
