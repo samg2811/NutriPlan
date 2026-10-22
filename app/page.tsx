@@ -656,6 +656,7 @@ export default function Home() {
           {userEmail ? (
             <>
               <a href="/food-log">Food Log</a>
+              <a href="/pantry">Pantry</a>
 
               <button
                 className="login-button"
