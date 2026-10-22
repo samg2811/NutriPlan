@@ -6,6 +6,8 @@ import { meals, Meal, MealIngredient } from "@/data/meals";
 import { createClient } from "@/lib/supabase/client";
 import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import { getRecipe } from "@/data/recipes";
+import FoodLogSection from "@/components/FoodLogSection";
+import MobileNav from "@/components/MobileNav";
 
 type RankedMeal = {
   meal: Meal;
