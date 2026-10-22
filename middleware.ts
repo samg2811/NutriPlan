@@ -39,7 +39,13 @@ export async function middleware(request: NextRequest) {
     error: authError,
   } = await supabase.auth.getUser();
 
-  if (authError) {
+  
+  // "Auth session missing" just means a logged-out visitor. Only log real problems.
+  const noSession =
+    authError?.name === "AuthSessionMissingError" ||
+    /session missing/i.test(authError?.message ?? "");
+  
+  if (authError && !noSession) {
     console.warn("Middleware session check failed:", authError.message);
   }
 
