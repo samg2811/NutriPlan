@@ -9,6 +9,7 @@ import { getRecipe } from "@/data/recipes";
 import FoodLogSection from "@/components/FoodLogSection";
 import MobileNav from "@/components/MobileNav";
 import PantrySection from "@/components/PantrySection";
+import TodaySummary from "@/components/TodaySummary";
 
 type RankedMeal = {
   meal: Meal;
@@ -678,6 +679,9 @@ export default function Home() {
           )}
         </div>
       </nav>
+
+      {/* TODAY SO FAR */}
+      <TodaySummary />
 
       {/* MEAL PLANNER */}
       <section className="planner" id="planner">
