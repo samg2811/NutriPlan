@@ -1,5 +1,6 @@
 // Auto-generated meal dataset. Ingredient names are plain lowercase food names
 // (e.g. "chicken breast") so they can be looked up in the USDA FoodData Central API.
+import { moreMeals } from "./moreMeals";
 
 export interface MealIngredient {
   /** Lowercase food name, suitable as a USDA search query. */
@@ -21,7 +22,7 @@ export interface Meal {
   cost: number;
 }
 
-export const meals: Meal[] = [
+const baseMeals: Meal[] = [
   {
     id: 1,
     name: "Chicken & Broccoli Rice Bowl",
@@ -3502,6 +3503,9 @@ export const meals: Meal[] = [
     cost: 5,
   },
 ];
+
+/** All meals: the original set plus the extra recipes from cuisines around the world. */
+export const meals: Meal[] = [...baseMeals, ...moreMeals];
 
 /** Every distinct ingredient name used across all meals (handy for batch USDA lookups). */
 export const ingredientNames: string[] = Array.from(
