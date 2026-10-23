@@ -16,20 +16,37 @@ async function mealMacros(meal: (typeof meals)[number]): Promise<Macros | null> 
   const total: Macros = { calories: 0, protein: 0, carbs: 0, fat: 0 };
   let found = 0;
 
-  for (const ing of meal.ingredients) {
-    const match = await lookupPer100g(ing.name);
-    if (!match) continue;
+  // Look up all of this meal's ingredients at the same time instead of one by one.
+  const matches = await Promise.all(meal.ingredients.map((ing) => lookupPer100g(ing.name)));
+  meal.ingredients.forEach((ing, i) => {
+    const match = matches[i];
+    if (!match) return;
     found++;
     const f = ing.grams / 100;
     total.calories += match.per100g.calories * f;
     total.protein += match.per100g.protein * f;
     total.carbs += match.per100g.carbs * f;
     total.fat += match.per100g.fat * f;
-  }
+  });
 
   const result = found > 0 ? total : null;
   mealCache.set(key, result);
   return result;
+}
+
+// Fetch each distinct ingredient once, 20 at a time, the first time anyone asks.
+// After that every meal calculation is answered from the cache.
+let warmup: Promise<void> | null = null;
+function warmIngredients(): Promise<void> {
+  if (!warmup) {
+    warmup = (async () => {
+      const names = Array.from(new Set(meals.flatMap((m) => m.ingredients.map((i) => i.name))));
+      for (let i = 0; i < names.length; i += 20) {
+        await Promise.all(names.slice(i, i + 20).map((n) => lookupPer100g(n)));
+      }
+    })().catch(() => { warmup = null; });
+  }
+  return warmup;
 }
 
 export async function POST(req: Request) {
@@ -55,6 +72,8 @@ export async function POST(req: Request) {
     const mealsLeft = hour < 11 ? 3 : hour < 16 ? 2 : 1;
     const targetCal = remainingCalories / mealsLeft;
     const targetProtein = Math.max(remainingProtein, 0) / mealsLeft;
+
+    await warmIngredients();
 
     // Calculate macros for every meal (in small parallel batches)
     const withMacros: { meal: (typeof meals)[number]; macros: Macros }[] = [];
