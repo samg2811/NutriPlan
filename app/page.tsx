@@ -10,6 +10,7 @@ import FoodLogSection from "@/components/FoodLogSection";
 import MobileNav from "@/components/MobileNav";
 import PantrySection from "@/components/PantrySection";
 import TodaySummary from "@/components/TodaySummary";
+import { announceFoodLogChanged, announceMealLogged } from "@/lib/cook";
 
 type RankedMeal = {
   meal: Meal;
@@ -179,6 +180,7 @@ export default function Home() {
     if (error) {
       console.error("Food Tracker save error:", error);
       throw new Error("Couldn't save this entry. Please try again.");
+      announceFoodLogChanged();
     }
   }
 
@@ -254,6 +256,7 @@ export default function Home() {
       });
 
       setRecipeSaveMessage("Recipe saved to your Food Tracker!");
+      announceMealLogged(selectedMeal.ingredients.map((i) => i.name));
     } catch (error) {
       setRecipeSaveError(
         error instanceof Error
