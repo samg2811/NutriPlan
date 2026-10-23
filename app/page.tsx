@@ -83,6 +83,8 @@ export default function Home() {
   const [nutritionLoading, setNutritionLoading] = useState(false);
   const [nutritionError, setNutritionError] = useState("");
   const [nutritionMealId, setNutritionMealId] = useState<number | null>(null);
+  const { prefs } = useRestrictions();
+  const [hiddenCount, setHiddenCount] = useState(0);
 
   const [results, setResults] = useState<RankedMeal[]>([]);
 
