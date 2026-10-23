@@ -11,6 +11,9 @@ import MobileNav from "@/components/MobileNav";
 import PantrySection from "@/components/PantrySection";
 import TodaySummary from "@/components/TodaySummary";
 import { announceFoodLogChanged, announceMealLogged } from "@/lib/cook";
+import RestrictionsPanel from "@/components/RestrictionsPanel";
+import { useRestrictions } from "@/components/useRestrictions";
+import { findViolations } from "@/lib/restrictions";
 
 type RankedMeal = {
   meal: Meal;
