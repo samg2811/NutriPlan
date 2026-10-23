@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
@@ -116,9 +115,16 @@ export default function FoodLogSection() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
+        signal: AbortSignal.timeout(28000), // stop waiting after 28 seconds
       });
       if (res.status === 401) throw new Error("login");
-      if (!res.ok) throw new Error("Status " + res.status);
+      if (!res.ok) {
+        let serverMessage = "";
+        try {
+          serverMessage = (await res.json()).error ?? "";
+        } catch {}
+        throw new Error(serverMessage || "Status " + res.status);
+      }
       const data = await res.json();
       if (!data.items?.length) {
         setError("No foods recognized. Try listing each food with a rough amount.");
@@ -128,9 +134,15 @@ export default function FoodLogSection() {
       }
     } catch (err) {
       console.error("analyze failed:", err);
+      const name = err instanceof Error ? err.name : "";
+      const msg = err instanceof Error ? err.message : "";
       setError(
-        err instanceof Error && err.message === "login"
+        name === "TimeoutError" || name === "AbortError"
+          ? "This is taking too long. Please try again."
+          : msg === "login"
           ? "Please log in to use the food log."
+          : msg && !msg.startsWith("Status") && msg !== "Server error"
+          ? msg
           : "Couldn't get nutrition facts. Check your connection and try again."
       );
     } finally {
