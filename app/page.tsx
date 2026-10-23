@@ -448,7 +448,11 @@ export default function Home() {
       .filter((item) => item.matchedIngredients.length > 0)
       .sort((a, b) => b.score - a.score);
 
-    setResults(rankedMeals.slice(0, 3));
+    const allowed = rankedMeals.filter(
+  (r) => findViolations(r.meal, prefs.ids, prefs.avoid).length === 0
+);
+setHiddenCount(rankedMeals.length - allowed.length);
+setResults(allowed.slice(0, 3));
   }
 
   // Handle photo / screenshot upload (shrinks the image before it is sent)
