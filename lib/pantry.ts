@@ -84,3 +84,17 @@ export function rankMeals(items: PantryItem[]): { useItUp: Ranked[]; bestFit: Ra
     bestFit: ranked.filter((r) => r.urgent === 0).sort(byScore).slice(0, 5),
   };
 }
+
+// Which pantry items does a list of recipe ingredients use? One item per ingredient,
+// never an expired one.
+export function pantryIdsForIngredients(items: PantryItem[], names: string[]): string[] {
+  const usable = sortByExpiry(items).filter((i) => freshness(i.expires_on) !== "expired");
+  const ids = new Set<string>();
+  for (const name of names) {
+    const full = norm(name);
+    const simple = norm(ALIASES[name.toLowerCase()] ?? name);
+    const item = usable.find((u) => !ids.has(u.id) && [full, simple].includes(norm(u.name)));
+    if (item) ids.add(item.id);
+  }
+  return Array.from(ids);
+}
