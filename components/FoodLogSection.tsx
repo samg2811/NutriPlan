@@ -75,6 +75,8 @@ export default function FoodLogSection() {
       if (data.user) loadToday();
     }
     init();
+    const onChanged = () => loadToday();
+    window.addEventListener("foodlog:changed", onChanged);
 
     // Keep the section in sync when someone logs in or out on the same page
     const {
@@ -88,7 +90,10 @@ export default function FoodLogSection() {
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      window.removeEventListener("foodlog:changed", onChanged);
+      subscription.unsubscribe();
+    };
   }, [supabase, loadToday]);
 
   const eaten = today.reduce(
