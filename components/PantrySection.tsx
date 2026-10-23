@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
 import {
-  INGREDIENT_NAMES, freshness, freshnessLabel, rankMeals, sortByExpiry,
+  INGREDIENT_NAMES, freshness, freshnessLabel, rankMeals, sortByExpiry, pantryIdsForIngredients,
   type PantryItem, type Ranked,
 } from "@/lib/pantry";
+import { announceFoodLogChanged, fetchMealNutrition } from "@/lib/cook";
 import styles from "./PantrySection.module.css";
 
 const MAX_ITEMS = 200;
@@ -22,6 +23,7 @@ export default function PantrySection({ onUse }: { onUse: (names: string[]) => v
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [note, setNote] = useState("");
+  const [cookingId, setCookingId] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     const since = new Date(Date.now() - 30 * 86_400_000).toISOString();
@@ -76,21 +78,68 @@ export default function PantrySection({ onUse }: { onUse: (names: string[]) => v
   }
 
   // "used" = cooked/eaten, "wasted" = tossed. Both leave the active list.
-  async function close(ids: string[], status: "used" | "wasted") {
-    setError(""); setNote("");
+  async function close(ids: string[], status: "used" | "wasted", message?: string): Promise<boolean> {
+    setError(""); if (!message) setNote("");
     const { error: err } = await supabase
       .from("pantry_items")
       .update({ status, closed_at: new Date().toISOString() })
       .in("id", ids);
-    if (err) return setError("Couldn't update that. Please try again.");
+    if (err) { setError("Couldn't update that. Please try again."); return false; }
     setItems((prev) => prev.filter((i) => !ids.includes(i.id)));
     if (status === "used") {
       setUsed((n) => n + ids.length);
-      setNote(`Nice. ${ids.length} item${ids.length > 1 ? "s" : ""} used up.`);
+      setNote(message ?? `Nice. ${ids.length} item${ids.length > 1 ? "s" : ""} used up.`);
     } else {
       setWasted((n) => n + ids.length);
     }
+    return true;
   }
+
+  // One tap: log one serving of this meal to the food log AND mark its pantry items used.
+  // If the meal can't be logged, nothing in the pantry changes.
+  async function cook(r: Ranked) {
+    if (cookingId !== null) return;
+    setCookingId(r.meal.id); setError(""); setNote("");
+    try {
+      const { totals, items: logItems } = await fetchMealNutrition(r.meal);
+      const { error: logErr } = await supabase.from("food_logs").insert({
+        meal_text: `Recipe: ${r.meal.name}`,
+        items: logItems,
+        calories: Math.round(totals.calories),
+        protein: Math.round(totals.protein * 10) / 10,
+        carbs: Math.round(totals.carbs * 10) / 10,
+        fat: Math.round(totals.fat * 10) / 10,
+      });
+      if (logErr) throw new Error("Couldn't save this meal to your food log. Nothing was changed.");
+      announceFoodLogChanged();
+
+      const ids = Array.from(new Set(r.matched.map((m) => m.item.id)));
+      const ok = await close(ids, "used",
+        `Logged ${r.meal.name} (${Math.round(totals.calories)} cal) and used ${ids.length} pantry item${ids.length > 1 ? "s" : ""}.`);
+      if (!ok) setError("The meal was logged, but your pantry couldn't be updated. Mark the items as used by hand.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong. Nothing was changed.");
+    } finally {
+      setCookingId(null);
+    }
+  }
+
+  // The planner logs a recipe too: when it does, mark the matching pantry items used.
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
+  const closeRef = useRef(close);
+  closeRef.current = close;
+  useEffect(() => {
+    function onMealLogged(e: Event) {
+      const names = (e as CustomEvent<{ ingredients?: string[] }>).detail?.ingredients ?? [];
+      const ids = pantryIdsForIngredients(itemsRef.current, names);
+      if (ids.length) {
+        closeRef.current(ids, "used", `Also marked ${ids.length} pantry item${ids.length > 1 ? "s" : ""} as used.`);
+      }
+    }
+    window.addEventListener("meal:logged", onMealLogged);
+    return () => window.removeEventListener("meal:logged", onMealLogged);
+  }, []);
 
   function fillPlanner() {
     onUse(usable.map((i) => i.name.toLowerCase()));
@@ -114,8 +163,8 @@ export default function PantrySection({ onUse }: { onUse: (names: string[]) => v
           ))}
           {r.missing.map((m) => <span key={m} className={styles.tagMissing}>+ {m}</span>)}
         </div>
-        <button type="button" className={styles.ghost} onClick={() => close(ids, "used")}>
-          I cooked this: mark {ids.length} item{ids.length > 1 ? "s" : ""} used
+        <button type="button" className={styles.ghost} onClick={() => cook(r)} disabled={cookingId !== null}>
+          {cookingId === r.meal.id ? "Logging…" : `I cooked this: log it + use ${ids.length} item${ids.length > 1 ? "s" : ""}`}
         </button>
       </li>
     );
