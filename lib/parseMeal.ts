@@ -9,8 +9,8 @@ export type ParsedItem = {
 // Use the same model name your photo route uses.
 const GEMINI_MODEL = "gemini-3.8-flash";
 
-const TIMEOUT_MS = 9000; // give up on one attempt after 9 seconds
-const MAX_TRIES = 2;
+const TIMEOUT_MS = 15000; // give up after 15 seconds
+const MAX_TRIES = 2; // a second try only happens for quick 503/429/500 errors
 
 const PROMPT = `You convert a description of a meal into JSON.
 Return ONLY valid JSON in this exact shape:
@@ -26,15 +26,11 @@ Meal description:
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+// Retry only when Google answers quickly with a busy/error status.
+// A timeout is NOT retried: waiting another 15 seconds would not help.
 function isRetryable(err: unknown): boolean {
-  const e = err as { status?: number; name?: string };
-  return (
-    e?.status === 503 ||
-    e?.status === 429 ||
-    e?.status === 500 ||
-    e?.name === "TimeoutError" ||
-    e?.name === "AbortError"
-  );
+  const e = err as { status?: number };
+  return e?.status === 503 || e?.status === 429 || e?.status === 500;
 }
 
 async function callGemini(text: string): Promise<ParsedItem[]> {
