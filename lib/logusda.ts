@@ -10,7 +10,7 @@ type Match = { description: string; per100g: Per100g };
 // Simple in-memory cache (resets when the server restarts)
 const cache = new Map<string, Match | null>();
 
-const TIMEOUT_MS = 5000; // give up on one attempt after 5 seconds
+const TIMEOUT_MS = 4000; // give up on one attempt after 4 seconds
 const MAX_TRIES = 2;
 
 export async function lookupPer100g(term: string): Promise<Match | null> {
