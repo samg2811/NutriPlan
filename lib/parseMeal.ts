@@ -6,11 +6,17 @@ export type ParsedItem = {
   grams: number;      // estimated total grams eaten
 };
 
-// Use the same model name your photo route uses.
-const GEMINI_MODEL = "gemini-3.8-flash";
+// Tried in order. If one is busy or fails, the next one is used.
+// You can reorder these or remove any you don't want.
+const MODELS = [
+  "gemini-2.5-flash",
+  "gemini-3.6-flash",
+  "gemini-2.5-flash-lite",
+  "gemini-3.8-flash",
+];
 
-const TIMEOUT_MS = 15000; // give up after 15 seconds
-const MAX_TRIES = 2; // a second try only happens for quick 503/429/500 errors
+const PER_MODEL_TIMEOUT_MS = 7000; // give up on one model after 7 seconds
+const TOTAL_BUDGET_MS = 18000;     // never spend more than 18 seconds in total
 
 const PROMPT = `You convert a description of a meal into JSON.
 Return ONLY valid JSON in this exact shape:
@@ -24,18 +30,29 @@ Rules:
 Meal description:
 `;
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+type HttpError = Error & { status?: number };
 
-// Retry only when Google answers quickly with a busy/error status.
-// A timeout is NOT retried: waiting another 15 seconds would not help.
-function isRetryable(err: unknown): boolean {
-  const e = err as { status?: number };
-  return e?.status === 503 || e?.status === 429 || e?.status === 500;
+// Errors where trying a different model makes sense
+function shouldTryNextModel(err: unknown): boolean {
+  const e = err as HttpError;
+  return (
+    e?.status === 503 ||
+    e?.status === 429 ||
+    e?.status === 500 ||
+    e?.status === 404 ||
+    e?.name === "TimeoutError" ||
+    e?.name === "AbortError" ||
+    err instanceof SyntaxError
+  );
 }
 
-async function callGemini(text: string): Promise<ParsedItem[]> {
+async function callGemini(
+  model: string,
+  text: string,
+  timeoutMs: number
+): Promise<ParsedItem[]> {
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
     {
       method: "POST",
       headers: {
@@ -49,14 +66,12 @@ async function callGemini(text: string): Promise<ParsedItem[]> {
           temperature: 0.2,
         },
       }),
-      signal: AbortSignal.timeout(TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
     }
   );
 
   if (!res.ok) {
-    const err = new Error("Gemini request failed: " + res.status) as Error & {
-      status?: number;
-    };
+    const err = new Error(`Gemini ${model} failed: ${res.status}`) as HttpError;
     err.status = res.status;
     throw err;
   }
@@ -70,14 +85,27 @@ async function callGemini(text: string): Promise<ParsedItem[]> {
 }
 
 export async function parseMeal(text: string): Promise<ParsedItem[]> {
-  for (let attempt = 0; attempt < MAX_TRIES; attempt++) {
+  const started = Date.now();
+  let lastError: unknown;
+
+  for (const model of MODELS) {
+    const remaining = TOTAL_BUDGET_MS - (Date.now() - started);
+    if (remaining < 2000) break;
+
     try {
-      return await callGemini(text);
+      const items = await callGemini(
+        model,
+        text,
+        Math.min(PER_MODEL_TIMEOUT_MS, remaining)
+      );
+      console.log(`parseMeal used ${model} in ${Date.now() - started}ms`);
+      return items;
     } catch (err) {
-      console.error(`parseMeal attempt ${attempt + 1} failed:`, err);
-      if (!isRetryable(err) || attempt === MAX_TRIES - 1) throw err;
-      await sleep(800 * (attempt + 1));
+      lastError = err;
+      console.error(`parseMeal: ${model} failed:`, err);
+      if (!shouldTryNextModel(err)) throw err; // e.g. bad API key: stop now
     }
   }
-  return [];
+
+  throw lastError ?? new Error("No Gemini model was available.");
 }
