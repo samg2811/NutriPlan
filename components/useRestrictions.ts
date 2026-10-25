@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { cleanPrefs, type Prefs } from "@/lib/restrictions";
 
-const KEY = "nutragoal.restrictions.v1";
-const EVENT = "nutragoal:restrictions";
+const KEY = "nutrigoal.restrictions.v1";
+const EVENT = "nutrigoal:restrictions";
 const EMPTY: Prefs = { ids: [], avoid: [] };
 
 function read(): Prefs {
