@@ -14,6 +14,7 @@ import { announceFoodLogChanged, announceMealLogged } from "@/lib/cook";
 import RestrictionsPanel from "@/components/RestrictionsPanel";
 import { useRestrictions } from "@/components/useRestrictions";
 import { findViolations } from "@/lib/restrictions";
+import WeeklyMealPlan from "@/components/WeeklyMealPlan";
 
 type RankedMeal = {
   meal: Meal;
@@ -670,6 +671,7 @@ setResults(allowed.slice(0, 3));
         <div className="nav-links">
           <a href="#planner">Meal Planner</a>
           <a href="#camera">Analyze Food</a>
+          <a href="#weekly-plan">Weekly Plan</a>
 
           {userEmail ? (
             <>
@@ -698,6 +700,7 @@ setResults(allowed.slice(0, 3));
 
       {/* TODAY SO FAR */}
       <TodaySummary />
+      <WeeklyMealPlan />
 
       {/* MEAL PLANNER */}
       <section className="planner" id="planner">
