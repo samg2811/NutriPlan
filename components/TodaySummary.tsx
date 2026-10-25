@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { GOALS } from "@/lib/goals";
 import styles from "./TodaySummary.module.css";
+import { meals } from "@/data/meals";
+import { recipes } from "@/data/recipes";
 
 type Totals = { calories: number; protein: number; carbs: number; fat: number };
 type Suggestion = {
@@ -31,6 +33,7 @@ export default function TodaySummary() {
   const [index, setIndex] = useState(0);
   const [note, setNote] = useState("");
   const [loadingNext, setLoadingNext] = useState(false);
+  const [recipeOpen, setRecipeOpen] = useState(false);
 
   const load = useCallback(async () => {
     lastLoad.current = Date.now();
@@ -136,6 +139,13 @@ export default function TodaySummary() {
   const calPct = pct(eaten.calories, GOALS.calories);
   const left = Math.round(GOALS.calories - eaten.calories);
   const current = suggestions[index];
+  const suggestedMeal = current
+    ? meals.find((meal) => String(meal.id) === String(current.id))
+    : undefined;
+  
+  const recipeSteps = current
+    ? recipes[Number(current.id)] ?? []
+    : [];
   const bars = [
     { label: "Protein", v: eaten.protein, goal: GOALS.protein },
     { label: "Carbs", v: eaten.carbs, goal: GOALS.carbs },
@@ -189,6 +199,41 @@ export default function TodaySummary() {
                 <p className={styles.small}>
                   {current.macros.calories} cal · {current.macros.protein}g protein · ⏱️ {current.cookingTime} min
                 </p>
+                
+                <button
+                  type="button"
+                  className={styles.cta}
+                  onClick={() => setRecipeOpen((open) => !open)}
+                >
+                  {recipeOpen ? "Hide recipe ↑" : "View recipe →"}
+                </button>
+                {recipeOpen && (
+                  <div className={styles.recipeDetails}>
+                    <h3>Ingredients</h3>
+                    {suggestedMeal ? (
+                      <ul>
+                        {suggestedMeal.ingredients.map((ingredient) => (
+                          <li key={ingredient.name}>
+                            {ingredient.grams} g {ingredient.name}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p>Ingredients unavailable.</p>
+                    )}
+                
+                    <h3>Instructions</h3>
+                    {recipeSteps.length > 0 ? (
+                      <ol>
+                        {recipeSteps.map((step, i) => (
+                          <li key={i}>{step}</li>
+                        ))}
+                      </ol>
+                    ) : (
+                      <p>Instructions are not available for this meal yet.</p>
+                    )}
+                  </div>
+                )}
               </>
             ) : (
               <p className={styles.prompt}>
