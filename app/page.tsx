@@ -913,16 +913,6 @@ export default function Home() {
             </div>
           )}
         </label>
-
-          {selectedImage && (
-            <div className="image-preview">
-              <img
-                src={selectedImage}
-                alt="Uploaded food"
-              />
-            </div>
-          )}
-        </div>
       </section>
 
       {/* AI RESULTS */}
