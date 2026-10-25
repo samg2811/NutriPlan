@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import NextImage from "next/image";
 import { meals, Meal, MealIngredient } from "@/data/meals";
 import { createClient } from "@/lib/supabase/client";
 import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
@@ -14,7 +15,6 @@ import { announceFoodLogChanged, announceMealLogged } from "@/lib/cook";
 import RestrictionsPanel from "@/components/RestrictionsPanel";
 import { useRestrictions } from "@/components/useRestrictions";
 import { findViolations } from "@/lib/restrictions";
-  import NextImage from "next/image";
 
 type RankedMeal = {
   meal: Meal;
@@ -38,14 +38,22 @@ type PhotoFoodPortion = {
   nutrition: NutritionData | null;
 };
 
-// Shrinks big photos and screenshots so they upload reliably
-function compressImage(file: File, maxSize = 1280, quality = 0.8): Promise<string> {
+// Compress photos before uploading them for AI analysis.
+function compressImage(
+  file: File,
+  maxSize = 1280,
+  quality = 0.8
+): Promise<string> {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
     const img = new Image();
 
     img.onload = () => {
-      const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+      const scale = Math.min(
+        1,
+        maxSize / Math.max(img.width, img.height)
+      );
+
       const canvas = document.createElement("canvas");
       canvas.width = Math.round(img.width * scale);
       canvas.height = Math.round(img.height * scale);
@@ -58,7 +66,6 @@ function compressImage(file: File, maxSize = 1280, quality = 0.8): Promise<strin
         return;
       }
 
-      // White background so transparent PNG screenshots don't turn black
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -79,19 +86,21 @@ export default function Home() {
   const [ingredients, setIngredients] = useState("");
   const [budget, setBudget] = useState(10);
   const [maxTime, setMaxTime] = useState(30);
+
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
-  const [mealNutrition, setMealNutrition] = useState<NutritionData | null>(null);
+  const [mealNutrition, setMealNutrition] = useState<NutritionData | null>(
+    null
+  );
   const [nutritionLoading, setNutritionLoading] = useState(false);
   const [nutritionError, setNutritionError] = useState("");
   const [nutritionMealId, setNutritionMealId] = useState<number | null>(null);
+
   const { prefs } = useRestrictions();
   const [hiddenCount, setHiddenCount] = useState(0);
-
   const [results, setResults] = useState<RankedMeal[]>([]);
 
   const router = useRouter();
   const [supabase] = useState(() => createClient());
-
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
@@ -103,7 +112,7 @@ export default function Home() {
       setUserEmail(user?.email ?? null);
     }
 
-    getUser();
+    void getUser();
 
     const {
       data: { subscription },
@@ -119,12 +128,16 @@ export default function Home() {
     };
   }, [supabase]);
 
-  // AI Food Analysis
+  // AI food analysis state.
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [imageMimeType, setImageMimeType] = useState<string>("image/jpeg");
+  const [imageMimeType, setImageMimeType] = useState("image/jpeg");
   const [detectedFoods, setDetectedFoods] = useState<string[]>([]);
-  const [photoFoodPortions, setPhotoFoodPortions] = useState<PhotoFoodPortion[]>([]);
-  const [photoNutrition, setPhotoNutrition] = useState<NutritionData | null>(null);
+  const [photoFoodPortions, setPhotoFoodPortions] = useState<
+    PhotoFoodPortion[]
+  >([]);
+  const [photoNutrition, setPhotoNutrition] = useState<NutritionData | null>(
+    null
+  );
   const [photoNutritionNote, setPhotoNutritionNote] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisError, setAnalysisError] = useState("");
@@ -188,13 +201,14 @@ export default function Home() {
       throw new Error("Couldn't save this entry. Please try again.");
     }
 
-    // Runs only after a successful save
     announceFoodLogChanged();
   }
 
   async function savePhotoToTracker() {
     if (!photoNutrition || detectedFoods.length === 0) {
-      setPhotoSaveError("Analyze the photo and load nutrition estimates first.");
+      setPhotoSaveError(
+        "Analyze the photo and load nutrition estimates first."
+      );
       return;
     }
 
@@ -213,17 +227,17 @@ export default function Home() {
 
       const items = portions.map((food) => {
         const grams = food.grams;
-        const n = food.nutrition;
+        const nutrition = food.nutrition;
         const factor = grams > 0 ? 100 / grams : 0;
 
         return {
           name: food.name,
           grams,
           per100g: {
-            calories: n ? n.calories * factor : 0,
-            protein: n ? n.protein * factor : 0,
-            carbs: n ? n.carbs * factor : 0,
-            fat: n ? n.fat * factor : 0,
+            calories: nutrition ? nutrition.calories * factor : 0,
+            protein: nutrition ? nutrition.protein * factor : 0,
+            carbs: nutrition ? nutrition.carbs * factor : 0,
+            fat: nutrition ? nutrition.fat * factor : 0,
           },
         };
       });
@@ -248,7 +262,9 @@ export default function Home() {
 
   async function saveRecipeToTracker() {
     if (!selectedMeal || !mealNutrition) {
-      setRecipeSaveError("Wait for nutrition information to finish loading.");
+      setRecipeSaveError(
+        "Wait for nutrition information to finish loading."
+      );
       return;
     }
 
@@ -264,7 +280,7 @@ export default function Home() {
       });
 
       setRecipeSaveMessage("Recipe saved to your Food Tracker!");
-      announceMealLogged(selectedMeal.ingredients.map((i) => i.name));
+      announceMealLogged(selectedMeal.ingredients.map((item) => item.name));
     } catch (error) {
       setRecipeSaveError(
         error instanceof Error
@@ -276,7 +292,7 @@ export default function Home() {
     }
   }
 
-  // Open a meal and calculate its estimated nutrition using the USDA endpoint.
+  // Load recipe details and estimated nutrition.
   async function openMealDetails(meal: Meal) {
     setSelectedMeal(meal);
     setMealNutrition(null);
@@ -312,7 +328,8 @@ export default function Home() {
       ];
 
       const missingNutrients = nutrientKeys.filter(
-        (key) => typeof data[key] !== "number" || !Number.isFinite(data[key])
+        (key) =>
+          typeof data[key] !== "number" || !Number.isFinite(data[key])
       );
 
       if (missingNutrients.length > 0) {
@@ -381,7 +398,7 @@ export default function Home() {
     }
   }
 
-  // Find meals using typed ingredients
+  // Match recipes to the user's ingredients, budget, and cooking time.
   function findMeals() {
     const userIngredients = ingredients
       .toLowerCase()
@@ -389,77 +406,62 @@ export default function Home() {
       .map((item) => item.trim())
       .filter(Boolean);
 
+    const ingredientAliases: Record<string, string> = {
+      "chicken breast": "chicken",
+      "chicken thigh": "chicken",
+      "ground chicken": "chicken",
+      "white rice": "rice",
+      "brown rice": "rice",
+      "corn tortilla": "tortilla",
+      "cheddar cheese": "cheese",
+      "parmesan cheese": "cheese",
+      "mozzarella cheese": "cheese",
+      "feta cheese": "cheese",
+      "whole wheat bread": "bread",
+      "ground beef": "beef",
+      "beef steak": "beef",
+      "ground turkey": "turkey",
+      "turkey breast": "turkey",
+      "greek yogurt": "yogurt",
+      "bell pepper": "pepper",
+      "olive oil": "oil",
+      "egg white": "egg",
+    };
+
     const rankedMeals = meals
       .map((meal) => {
         let score = 0;
 
-        const ingredientAliases: Record<string, string> = {
-          "chicken breast": "chicken",
-          "chicken thigh": "chicken",
-          "ground chicken": "chicken",
-          "white rice": "rice",
-          "brown rice": "rice",
-          "corn tortilla": "tortilla",
-          "cheddar cheese": "cheese",
-          "parmesan cheese": "cheese",
-          "mozzarella cheese": "cheese",
-          "feta cheese": "cheese",
-          "whole wheat bread": "bread",
-          "ground beef": "beef",
-          "beef steak": "beef",
-          "ground turkey": "turkey",
-          "turkey breast": "turkey",
-          "greek yogurt": "yogurt",
-          "bell pepper": "pepper",
-          "olive oil": "oil",
-          "egg white": "egg",
-        };
-
         const matchedIngredients = meal.ingredients.filter((ingredient) => {
-          const simplifiedName =
-            ingredientAliases[ingredient.name.toLowerCase()] ||
-            ingredient.name.toLowerCase();
+          const name = ingredient.name.toLowerCase();
+          const simplifiedName = ingredientAliases[name] || name;
 
-          return userIngredients.some((userIngredient) => {
-            return (
+          return userIngredients.some(
+            (userIngredient) =>
               userIngredient === simplifiedName ||
-              userIngredient === ingredient.name.toLowerCase()
-            );
-          });
+              userIngredient === name
+          );
         });
 
         score += matchedIngredients.length * 5;
+        score += meal.cookingTime <= maxTime ? 3 : -2;
+        score += meal.cost <= budget ? 3 : -2;
 
-        if (meal.cookingTime <= maxTime) {
-          score += 3;
-        } else {
-          score -= 2;
-        }
-
-        if (meal.cost <= budget) {
-          score += 3;
-        } else {
-          score -= 2;
-        }
-
-        return {
-          meal,
-          score,
-          matchedIngredients,
-        };
+        return { meal, score, matchedIngredients };
       })
       .filter((item) => item.matchedIngredients.length > 0)
       .sort((a, b) => b.score - a.score);
 
-    // Hide meals that break the user's dietary restrictions
     const allowed = rankedMeals.filter(
-      (r) => findViolations(r.meal, prefs.ids, prefs.avoid).length === 0
+      (item) =>
+        findViolations(item.meal, prefs.ids, prefs.avoid).length === 0
     );
+
     setHiddenCount(rankedMeals.length - allowed.length);
     setResults(allowed.slice(0, 3));
   }
 
-  // Handle photo / screenshot upload (shrinks the image before it is sent)
+  // Process and compress an uploaded food photo.
   async function handleImageUpload(
     event: React.ChangeEvent<HTMLInputElement>
   ) {
@@ -489,12 +491,11 @@ export default function Home() {
     } catch {
       setAnalysisError("Couldn't read that image. Try a JPEG or PNG.");
     } finally {
-      // Lets the same file be chosen again if the first try fails
       input.value = "";
     }
   }
 
-  // Send photo to Gemini
+  // Send the selected photo to the food-analysis API.
   async function analyzeFood() {
     if (!selectedImage) return;
 
@@ -512,9 +513,7 @@ export default function Home() {
 
       const response = await fetch("/api/analyze-food", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           base64Image: base64Data,
           mimeType: imageMimeType,
@@ -529,20 +528,16 @@ export default function Home() {
 
       const foods: string[] = Array.isArray(data.detectedIngredients)
         ? data.detectedIngredients.filter(
-            (food: unknown): food is string =>
-              typeof food === "string"
+            (food: unknown): food is string => typeof food === "string"
           )
         : Array.isArray(data.foods)
-        ? data.foods.filter(
-            (food: unknown): food is string =>
-              typeof food === "string"
-          )
-        : [];
+          ? data.foods.filter(
+              (food: unknown): food is string => typeof food === "string"
+            )
+          : [];
 
       if (foods.length === 0) {
-        setAnalysisError(
-          "No identifiable food items found in this photo."
-        );
+        setAnalysisError("No identifiable food items found in this photo.");
         return;
       }
 
@@ -563,32 +558,31 @@ export default function Home() {
       );
 
       if (data.nutrition && typeof data.nutrition === "object") {
-        const n = data.nutrition;
+        const nutrition = data.nutrition;
         const values = [
-          n.calories,
-          n.protein,
-          n.carbs,
-          n.fat,
-          n.fiber,
-          n.sugar,
-          n.sodium,
+          nutrition.calories,
+          nutrition.protein,
+          nutrition.carbs,
+          nutrition.fat,
+          nutrition.fiber,
+          nutrition.sugar,
+          nutrition.sodium,
         ];
 
         if (
           values.every(
             (value: unknown) =>
-              typeof value === "number" &&
-              Number.isFinite(value)
+              typeof value === "number" && Number.isFinite(value)
           )
         ) {
           setPhotoNutrition({
-            calories: n.calories,
-            protein: n.protein,
-            carbs: n.carbs,
-            fat: n.fat,
-            fiber: n.fiber,
-            sugar: n.sugar,
-            sodium: n.sodium,
+            calories: nutrition.calories,
+            protein: nutrition.protein,
+            carbs: nutrition.carbs,
+            fat: nutrition.fat,
+            fiber: nutrition.fiber,
+            sugar: nutrition.sugar,
+            sodium: nutrition.sodium,
           });
         }
       }
@@ -614,7 +608,7 @@ export default function Home() {
     }
   }
 
-  // Use AI-detected foods in recipe finder
+  // Use detected foods to find matching recipes.
   function useDetectedFoods() {
     if (detectedFoods.length === 0) return;
 
@@ -631,30 +625,24 @@ export default function Home() {
 
           return userIngredients.some(
             (food) =>
-              food === name ||
-              food.includes(name) ||
-              name.includes(food)
+              food === name || food.includes(name) || name.includes(food)
           );
         });
 
         let score = matchedIngredients.length * 5;
-
         score += meal.cookingTime <= maxTime ? 3 : -2;
         score += meal.cost <= budget ? 3 : -2;
 
-        return {
-          meal,
-          score,
-          matchedIngredients,
-        };
+        return { meal, score, matchedIngredients };
       })
       .filter((item) => item.matchedIngredients.length > 0)
       .sort((a, b) => b.score - a.score);
 
-    // Hide meals that break the user's dietary restrictions
     const allowed = rankedMeals.filter(
-      (r) => findViolations(r.meal, prefs.ids, prefs.avoid).length === 0
+      (item) =>
+        findViolations(item.meal, prefs.ids, prefs.avoid).length === 0
     );
+
     setHiddenCount(rankedMeals.length - allowed.length);
     setResults(allowed.slice(0, 3));
 
@@ -670,22 +658,19 @@ export default function Home() {
     <main className="container">
       {/* NAVBAR */}
       <nav className="navbar">
-  <div
-    className="logo"
-    style={{ display: "flex", alignItems: "center", gap: 10 }}
-  >   
-  <div className="brand">
-    <NextImage
-      src="/nutrigoal-logo.png"
-      alt="NutriGoal logo"
-      width={48}
-      height={48}
-      className="brand-logo"
-      priority
-    />
-    <span className="logo">NutriPlan</span>
-  </div>
-  <div className="nav-links">
+        <div className="brand">
+          <NextImage
+            src="/nutrigoal-logo.png"
+            alt="NutriGoal logo"
+            width={48}
+            height={48}
+            className="brand-logo"
+            priority
+          />
+          <span className="logo">NutriPlan</span>
+        </div>
+
+        <div className="nav-links">
           <a href="#planner">Meal Planner</a>
           <a href="/weekly-plan">Weekly Plan</a>
           <a href="#camera">Analyze Food</a>
@@ -693,7 +678,6 @@ export default function Home() {
           {userEmail ? (
             <>
               <a href="/food-log">Food Log</a>
-
               <button
                 className="login-button"
                 onClick={async () => {
@@ -715,40 +699,36 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* TODAY SO FAR */}
+      {/* TODAY'S SUMMARY */}
       <TodaySummary />
 
       {/* MEAL PLANNER */}
       <section className="planner" id="planner">
         <h2>Find Your Meal</h2>
-
         <p className="section-description">
           Tell us what you have and we'll find meals that match.
         </p>
 
         <div className="form-card">
           <label>What ingredients do you have?</label>
-
           <input
             type="text"
             placeholder="chicken, rice, broccoli"
             value={ingredients}
-            onChange={(e) => setIngredients(e.target.value)}
+            onChange={(event) => setIngredients(event.target.value)}
           />
 
           <div className="form-row">
             <div>
               <label>Budget</label>
-
               <div className="input-with-symbol">
                 <span>$</span>
-
                 <input
                   type="number"
                   value={budget}
                   min={1}
-                  onChange={(e) =>
-                    setBudget(Number(e.target.value))
+                  onChange={(event) =>
+                    setBudget(Number(event.target.value))
                   }
                 />
               </div>
@@ -756,17 +736,15 @@ export default function Home() {
 
             <div>
               <label>Maximum cooking time</label>
-
               <div className="input-with-symbol">
                 <input
                   type="number"
                   value={maxTime}
                   min={5}
-                  onChange={(e) =>
-                    setMaxTime(Number(e.target.value))
+                  onChange={(event) =>
+                    setMaxTime(Number(event.target.value))
                   }
                 />
-
                 <span>min</span>
               </div>
             </div>
@@ -774,61 +752,52 @@ export default function Home() {
 
           <RestrictionsPanel />
 
-          <button
-            className="primary-button"
-            onClick={findMeals}
-          >
+          <button className="primary-button" onClick={findMeals}>
             Find My Meals →
           </button>
         </div>
 
         {hiddenCount > 0 && (
           <p className="section-description">
-            {hiddenCount} matching meal{hiddenCount !== 1 ? "s were" : " was"} hidden
-            because of your dietary restrictions.
+            {hiddenCount} matching meal{hiddenCount !== 1 ? "s were" : " was"}{" "}
+            hidden because of your dietary restrictions.
           </p>
         )}
 
-        <PantrySection onUse={(names) => setIngredients(names.join(", "))} />
+        <PantrySection
+          onUse={(names) => setIngredients(names.join(", "))}
+        />
       </section>
 
       {/* RECOMMENDATIONS */}
       {results.length > 0 && (
         <section className="results">
           <h2>Your Recommendations</h2>
-
           <p className="section-description">
-            Meals ranked using your ingredients, budget, and
-            cooking time.
+            Meals ranked using your ingredients, budget, and cooking time.
           </p>
 
           <div className="meal-grid">
             {results.map(({ meal, matchedIngredients }) => (
               <div className="meal-card" key={meal.id}>
                 <div className="meal-icon">🍽️</div>
-
                 <h3>{meal.name}</h3>
-
                 <p>{meal.description}</p>
 
                 <div className="match-info">
                   ✓ {matchedIngredients.length} ingredient
-                  {matchedIngredients.length !== 1 ? "s" : ""}{" "}
-                  match
-                  {matchedIngredients.length !== 1 ? "" : "es"}
+                  {matchedIngredients.length !== 1 ? "s" : ""} match
+                  {matchedIngredients.length === 1 ? "es" : ""}
                 </div>
 
                 <div className="meal-info">
                   <span>⏱️ {meal.cookingTime} min</span>
-
                   <span>💰 ${meal.cost.toFixed(2)}</span>
                 </div>
 
                 <div className="ingredient-tags">
                   {matchedIngredients.map((ingredient) => (
-                    <span key={ingredient.name}>
-                      {ingredient.name}
-                    </span>
+                    <span key={ingredient.name}>{ingredient.name}</span>
                   ))}
                 </div>
 
@@ -848,21 +817,18 @@ export default function Home() {
       <section className="camera-section" id="camera">
         <div>
           <p className="eyebrow">AI FOOD ANALYSIS</p>
-
           <h2>
             What's in your
             <br />
             meal? 📸
           </h2>
-
           <p>
-            Upload a photo of your food and our AI will identify
-            the foods it can recognize.
+            Upload a photo of your food and our AI will identify the foods it
+            can recognize.
           </p>
 
           <label className="upload-button">
             📷 Choose Food Photo
-
             <input
               type="file"
               accept="image/*"
@@ -877,18 +843,15 @@ export default function Home() {
               onClick={analyzeFood}
               disabled={isAnalyzing}
             >
-              {isAnalyzing
-                ? "🤖 Analyzing..."
-                : "🤖 Analyze Food"}
+              {isAnalyzing ? "🤖 Analyzing..." : "🤖 Analyze Food"}
             </button>
           )}
 
           {analysisError && (
-            <p className="error-message">
-              {analysisError}
-            </p>
+            <p className="error-message">{analysisError}</p>
           )}
-        </div>       
+        </div>
+
         <label
           className="camera-card camera-upload-target"
           aria-label={
@@ -904,26 +867,22 @@ export default function Home() {
             onChange={handleImageUpload}
             hidden
           />
-        
+
           {!selectedImage && (
             <div className="empty-camera">
               <div className="camera-icon">📸</div>
               <h3>Upload a food photo</h3>
-              <p>
-                Click here to choose a photo or take one with your camera.
-              </p>
+              <p>Click here to choose a photo or take one with your camera.</p>
             </div>
           )}
-        
+
           {selectedImage && (
             <div className="image-preview">
               <img
                 src={selectedImage}
                 alt="Uploaded food — click to choose another"
               />
-              <p className="camera-change-hint">
-                Click to change photo
-              </p>
+              <p className="camera-change-hint">Click to change photo</p>
             </div>
           )}
         </label>
@@ -933,9 +892,7 @@ export default function Home() {
       {detectedFoods.length > 0 && (
         <section className="ai-results">
           <p className="eyebrow">AI RESULTS</p>
-
           <h2>We found these foods</h2>
-
           <p className="section-description">
             Gemini identified the following foods in your photo.
           </p>
@@ -945,33 +902,67 @@ export default function Home() {
               const portion = photoFoodPortions.find(
                 (item) => item.name.toLowerCase() === food.toLowerCase()
               );
+
               return (
                 <div className="food-item" key={`${food}-${index}`}>
                   <span>✓</span>
                   <span>{food}</span>
-                  {portion && <strong>{Math.round(portion.grams)} g (estimated)</strong>}
+                  {portion && (
+                    <strong>
+                      {Math.round(portion.grams)} g (estimated)
+                    </strong>
+                  )}
                 </div>
               );
             })}
           </div>
 
           {photoNutrition && (
-            <section className="nutrition-panel photo-nutrition-panel" aria-live="polite">
+            <section
+              className="nutrition-panel photo-nutrition-panel"
+              aria-live="polite"
+            >
               <h3>Estimated Nutrition From Photo</h3>
               <p className="section-description">
-                Calculated from estimated portions and USDA FoodData Central matches.
+                Calculated from estimated portions and USDA FoodData Central
+                matches.
               </p>
+
               <div className="nutrition-grid">
-                <div className="nutrition-item"><span>Calories</span><strong>{Math.round(photoNutrition.calories)} kcal</strong></div>
-                <div className="nutrition-item"><span>Protein</span><strong>{photoNutrition.protein.toFixed(1)} g</strong></div>
-                <div className="nutrition-item"><span>Carbs</span><strong>{photoNutrition.carbs.toFixed(1)} g</strong></div>
-                <div className="nutrition-item"><span>Fat</span><strong>{photoNutrition.fat.toFixed(1)} g</strong></div>
-                <div className="nutrition-item"><span>Fiber</span><strong>{photoNutrition.fiber.toFixed(1)} g</strong></div>
-                <div className="nutrition-item"><span>Sugar</span><strong>{photoNutrition.sugar.toFixed(1)} g</strong></div>
-                <div className="nutrition-item"><span>Sodium</span><strong>{Math.round(photoNutrition.sodium)} mg</strong></div>
+                <div className="nutrition-item">
+                  <span>Calories</span>
+                  <strong>{Math.round(photoNutrition.calories)} kcal</strong>
+                </div>
+                <div className="nutrition-item">
+                  <span>Protein</span>
+                  <strong>{photoNutrition.protein.toFixed(1)} g</strong>
+                </div>
+                <div className="nutrition-item">
+                  <span>Carbs</span>
+                  <strong>{photoNutrition.carbs.toFixed(1)} g</strong>
+                </div>
+                <div className="nutrition-item">
+                  <span>Fat</span>
+                  <strong>{photoNutrition.fat.toFixed(1)} g</strong>
+                </div>
+                <div className="nutrition-item">
+                  <span>Fiber</span>
+                  <strong>{photoNutrition.fiber.toFixed(1)} g</strong>
+                </div>
+                <div className="nutrition-item">
+                  <span>Sugar</span>
+                  <strong>{photoNutrition.sugar.toFixed(1)} g</strong>
+                </div>
+                <div className="nutrition-item">
+                  <span>Sodium</span>
+                  <strong>{Math.round(photoNutrition.sodium)} mg</strong>
+                </div>
               </div>
+
               <p className="nutrition-note">
-                {photoNutritionNote} Photo-based portion sizes can be inaccurate, and sauces, oils, seasonings, or hidden ingredients may not be counted.
+                {photoNutritionNote} Photo-based portion sizes can be
+                inaccurate, and sauces, oils, seasonings, or hidden ingredients
+                may not be counted.
               </p>
             </section>
           )}
@@ -999,19 +990,17 @@ export default function Home() {
           </div>
 
           <p className="confirmation-text">
-            AI identification and portion estimates can make mistakes. Review the foods and amounts before relying on the results.
+            AI identification and portion estimates can make mistakes. Review
+            the foods and amounts before relying on the results.
           </p>
 
-          <button
-            className="primary-button"
-            onClick={useDetectedFoods}
-          >
+          <button className="primary-button" onClick={useDetectedFoods}>
             🍽️ Find Recipes With These Foods →
           </button>
         </section>
       )}
 
-      {/* MODAL */}
+      {/* RECIPE DETAILS MODAL */}
       {selectedMeal && (
         <div
           className="modal-overlay"
@@ -1019,7 +1008,7 @@ export default function Home() {
         >
           <div
             className="recipe-modal"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
           >
             <button
               className="close-button"
@@ -1030,14 +1019,9 @@ export default function Home() {
             </button>
 
             <div className="recipe-icon">🍽️</div>
-
-            <p className="eyebrow">NUTRIGOAL RECIPE</p>
-
+            <p className="eyebrow">NUTRIPLAN RECIPE</p>
             <h2>{selectedMeal.name}</h2>
-
-            <p className="recipe-description">
-              {selectedMeal.description}
-            </p>
+            <p className="recipe-description">{selectedMeal.description}</p>
 
             <div className="recipe-stats">
               <span>⏱️ {selectedMeal.cookingTime} min</span>
@@ -1066,7 +1050,9 @@ export default function Home() {
                     <div className="nutrition-grid">
                       <div className="nutrition-item">
                         <span>Calories</span>
-                        <strong>{Math.round(mealNutrition.calories)} kcal</strong>
+                        <strong>
+                          {Math.round(mealNutrition.calories)} kcal
+                        </strong>
                       </div>
                       <div className="nutrition-item">
                         <span>Protein</span>
@@ -1093,6 +1079,7 @@ export default function Home() {
                         <strong>{Math.round(mealNutrition.sodium)} mg</strong>
                       </div>
                     </div>
+
                     <p className="nutrition-note">
                       These are estimates based on USDA food matches and the
                       ingredient amounts listed. Cooking oil, sauces, and other
@@ -1104,7 +1091,11 @@ export default function Home() {
                       <button
                         className="primary-button"
                         onClick={saveRecipeToTracker}
-                        disabled={savingRecipe || nutritionLoading || mealNutritionItems.length === 0}
+                        disabled={
+                          savingRecipe ||
+                          nutritionLoading ||
+                          mealNutritionItems.length === 0
+                        }
                       >
                         {savingRecipe
                           ? "Saving..."
@@ -1123,7 +1114,8 @@ export default function Home() {
 
                       {mealNutritionItems.length === 0 && (
                         <p className="nutrition-note">
-                          Ingredient-level nutrition data is needed to save this recipe.
+                          Ingredient-level nutrition data is needed to save
+                          this recipe.
                         </p>
                       )}
                     </div>
@@ -1132,7 +1124,6 @@ export default function Home() {
             </section>
 
             <h3>Ingredients</h3>
-
             <ul className="ingredient-list">
               {selectedMeal.ingredients.map((ingredient) => (
                 <li key={ingredient.name}>
@@ -1144,7 +1135,6 @@ export default function Home() {
             </ul>
 
             <h3>How to Make It</h3>
-
             <ol className="recipe-steps">
               {getRecipe(selectedMeal.id).map((step, index) => (
                 <li key={index}>{step}</li>
@@ -1161,19 +1151,16 @@ export default function Home() {
         </div>
       )}
 
-      {/* FOOD LOG */}
+      {/* FOOD LOG AND MOBILE NAVIGATION */}
       <FoodLogSection />
-
       <MobileNav />
 
       {/* FOOTER */}
       <footer>
-        <strong>NutriGoal</strong>
-
-        <span>
-          Plan smarter. Eat better. Waste less.
-        </span>
+        <strong>NutriPlan</strong>
+        <span>Plan smarter. Eat better. Waste less.</span>
       </footer>
     </main>
   );
 }
+```
