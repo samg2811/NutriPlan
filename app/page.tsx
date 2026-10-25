@@ -670,22 +670,20 @@ export default function Home() {
     <main className="container">
       {/* NAVBAR */}
       <nav className="navbar">
-        <div className="logo">🍽️ NutriGoal</div>
+  <div
+    className="logo"
+    style={{ display: "flex", alignItems: "center", gap: 10 }}
+  >
+    <NextImage
+      src="/nutriplan-logo.png"
+      alt=""
+      width={44}
+      height={44}
+    />
+    NutriGoal
+  </div>
 
-        import Image from "next/image";
-        
-        // Place inside your existing navbar:
-           <div className="logo">
-     <NextImage
-       src="/nutriplan-logo.png"
-       alt="NutriGoal logo"
-       width={44}
-       height={44}
-     />
-     NutriGoal
-   </div>
-
-        <div className="nav-links">
+  <div className="nav-links">
           <a href="#planner">Meal Planner</a>
           <a href="/weekly-plan">Weekly Plan</a>
           <a href="#camera">Analyze Food</a>
