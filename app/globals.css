@@ -123,3 +123,48 @@ input[type='checkbox'], input[type='radio'] { width: auto; min-height: auto; acc
   background: rgba(255, 255, 255, 0.94);
 }
 
+
+.camera-upload-target {
+  min-height: 300px;
+  width: 100%;
+  border: 2px dashed #9bb8a1;
+  border-radius: 20px;
+  background: #f7faf6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  box-sizing: border-box;
+}
+
+.camera-upload-target:hover {
+  border-color: #2f6848;
+  background: #eef5ed;
+}
+
+.camera-upload-target:focus-within {
+  outline: 3px solid rgba(47, 104, 72, 0.25);
+  outline-offset: 3px;
+}
+
+.camera-upload-target .empty-camera {
+  width: 100%;
+  text-align: center;
+}
+
+.camera-upload-target .image-preview {
+  width: 100%;
+}
+
+.camera-upload-target .image-preview img {
+  display: block;
+  max-width: 100%;
+  max-height: 350px;
+  margin: 0 auto;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+
