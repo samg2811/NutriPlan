@@ -171,6 +171,19 @@ export default function LoginPage() {
   return (
     <main className="container">
       <nav className="navbar">
+           <div
+             className="logo"
+             style={{ display: "flex", alignItems: "center", gap: 10 }}
+           >
+             <NextImage
+               src="/nutriplan-logo.png"
+               alt=""
+               width={44}
+               height={44}
+               style={{ mixBlendMode: "multiply", borderRadius: 10 }}
+             />
+             NutriGoal
+           </div>
         <a href="/login" className={`logo ${styles.brandLink}`}>🍽️ NutriGoal</a>
         <div className="nav-links">
           <a href="#login" onClick={(e) => { e.preventDefault(); scrollToLogin(); }}>Log in</a>
