@@ -670,7 +670,7 @@ export default function Home() {
     <main className="container">
       {/* NAVBAR */}
       <nav className="navbar">
-        <div className="logo">🍽️ NutraGoal</div>
+        <div className="logo">🍽️ NutriGoal</div>
 
         <div className="nav-links">
           <a href="#planner">Meal Planner</a>
@@ -1006,7 +1006,7 @@ export default function Home() {
 
             <div className="recipe-icon">🍽️</div>
 
-            <p className="eyebrow">NUTRAGOAL RECIPE</p>
+            <p className="eyebrow">NUTRIGOAL RECIPE</p>
 
             <h2>{selectedMeal.name}</h2>
 
@@ -1143,7 +1143,7 @@ export default function Home() {
 
       {/* FOOTER */}
       <footer>
-        <strong>NutraGoal</strong>
+        <strong>NutriGoal</strong>
 
         <span>
           Plan smarter. Eat better. Waste less.
