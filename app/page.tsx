@@ -671,6 +671,17 @@ export default function Home() {
       <nav className="navbar">
         <div className="logo">🍽️ NutriGoal</div>
 
+        import Image from "next/image";
+        
+        // Place inside your existing navbar:
+        <Image
+          src="/nutriplan-logo.png"
+          alt="NutriPlan logo"
+          width={44}
+          height={44}
+          priority
+        />
+
         <div className="nav-links">
           <a href="#planner">Meal Planner</a>
           <a href="/weekly-plan">Weekly Plan</a>
