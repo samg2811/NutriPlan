@@ -10,6 +10,7 @@ import FoodLogSection from "@/components/FoodLogSection";
 import MobileNav from "@/components/MobileNav";
 import PantrySection from "@/components/PantrySection";
 import TodaySummary from "@/components/TodaySummary";
+import WeeklyMealPlan from "@/components/WeeklyMealPlan"; // NEW
 import { announceFoodLogChanged, announceMealLogged } from "@/lib/cook";
 import RestrictionsPanel from "@/components/RestrictionsPanel";
 import { useRestrictions } from "@/components/useRestrictions";
@@ -673,6 +674,7 @@ export default function Home() {
 
         <div className="nav-links">
           <a href="#planner">Meal Planner</a>
+          <a href="#weekly-plan">Weekly Plan</a>
           <a href="#camera">Analyze Food</a>
 
           {userEmail ? (
@@ -828,6 +830,9 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      {/* WEEKLY MEAL PLAN + PERSONALIZE QUIZ (NEW) */}
+      <WeeklyMealPlan />
 
       {/* AI FOOD ANALYSIS */}
       <section className="camera-section" id="camera">
