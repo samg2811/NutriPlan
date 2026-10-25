@@ -3,7 +3,7 @@
 import PhoneDemo from "./PhoneDemo";
 import { scrollToLogin } from "@/lib/scrollToLogin";
 import styles from "./HeroWithPhone.module.css";
-
+import NextImage from "next/image";
 export default function HeroWithPhone() {
   function go(e: React.MouseEvent) {
     e.preventDefault();
