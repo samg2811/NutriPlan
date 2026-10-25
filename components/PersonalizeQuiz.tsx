@@ -8,7 +8,7 @@ import { useRestrictions } from "./useRestrictions";
 import { useProfile, type Profile } from "./useProfile";
 import styles from "./PersonalizeQuiz.module.css";
 
-const OPEN_EVENT = "nutragoal:open-quiz";
+const OPEN_EVENT = "nutrigoal:open-quiz";
 const TOTAL_STEPS = 6;
 
 export function openQuiz() {
@@ -55,9 +55,9 @@ export function QuizBanner() {
   if (!ready || profile.done || profile.dismissed) return null;
 
   return (
-    <section className={styles.banner} aria-label="Personalize NutraGoal">
+    <section className={styles.banner} aria-label="Personalize NutriGoal">
       <div>
-        <strong>✨ Make NutraGoal yours</strong>
+        <strong>✨ Make NutriGoal yours</strong>
         <p>Answer 6 quick questions and we&rsquo;ll tailor your meals and weekly plan.</p>
       </div>
       <div className={styles.bannerBtns}>
