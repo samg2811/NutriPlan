@@ -2,13 +2,13 @@
 
 import { useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
+import NextImage from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import HeroWithPhone from "@/components/HeroWithPhone";
 import StatsSection from "@/components/StatsSection";
 import StatsPhone from "@/components/StatsPhone";
 import { scrollToLogin } from "@/lib/scrollToLogin";
 import styles from "./login.module.css";
-import NextImage from "next/image";
 
 type Mode = "login" | "signup";
 
@@ -31,6 +31,8 @@ export default function LoginPage() {
   const [info, setInfo] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  // If the logo file can't be loaded, show the emoji instead of a broken image
+  const [logoFailed, setLogoFailed] = useState(false);
 
   // Client-side cooldown is a convenience only. Supabase rate limits are the real protection.
   const failures = useRef(0);
@@ -172,20 +174,27 @@ export default function LoginPage() {
   return (
     <main className="container">
       <nav className="navbar">
-           <div
-             className="logo"
-             style={{ display: "flex", alignItems: "center", gap: 10 }}
-           >
-             <NextImage
-               src="/nutriplan-logo.png"
-               alt=""
-               width={44}
-               height={44}
-               style={{ mixBlendMode: "multiply", borderRadius: 10 }}
-             />
-             NutriGoal
-           </div>
-        <a href="/login" className={`logo ${styles.brandLink}`}>🍽️ NutriGoal</a>
+        {/* One logo only: image with emoji fallback */}
+        <a
+          href="/login"
+          className={`logo ${styles.brandLink}`}
+          style={{ display: "flex", alignItems: "center", gap: 10 }}
+        >
+          {logoFailed ? (
+            <span aria-hidden="true">🍽️</span>
+          ) : (
+            <NextImage
+              src="/nutriplan-logo.png"
+              alt=""
+              width={44}
+              height={44}
+              unoptimized
+              onError={() => setLogoFailed(true)}
+            />
+          )}
+          NutriGoal
+        </a>
+
         <div className="nav-links">
           <a href="#login" onClick={(e) => { e.preventDefault(); scrollToLogin(); }}>Log in</a>
         </div>
