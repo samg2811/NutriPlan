@@ -4,9 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./PhoneDemo.module.css";
 
+// Order here must match the order of the <section>s below
 const SCREENS = [
   { id: "home", label: "Home", icon: "🏠" },
   { id: "plan", label: "Plan", icon: "🥘" },
+  { id: "week", label: "Week", icon: "🗓️" },
+  { id: "pantry", label: "Pantry", icon: "🧺" },
   { id: "scan", label: "Scan", icon: "📸" },
   { id: "log", label: "Log", icon: "📝" },
 ];
@@ -126,11 +129,69 @@ export default function PhoneDemo({ onOpen }: { onOpen?: () => void }) {
                   <div><p className={styles.small}>Budget</p><div className={styles.fakeInput}>$10</div></div>
                   <div><p className={styles.small}>Max time</p><div className={styles.fakeInput}>30 min</div></div>
                 </div>
+                <p className={styles.small}>Dietary restrictions</p>
+                <div className={`${styles.chips} ${styles.chipsGap}`}>
+                  <span>🌱 Vegetarian</span><span>🥜 Nut-free</span><span>＋ Add</span>
+                </div>
                 <div className={styles.result}>
                   <strong>Chicken &amp; Broccoli Rice</strong>
                   <span>✓ 3 ingredients match · ⏱️ 25 min · 💰 $6.40</span>
                 </div>
                 <span className={styles.cta}>Open Meal Planner →</span>
+              </div>
+            </section>
+
+            {/* WEEKLY PLAN */}
+            <section ref={(el) => { sectionRefs.current.week = el; }} className={styles.section}>
+              <h3 className={styles.h}>Weekly Meal Plan</h3>
+              <div className={`${styles.card} ${styles.tap}`} {...cardProps("/weekly-plan", "Open the weekly meal plan")}>
+                <span className={styles.generate}>✨ Generate my week</span>
+                <p className={`${styles.small} ${styles.using}`}>Using: vegetarian · 30 min or less</p>
+
+                <div className={styles.day}>
+                  <strong>Mon</strong>
+                  <ul>
+                    <li><em>B</em>Greek yogurt bowl</li>
+                    <li><em>L</em>Veggie wrap</li>
+                    <li><em>D</em>Lentil curry</li>
+                  </ul>
+                </div>
+                <div className={styles.day}>
+                  <strong>Tue</strong>
+                  <ul>
+                    <li><em>B</em>Oats &amp; berries</li>
+                    <li><em>L</em>Quinoa salad</li>
+                    <li><em>D</em>Veggie stir-fry</li>
+                  </ul>
+                </div>
+                <p className={`${styles.small} ${styles.more}`}>+ 5 more days · swap any meal</p>
+
+                <div className={styles.shopRow}>
+                  <span>🛒 Shopping list</span>
+                  <b>14 items</b>
+                </div>
+                <span className={styles.cta}>Open Weekly Plan →</span>
+              </div>
+            </section>
+
+            {/* PANTRY */}
+            <section ref={(el) => { sectionRefs.current.pantry = el; }} className={styles.section}>
+              <h3 className={styles.h}>Your Pantry</h3>
+              <div className={`${styles.card} ${styles.tap}`} {...cardProps("#planner", "Open your pantry")}>
+                <p className={styles.small}>Staples you keep on hand</p>
+                <div className={styles.pantryGrid}>
+                  <span>🍚 Rice</span>
+                  <span>🥚 Eggs</span>
+                  <span>🧅 Onions</span>
+                  <span>🫒 Olive oil</span>
+                  <span>🍗 Chicken</span>
+                  <span>🥦 Broccoli</span>
+                </div>
+                <div className={styles.result}>
+                  <strong>6 items ready to cook with</strong>
+                  <span>Tap to use them in the meal finder</span>
+                </div>
+                <span className={styles.cta}>Open Pantry →</span>
               </div>
             </section>
 
