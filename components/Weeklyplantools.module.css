@@ -1,0 +1,180 @@
+/* Styles for the generator toolbar, swap buttons and shopping list.
+   Colors fall back to a green theme; set --primary / --border / --muted
+   in your globals.css to match your app. */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0 8px;
+}
+
+.generate {
+  padding: 12px 22px;
+  border: none;
+  border-radius: 999px;
+  background: var(--primary, #2e7d32);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.generate:hover {
+  transform: translateY(-1px);
+  opacity: 0.92;
+}
+
+.generate:focus-visible,
+.link:focus-visible,
+.swap:focus-visible,
+.copy:focus-visible,
+.conflictBtn:focus-visible {
+  outline: 3px solid rgba(46, 125, 50, 0.4);
+  outline-offset: 2px;
+}
+
+.link {
+  padding: 8px 4px;
+  border: none;
+  background: none;
+  color: var(--primary, #2e7d32);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.using {
+  margin: 4px 0 12px;
+  color: var(--muted, #5f6b61);
+  font-size: 0.9rem;
+}
+
+.conflict {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 12px;
+  padding: 10px 14px;
+  border: 1px solid #f0c36d;
+  border-radius: 10px;
+  background: #fff7e0;
+  color: #7a5200;
+  font-size: 0.92rem;
+}
+
+.conflictBtn {
+  padding: 6px 12px;
+  border: 1px solid #7a5200;
+  border-radius: 999px;
+  background: transparent;
+  color: #7a5200;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.stats {
+  margin: 4px 0 12px;
+  color: var(--muted, #5f6b61);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.slotActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.swap {
+  padding: 5px 12px;
+  border: 1px solid var(--border, #cfd8d0);
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.swap:hover:not(:disabled) {
+  border-color: var(--primary, #2e7d32);
+  color: var(--primary, #2e7d32);
+}
+
+.swap:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.warn {
+  color: #b3261e;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.shop {
+  margin: 20px 0 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--border, #cfd8d0);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.shop summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.shopList {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shopList li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--border, #cfd8d0);
+  text-transform: capitalize;
+}
+
+.shopList li span:last-child {
+  color: var(--muted, #5f6b61);
+  white-space: nowrap;
+}
+
+.copy {
+  padding: 8px 16px;
+  border: 1px solid var(--primary, #2e7d32);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--primary, #2e7d32);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.copy:hover {
+  background: var(--primary, #2e7d32);
+  color: #fff;
+}
+
+@media (max-width: 600px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .generate {
+    width: 100%;
+  }
+}
