@@ -21,8 +21,8 @@ export const DEFAULT_PROFILE: Profile = {
   variety: "never",
 };
 
-const KEY = "nutragoal.profile.v1";
-const EVENT = "nutragoal:profile";
+const KEY = "nutrigoal.profile.v1";
+const EVENT = "nutrigoal:profile";
 
 function clean(raw: unknown): Profile {
   const r = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
