@@ -8,6 +8,7 @@ import StatsSection from "@/components/StatsSection";
 import StatsPhone from "@/components/StatsPhone";
 import { scrollToLogin } from "@/lib/scrollToLogin";
 import styles from "./login.module.css";
+import NextImage from "next/image";
 
 type Mode = "login" | "signup";
 
