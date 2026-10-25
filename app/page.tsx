@@ -667,7 +667,7 @@ export default function Home() {
             className="brand-logo"
             priority
           />
-          <span className="logo">NutriPlan</span>
+          <span className="logo">NutriGoal</span>
         </div>
 
         <div className="nav-links">
@@ -1019,7 +1019,7 @@ export default function Home() {
             </button>
 
             <div className="recipe-icon">🍽️</div>
-            <p className="eyebrow">NUTRIPLAN RECIPE</p>
+            <p className="eyebrow">NUTRIGOAL RECIPE</p>
             <h2>{selectedMeal.name}</h2>
             <p className="recipe-description">{selectedMeal.description}</p>
 
@@ -1157,7 +1157,7 @@ export default function Home() {
 
       {/* FOOTER */}
       <footer>
-        <strong>NutriPlan</strong>
+        <strong>NutriGoal</strong>
         <span>Plan smarter. Eat better. Waste less.</span>
       </footer>
     </main>
