@@ -612,4 +612,27 @@ input[type='radio'] {
     animation-iteration-count: 1 !important;
   }
 }
+
+```css
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-logo {
+  display: block;
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.brand .logo {
+  color: var(--green-dark);
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -.7px;
+}
 ```
