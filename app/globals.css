@@ -585,9 +585,10 @@ input[type='radio'] {
   }
 
   .navbar {
-    flex-wrap: wrap;
-    padding-block: 12px;
-  }
+  background: transparent;
+  box-shadow: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06); /* keep a faint divider, or delete this line */
+}
 
   .nav-links {
     width: 100%;
