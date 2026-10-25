@@ -14,6 +14,7 @@ import { announceFoodLogChanged, announceMealLogged } from "@/lib/cook";
 import RestrictionsPanel from "@/components/RestrictionsPanel";
 import { useRestrictions } from "@/components/useRestrictions";
 import { findViolations } from "@/lib/restrictions";
+  import NextImage from "next/image";
 
 type RankedMeal = {
   meal: Meal;
