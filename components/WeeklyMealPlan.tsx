@@ -31,7 +31,10 @@ export default function WeeklyMealPlan() {
     setWeek(monday(new Date()));
     try { const saved = localStorage.getItem(STORAGE_KEY); if (saved) setPlan(JSON.parse(saved)); } catch {}
     setLoaded(true);
-    supabase.auth.getUser().then(({data}) => setLoggedIn(!!data.user));
+    (async () => {
+  const { data } = await supabase.auth.getUser();
+  setLoggedIn(!!data.user);
+})();
   }, [supabase]);
 
   useEffect(() => { if (loaded) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(plan)); } catch {} } }, [plan, loaded]);
