@@ -4,7 +4,7 @@ import WeeklyMealPlan from "@/components/WeeklyMealPlan";
 import MobileNav from "@/components/MobileNav";
 
 export const metadata: Metadata = {
-  title: "Weekly Meal Plan | NutraGoal",
+  title: "Weekly Meal Plan | NutriGoal",
   description:
     "Generate a weekly meal plan that fits your dietary restrictions, time and budget.",
 };
@@ -19,7 +19,7 @@ export default function WeeklyPlanPage() {
           className="logo"
           style={{ textDecoration: "none", color: "inherit" }}
         >
-          🍽️ NutraGoal
+          🍽️ NutriGoal
         </Link>
 
         <div className="nav-links">
@@ -37,7 +37,7 @@ export default function WeeklyPlanPage() {
       <MobileNav />
 
       <footer>
-        <strong>NutraGoal</strong>
+        <strong>NutriGoal</strong>
         <span>Plan smarter. Eat better. Waste less.</span>
       </footer>
     </main>
