@@ -659,16 +659,15 @@ export default function Home() {
       {/* NAVBAR */}
       <nav className="navbar">
         <div className="brand">
-            <NextImage
-              src="/nutriplan-logo.png"
-              alt=""
-              width={44}
-              height={44}
-              style={{ mixBlendMode: "multiply", borderRadius: 10 }}
-            />
+          <span
+            className="brand-plate"
+            role="img"
+            aria-label="Plate"
+          >
+            🍽️
+          </span>
           <span className="logo">NutriGoal</span>
         </div>
-
         <div className="nav-links">
           <a href="#planner">Meal Planner</a>
           <a href="/weekly-plan">Weekly Plan</a>
