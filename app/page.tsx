@@ -14,7 +14,6 @@ import { announceFoodLogChanged, announceMealLogged } from "@/lib/cook";
 import RestrictionsPanel from "@/components/RestrictionsPanel";
 import { useRestrictions } from "@/components/useRestrictions";
 import { findViolations } from "@/lib/restrictions";
-import WeeklyMealPlan from "@/components/WeeklyMealPlan";
 
 type RankedMeal = {
   meal: Meal;
@@ -186,8 +185,10 @@ export default function Home() {
     if (error) {
       console.error("Food Tracker save error:", error);
       throw new Error("Couldn't save this entry. Please try again.");
-      announceFoodLogChanged();
     }
+
+    // Runs only after a successful save
+    announceFoodLogChanged();
   }
 
   async function savePhotoToTracker() {
@@ -449,11 +450,12 @@ export default function Home() {
       .filter((item) => item.matchedIngredients.length > 0)
       .sort((a, b) => b.score - a.score);
 
+    // Hide meals that break the user's dietary restrictions
     const allowed = rankedMeals.filter(
-  (r) => findViolations(r.meal, prefs.ids, prefs.avoid).length === 0
-);
-setHiddenCount(rankedMeals.length - allowed.length);
-setResults(allowed.slice(0, 3));
+      (r) => findViolations(r.meal, prefs.ids, prefs.avoid).length === 0
+    );
+    setHiddenCount(rankedMeals.length - allowed.length);
+    setResults(allowed.slice(0, 3));
   }
 
   // Handle photo / screenshot upload (shrinks the image before it is sent)
@@ -648,11 +650,12 @@ setResults(allowed.slice(0, 3));
       .filter((item) => item.matchedIngredients.length > 0)
       .sort((a, b) => b.score - a.score);
 
+    // Hide meals that break the user's dietary restrictions
     const allowed = rankedMeals.filter(
-  (r) => findViolations(r.meal, prefs.ids, prefs.avoid).length === 0
-);
-setHiddenCount(rankedMeals.length - allowed.length);
-setResults(allowed.slice(0, 3));
+      (r) => findViolations(r.meal, prefs.ids, prefs.avoid).length === 0
+    );
+    setHiddenCount(rankedMeals.length - allowed.length);
+    setResults(allowed.slice(0, 3));
 
     window.setTimeout(() => {
       document.getElementById("planner")?.scrollIntoView({
@@ -666,12 +669,11 @@ setResults(allowed.slice(0, 3));
     <main className="container">
       {/* NAVBAR */}
       <nav className="navbar">
-        <div className="logo">🍽️ NutriGoal</div>
+        <div className="logo">🍽️ NutraGoal</div>
 
         <div className="nav-links">
           <a href="#planner">Meal Planner</a>
           <a href="#camera">Analyze Food</a>
-          <a href="#weekly-plan">Weekly Plan</a>
 
           {userEmail ? (
             <>
@@ -700,7 +702,6 @@ setResults(allowed.slice(0, 3));
 
       {/* TODAY SO FAR */}
       <TodaySummary />
-      <WeeklyMealPlan />
 
       {/* MEAL PLANNER */}
       <section className="planner" id="planner">
@@ -756,6 +757,8 @@ setResults(allowed.slice(0, 3));
             </div>
           </div>
 
+          <RestrictionsPanel />
+
           <button
             className="primary-button"
             onClick={findMeals}
@@ -763,6 +766,14 @@ setResults(allowed.slice(0, 3));
             Find My Meals →
           </button>
         </div>
+
+        {hiddenCount > 0 && (
+          <p className="section-description">
+            {hiddenCount} matching meal{hiddenCount !== 1 ? "s were" : " was"} hidden
+            because of your dietary restrictions.
+          </p>
+        )}
+
         <PantrySection onUse={(names) => setIngredients(names.join(", "))} />
       </section>
 
@@ -990,7 +1001,7 @@ setResults(allowed.slice(0, 3));
 
             <div className="recipe-icon">🍽️</div>
 
-            <p className="eyebrow">NUTRIGOAL RECIPE</p>
+            <p className="eyebrow">NUTRAGOAL RECIPE</p>
 
             <h2>{selectedMeal.name}</h2>
 
@@ -1127,7 +1138,7 @@ setResults(allowed.slice(0, 3));
 
       {/* FOOTER */}
       <footer>
-        <strong>NutriGoal</strong>
+        <strong>NutraGoal</strong>
 
         <span>
           Plan smarter. Eat better. Waste less.
