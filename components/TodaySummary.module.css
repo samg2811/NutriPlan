@@ -34,3 +34,33 @@
   .ringWrap { align-self: center; }
 }
 @media (prefers-reduced-motion: reduce) { .ringFg, .fill { transition: none; } }
+
+.recipeDetails {
+  margin-top: 10px;
+  padding: 14px;
+  background: #f5f8f5;
+  border: 1px solid #e1e8e1;
+  border-radius: 12px;
+  color: #33443a;
+  line-height: 1.6;
+}
+
+.recipeDetails h3 {
+  margin: 10px 0 4px;
+  font-size: 1rem;
+  color: #1f2a24;
+}
+
+.recipeDetails h3:first-child {
+  margin-top: 0;
+}
+
+.recipeDetails ul,
+.recipeDetails ol {
+  padding-left: 22px;
+  margin: 4px 0 12px;
+}
+
+.recipeDetails li {
+  margin-bottom: 4px;
+}
