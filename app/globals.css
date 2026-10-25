@@ -630,6 +630,13 @@ input[type='radio'] {
 .brand .logo {
   color: var(--green-dark);
   font-family: 'Manrope', sans-serif;
+
+  main.container nav.navbar {
+  background: transparent;
+  backdrop-filter: none;
+  box-shadow: none;
+  border-bottom: none;
+}
   font-size: 1.35rem;
   font-weight: 800;
   letter-spacing: -.7px;
