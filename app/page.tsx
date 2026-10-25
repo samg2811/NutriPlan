@@ -659,14 +659,13 @@ export default function Home() {
       {/* NAVBAR */}
       <nav className="navbar">
         <div className="brand">
-          <NextImage
-            src="/nutrigoal-logo.png"
-            alt="NutriGoal logo"
-            width={48}
-            height={48}
-            className="brand-logo"
-            priority
-          />
+            <NextImage
+              src="/nutriplan-logo.png"
+              alt=""
+              width={44}
+              height={44}
+              style={{ mixBlendMode: "multiply", borderRadius: 10 }}
+            />
           <span className="logo">NutriGoal</span>
         </div>
 
