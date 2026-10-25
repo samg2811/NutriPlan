@@ -13,6 +13,13 @@ export default function HeroWithPhone() {
   return (
     <section className={styles.hero}>
       <div className={styles.text}>
+          <NextImage
+    src="/nutriplan-logo.png"
+    alt="NutriGoal"
+    width={64}
+    height={64}
+    priority
+  />
         <p className={styles.eyebrow}>SMARTER MEAL PLANNING</p>
         <h1 className={styles.title}>
           What should
