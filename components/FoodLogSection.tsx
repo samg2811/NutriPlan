@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
+import { describePrefs } from "@/lib/restrictions";
+import { useRestrictions } from "./useRestrictions";
 import styles from "./FoodLogSection.module.css";
 
 // Change these to whatever daily targets you want
@@ -41,6 +43,7 @@ const scale = (item: Item, key: keyof Per100g) => item.per100g[key] * (item.gram
 export default function FoodLogSection() {
   const router = useRouter();
   const [supabase] = useState(() => createClient());
+  const { prefs } = useRestrictions();
 
   const [text, setText] = useState("");
   const [items, setItems] = useState<Item[]>([]);
@@ -75,8 +78,6 @@ export default function FoodLogSection() {
       if (data.user) loadToday();
     }
     init();
-    const onChanged = () => loadToday();
-    window.addEventListener("foodlog:changed", onChanged);
 
     // Keep the section in sync when someone logs in or out on the same page
     const {
@@ -90,10 +91,7 @@ export default function FoodLogSection() {
       }
     );
 
-    return () => {
-      window.removeEventListener("foodlog:changed", onChanged);
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, [supabase, loadToday]);
 
   const eaten = today.reduce(
@@ -226,6 +224,8 @@ export default function FoodLogSection() {
           remainingCalories: GOALS.calories - eaten.calories,
           remainingProtein: GOALS.protein - eaten.protein,
           hour: new Date().getHours(),
+          restrictions: prefs.ids,
+          avoid: prefs.avoid,
         }),
       });
       if (!res.ok) throw new Error("Status " + res.status);
@@ -296,6 +296,12 @@ export default function FoodLogSection() {
               </ul>
             )}
 
+            {prefs.ids.length + prefs.avoid.length > 0 && (
+              <p className={styles.sub} style={{ margin: "14px 0 0", fontSize: ".88rem" }}>
+                Avoiding: {describePrefs(prefs.ids, prefs.avoid).join(", ")} ·{" "}
+                <a href="/#planner">change</a>
+              </p>
+            )}
             <button className="primary-button" onClick={getNextMeal} disabled={suggesting} style={{ marginTop: 14 }}>
               {suggesting ? "Finding meals…" : "What should I eat next? →"}
             </button>
