@@ -1,30 +1,57 @@
-/* Styles for the generator toolbar, swap buttons and shopping list.
-   Colors fall back to a green theme; set --primary / --border / --muted
-   in your globals.css to match your app. */
+/* Generator toolbar, swap buttons, restriction warnings and shopping list.
+   Uses the same theme variables as WeeklyMealPlan.module.css. */
 
 .toolbar {
+  --wp-primary: var(--primary, #2e7d32);
+  --wp-primary-soft: var(--primary-soft, #e8f5e9);
+  --wp-muted: var(--muted, #667267);
+  --wp-border: var(--border, #e3e9e4);
+  --wp-card: var(--card, #ffffff);
+
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
-  margin: 16px 0 8px;
+  gap: 14px;
+  margin: 0 0 10px;
+  padding: 16px 18px;
+  border: 1px solid var(--wp-border);
+  border-radius: 16px;
+  background: var(--wp-card);
+  box-shadow: 0 1px 3px rgba(16, 24, 18, 0.06);
 }
 
 .generate {
-  padding: 12px 22px;
+  padding: 12px 24px;
   border: none;
   border-radius: 999px;
-  background: var(--primary, #2e7d32);
+  background: var(--wp-primary);
   color: #fff;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: transform 0.15s ease, opacity 0.15s ease;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--wp-primary) 30%, transparent);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .generate:hover {
   transform: translateY(-1px);
-  opacity: 0.92;
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--wp-primary) 38%, transparent);
+}
+
+.link {
+  padding: 10px 16px;
+  border: 1px solid var(--wp-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--wp-primary);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.link:hover {
+  background: var(--wp-primary-soft);
 }
 
 .generate:focus-visible,
@@ -32,109 +59,117 @@
 .swap:focus-visible,
 .copy:focus-visible,
 .conflictBtn:focus-visible {
-  outline: 3px solid rgba(46, 125, 50, 0.4);
+  outline: 3px solid color-mix(in srgb, var(--wp-primary) 40%, transparent);
   outline-offset: 2px;
 }
 
-.link {
-  padding: 8px 4px;
-  border: none;
-  background: none;
-  color: var(--primary, #2e7d32);
-  font-size: 0.95rem;
-  font-weight: 600;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
+/* "Using: vegetarian · 30 min or less" line */
 .using {
-  margin: 4px 0 12px;
-  color: var(--muted, #5f6b61);
-  font-size: 0.9rem;
+  margin: 0 0 14px;
+  padding: 0 4px;
+  color: var(--wp-muted);
+  font-size: 0.88rem;
 }
 
+.stats {
+  display: inline-block;
+  margin: 0 0 14px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: var(--wp-primary-soft);
+  color: var(--wp-primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+/* Restriction conflict banner */
 .conflict {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  margin: 8px 0 12px;
-  padding: 10px 14px;
-  border: 1px solid #f0c36d;
-  border-radius: 10px;
-  background: #fff7e0;
+  margin: 0 0 14px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #fff6e0;
   color: #7a5200;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
 }
 
 .conflictBtn {
-  padding: 6px 12px;
+  margin-left: auto;
+  padding: 6px 14px;
   border: 1px solid #7a5200;
   border-radius: 999px;
   background: transparent;
   color: #7a5200;
-  font-weight: 600;
+  font-size: 0.82rem;
+  font-weight: 700;
   cursor: pointer;
 }
 
-.stats {
-  margin: 4px 0 12px;
-  color: var(--muted, #5f6b61);
-  font-size: 0.9rem;
-  font-weight: 600;
+.conflictBtn:hover {
+  background: #7a5200;
+  color: #fff;
 }
 
+/* Swap / suggest button under each slot */
 .slotActions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  margin-top: 6px;
 }
 
 .swap {
-  padding: 5px 12px;
-  border: 1px solid var(--border, #cfd8d0);
+  padding: 4px 12px;
+  border: 1px dashed var(--wp-border);
   border-radius: 999px;
-  background: #fff;
-  color: inherit;
-  font-size: 0.85rem;
+  background: transparent;
+  color: var(--wp-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
 
 .swap:hover:not(:disabled) {
-  border-color: var(--primary, #2e7d32);
-  color: var(--primary, #2e7d32);
+  border-color: var(--wp-primary);
+  color: var(--wp-primary);
 }
 
 .swap:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
 .warn {
   color: #b3261e;
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   font-weight: 600;
 }
 
+/* Shopping list */
 .shop {
-  margin: 20px 0 8px;
-  padding: 14px 16px;
-  border: 1px solid var(--border, #cfd8d0);
-  border-radius: 12px;
-  background: #fff;
+  margin: 24px 0 8px;
+  padding: 6px 20px;
+  border: 1px solid var(--wp-border);
+  border-radius: 16px;
+  background: var(--wp-card);
+  box-shadow: 0 1px 3px rgba(16, 24, 18, 0.06);
 }
 
 .shop summary {
-  cursor: pointer;
+  padding: 14px 0;
   font-weight: 700;
+  cursor: pointer;
 }
 
 .shopList {
   display: grid;
-  gap: 6px;
-  margin: 12px 0;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0 28px;
+  margin: 0 0 12px;
   padding: 0;
   list-style: none;
 }
@@ -143,38 +178,46 @@
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  padding: 6px 0;
-  border-bottom: 1px dashed var(--border, #cfd8d0);
+  padding: 9px 0;
+  border-bottom: 1px solid var(--wp-border);
   text-transform: capitalize;
 }
 
 .shopList li span:last-child {
-  color: var(--muted, #5f6b61);
+  color: var(--wp-muted);
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
 .copy {
-  padding: 8px 16px;
-  border: 1px solid var(--primary, #2e7d32);
+  margin: 4px 0 16px;
+  padding: 9px 18px;
+  border: 1px solid var(--wp-primary);
   border-radius: 999px;
   background: transparent;
-  color: var(--primary, #2e7d32);
-  font-weight: 600;
+  color: var(--wp-primary);
+  font-weight: 700;
   cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .copy:hover {
-  background: var(--primary, #2e7d32);
+  background: var(--wp-primary);
   color: #fff;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .toolbar {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .generate {
+  .generate,
+  .link {
     width: 100%;
+  }
+
+  .conflictBtn {
+    margin-left: 0;
   }
 }
