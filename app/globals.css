@@ -168,3 +168,14 @@ input[type='checkbox'], input[type='radio'] { width: auto; min-height: auto; acc
 }
 
 
+.brand-logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.navbar {
+  background: #faf9f2;
+  color: #174d38;
+}
+
