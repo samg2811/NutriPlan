@@ -41,7 +41,7 @@ export default function RestrictionsPanel() {
 
       <div className={styles.body}>
         <p className={styles.help}>
-          Pick anything you avoid. NutraGoal will hide recipes that contain it.
+          Pick anything you avoid. NutriGoal will hide recipes that contain it.
         </p>
 
         <div className={styles.chips} role="group" aria-label="Dietary restrictions">
