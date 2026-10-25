@@ -1404,6 +1404,426 @@ export const recipes: Record<number, string[]> = {
     "Toss with chickpeas, cucumber, tomatoes, parsley, lemon juice, and olive oil.",
     "Serve with feta or grilled chicken if desired."
   ], 
+  
+  // ───────── India ─────────
+  302: [
+    "If using ready-made dosa batter, stir it until smooth. Otherwise, soak the rice and lentils, blend with water, and ferment the batter according to a dosa recipe.",
+    "Boil the potato until tender, then dice it. Sauté the onion in oil and add the potato with salt and curry spices.",
+    "Spread a thin layer of batter on a hot, lightly oiled skillet and cook until the bottom is golden and crisp.",
+    "Place the potato filling in the center, fold the dosa, and serve hot."
+  ],
+  303: [
+    "Prepare dosa batter from the rice and lentils, or use ready-made batter.",
+    "Cook the lentils in water until soft. Add chopped tomato, carrot, onion, and sambar spices; simmer until the vegetables are tender.",
+    "Spread the dosa batter thinly on a hot, lightly oiled skillet and cook until crisp, flipping if needed.",
+    "Serve the dosa with the hot lentil sambar."
+  ],
+  304: [
+    "Prepare dosa batter from the rice and lentils, or use ready-made batter.",
+    "Spread a thin layer of batter on a hot, lightly oiled skillet.",
+    "Beat the egg and pour it over the dosa. Sprinkle with finely chopped onion.",
+    "Cook until the egg is fully set and the dosa is crisp, then fold and serve."
+  ],
+  305: [
+    "Prepare a smooth rice-and-lentil batter. For traditional idli, ferment it and pour it into greased idli molds.",
+    "Steam the idlis for about 10–15 minutes, until cooked through.",
+    "Cook the lentils in water until soft, then add chopped carrot, tomato, and sambar spices.",
+    "Simmer the sambar until the vegetables are tender and serve with the steamed idlis."
+  ],
+  306: [
+    "Cook the rice according to package directions.",
+    "Sauté chopped onion, garlic, and ginger in oil until fragrant.",
+    "Add the chopped tomato, curry powder, chickpeas, and a little water. Simmer for 15–20 minutes, stirring occasionally.",
+    "Mash a few chickpeas to thicken the sauce, season to taste, and serve over rice."
+  ],
+  307: [
+    "Cut the potato and cauliflower into bite-size pieces; chop the onion and tomato.",
+    "Heat oil in a skillet or pot. Sauté the onion, then add curry powder and the tomato.",
+    "Add potato, cauliflower, and a splash of water. Cover and cook, stirring occasionally, until the vegetables are tender.",
+    "Season to taste and serve warm."
+  ],
+  308: [
+    "Cook the rice according to package directions.",
+    "Sauté chopped onion, garlic, and ginger until fragrant, then add the tomato and cook until softened.",
+    "Add the spinach and cook until wilted. Stir in the paneer cubes and a splash of water; simmer gently until heated through.",
+    "Season to taste and serve the palak paneer over rice."
+  ],
+  309: [
+    "Cook the rice according to package directions.",
+    "Mix the chicken with yogurt and seasonings. Sauté the onion in a pan, then add the chicken and cook until nearly done.",
+    "Add the chopped tomato and butter. Simmer until the chicken reaches 165°F (74°C) internally and the sauce thickens.",
+    "Adjust the seasoning and serve the chicken and sauce over rice."
+  ],
+  310: [
+    "Rinse the rice. Mix the chicken with yogurt and seasonings; refrigerate while preparing the other ingredients.",
+    "Sauté sliced onion in oil until golden. Add the tomato and seasoned chicken and cook until the outside is no longer raw.",
+    "Add the rice and enough water for it to cook, cover, and simmer gently until the rice is tender and the chicken reaches 165°F (74°C).",
+    "Let rest briefly, fluff the rice, and serve."
+  ],
+  311: [
+    "Cook the rice according to package directions.",
+    "Sauté chopped onion and garlic until fragrant. Add the chopped tomato and cook until softened.",
+    "Stir in cooked kidney beans and a little water with seasonings. Simmer for 15–20 minutes until the sauce thickens.",
+    "Season to taste and serve the kidney bean curry over rice."
+  ],
+  312: [
+    "Cook the rice according to package directions.",
+    "Rinse the lentils and simmer them in water until soft, adding more water as needed.",
+    "Sauté chopped onion and garlic in oil. Add the tomato and seasonings, then stir this mixture into the lentils.",
+    "Simmer until the dal reaches your preferred consistency and serve with rice."
+  ],
+  313: [
+    "Dry-toast the semolina in a skillet over low heat, stirring until lightly fragrant; transfer to a bowl.",
+    "Heat the oil and sauté chopped onion, carrot, and peas until beginning to soften.",
+    "Add water and salt and bring to a boil. Slowly stir in the semolina to prevent lumps.",
+    "Cook over low heat, stirring, until the semolina absorbs the water and becomes soft."
+  ],
+  314: [
+    "Rinse the rice until the water runs mostly clear.",
+    "Sauté chopped onion, carrot, and peas in oil for a few minutes.",
+    "Add the rice, water according to the rice package directions, and seasonings. Bring to a boil.",
+    "Cover and simmer until the rice is tender and the liquid is absorbed. Rest briefly, fluff, and serve."
+  ],
+  315: [
+    "Mix the yogurt with lemon juice, garlic, and seasonings. Coat the chicken and marinate in the refrigerator.",
+    "Cook the rice according to package directions.",
+    "Thread the chicken onto skewers if desired and grill or pan-cook, turning until browned and the center reaches 165°F (74°C).",
+    "Mix chopped cucumber with yogurt for a simple raita, then serve with the chicken and rice."
+  ],
+  316: [
+    "Mix the whole wheat flour with water and a pinch of salt to make a soft dough. Rest briefly, divide, roll into thin rounds, and cook on a hot skillet until browned on both sides.",
+    "Dice the potato and chop the onion and tomato.",
+    "Sauté the onion in oil, add the potato, peas, tomato, curry spices, and a splash of water.",
+    "Cover and simmer until the potato is tender. Serve the aloo matar with the roti."
+  ],
+
+  // ───────── Japan ─────────
+  317: [
+    "Cook the rice according to package directions. Shred the cabbage.",
+    "Flatten the chicken breast evenly. Dip it in beaten egg, then coat with breadcrumbs.",
+    "Pan-fry in oil over medium heat, turning once, until golden and the thickest part reaches 165°F (74°C).",
+    "Slice the chicken and serve over rice with shredded cabbage."
+  ],
+  318: [
+    "Cook the rice according to package directions.",
+    "Heat water or broth in a pot and dissolve the miso into it; avoid vigorously boiling the soup after adding miso.",
+    "Add diced tofu and seaweed and heat gently until warmed through.",
+    "Top with sliced green onion and serve alongside the rice."
+  ],
+  319: [
+    "Cook the rice until tender and let it cool just enough to handle while still warm.",
+    "Season the salmon and cook it thoroughly in a skillet or oven until it flakes easily. Remove any bones and flake it.",
+    "With damp hands, shape small portions of rice around a little salmon to form rice balls.",
+    "Wrap with seaweed and serve with sliced cucumber."
+  ],
+  320: [
+    "Cook the rice according to package directions.",
+    "Thinly slice the onion and chicken. Simmer them in a skillet with a little water and soy sauce until the chicken is cooked through.",
+    "Beat the eggs and pour them over the chicken and onion.",
+    "Cover and cook gently until the egg is fully set and the chicken reaches 165°F (74°C). Serve over rice."
+  ],
+  321: [
+    "Cook the rice according to package directions.",
+    "Thinly slice the beef and onion.",
+    "Simmer the onion with soy sauce, a little water, and a small amount of sugar if desired, until softened.",
+    "Add the beef and cook until it reaches a safe temperature. Spoon the beef and onion over the rice."
+  ],
+  322: [
+    "Prepare the noodles according to their package directions, then drain.",
+    "Slice the chicken and vegetables. Stir-fry the chicken in a hot pan until cooked through.",
+    "Add the cabbage and carrot and stir-fry until tender-crisp.",
+    "Add the noodles and soy sauce; toss until hot and evenly coated."
+  ],
+  323: [
+    "Cook the rice according to package directions. Prepare the spinach and carrot by steaming or sautéing until tender.",
+    "Beat the eggs. Lightly oil a nonstick skillet and pour in a thin layer of egg.",
+    "As the egg begins to set, roll it toward one side of the pan. Add more egg and repeat, rolling the cooked layer into the new layer.",
+    "Cook until the egg is fully set, slice the omelet, and serve with rice and vegetables."
+  ],
+
+  // ───────── Korea ─────────
+  324: [
+    "Cook the rice according to package directions.",
+    "Cook the beef in a skillet with seasonings until browned and safely cooked. Sauté the carrot and zucchini until tender, and cook the spinach and bean sprouts separately.",
+    "Fry the egg until the white is set and the yolk reaches your preferred doneness.",
+    "Arrange rice in a bowl and top with beef, vegetables, and egg. Drizzle with sesame oil and serve with gochujang if available."
+  ],
+  325: [
+    "Cook the rice according to package directions.",
+    "Thinly slice the beef and mix with soy sauce, minced garlic, sesame oil, and seasonings.",
+    "Sauté the beef in a hot skillet until browned and safely cooked. Add sliced onion and carrot and cook until tender.",
+    "Serve the beef and vegetables over rice."
+  ],
+  326: [
+    "Prepare the noodles according to their package directions and drain.",
+    "Thinly slice the beef and vegetables. Stir-fry the beef until browned and safely cooked, then set aside.",
+    "Stir-fry the carrot, bell pepper, and spinach until tender. Add the noodles, soy sauce, sesame oil, and beef.",
+    "Toss until hot and evenly mixed, then serve."
+  ],
+
+  // ───────── China ─────────
+  327: [
+    "Cook the rice according to package directions.",
+    "Cut the chicken and bell pepper into bite-size pieces. Stir-fry the chicken in a hot pan until cooked through.",
+    "Add the bell pepper, peanuts, soy sauce, chili, garlic, and ginger if available. Stir-fry until fragrant and the pepper is tender-crisp.",
+    "Serve over rice. If using whole peanuts, be mindful of peanut allergies."
+  ],
+  328: [
+    "Cook the rice according to package directions.",
+    "Cube the tofu and gently pat it dry. Brown the ground pork in a skillet until fully cooked.",
+    "Add garlic, ginger, soy sauce, chili, and a little water. Stir in the tofu carefully so the cubes remain intact.",
+    "Simmer gently until the sauce coats the tofu, then serve over rice."
+  ],
+  329: [
+    "Cook the rice according to package directions.",
+    "Bring the chicken broth to a gentle simmer and add the spinach.",
+    "Beat the eggs and slowly drizzle them into the simmering broth while stirring gently to form ribbons. Cook until the egg is fully set.",
+    "Serve the egg drop soup with rice."
+  ],
+  330: [
+    "Cook the rice according to package directions.",
+    "Cut the tomatoes into wedges and beat the eggs in a bowl.",
+    "Heat the oil in a skillet. Scramble the eggs until just set, then transfer to a plate.",
+    "Cook the tomatoes in the same skillet until softened and juicy. Return the eggs, fold together gently, season, and serve over rice."
+  ],
+  331: [
+    "Cook the rice according to package directions.",
+    "Cut the chicken and bell pepper into bite-size pieces and the pineapple into small chunks.",
+    "Cook the chicken in a skillet until browned and the center reaches 165°F (74°C). Add the bell pepper and pineapple.",
+    "Stir in sugar, soy sauce, vinegar, or other sweet-and-sour seasonings if available, with a little water. Simmer until glossy and serve over rice."
+  ],
+  332: [
+    "Rinse the rice. Put it in a pot with plenty of water or broth and bring to a boil.",
+    "Lower the heat and simmer, stirring occasionally, until the rice breaks down into a porridge; add water as needed.",
+    "Add diced chicken and ginger and cook until the chicken reaches 165°F (74°C).",
+    "Stir in the beaten egg and cook until fully set. Top with sliced green onion and serve."
+  ],
+  333: [
+    "Cook the rice according to package directions.",
+    "Trim and cut the green beans into bite-size pieces. Mince the garlic.",
+    "Stir-fry the ground pork in a hot skillet until fully cooked, then add garlic and green beans.",
+    "Stir-fry until the beans are tender-crisp, adding a splash of water if needed. Season and serve over rice."
+  ],
+
+  // ───────── Southeast Asia ─────────
+  334: [
+    "Prepare the rice noodles according to package directions and drain.",
+    "Slice the chicken and cook in a skillet until the center reaches 165°F (74°C). Set aside.",
+    "Scramble the egg in the skillet. Add the noodles, chicken, bean sprouts, fish sauce, and any available pad Thai sauce ingredients; toss until hot.",
+    "Serve with chopped peanuts and lime juice."
+  ],
+  335: [
+    "Cook the rice according to package directions.",
+    "Cut the chicken, zucchini, and bell pepper into bite-size pieces.",
+    "Simmer the coconut milk with green curry paste or curry seasoning, then add the chicken and vegetables.",
+    "Cook until the chicken reaches 165°F (74°C) and the vegetables are tender. Serve with rice."
+  ],
+  336: [
+    "Bring the chicken broth to a simmer. Add the sliced mushrooms and chopped tomato.",
+    "Add the shrimp and cook until opaque and firm, usually a few minutes depending on size.",
+    "Season with lime juice, chili, and any available tom yum seasonings. Simmer briefly without overcooking the shrimp.",
+    "Serve the soup with cooked rice."
+  ],
+  337: [
+    "Cook the rice according to package directions.",
+    "Mince the garlic and slice the bell pepper. Heat oil in a skillet and cook the ground chicken until fully cooked.",
+    "Add garlic, bell pepper, chili, and chopped basil. Stir-fry until fragrant and the pepper softens.",
+    "Fry the egg separately until the white is set and the yolk reaches your preferred doneness. Serve over rice with the chicken."
+  ],
+  338: [
+    "Cook the rice noodles according to package directions and drain.",
+    "Heat the beef broth with sliced onion and any available pho spices, such as star anise or cinnamon, if on hand.",
+    "For a safer home preparation, cook the thinly sliced beef in the simmering broth until fully cooked rather than relying on hot broth alone.",
+    "Place the noodles in bowls, ladle over the broth and beef, and top with bean sprouts, basil, and lime."
+  ],
+  339: [
+    "Season the chicken and cook in a skillet until browned and the center reaches 165°F (74°C). Slice thinly.",
+    "Split the bread lengthwise and lightly toast it if desired.",
+    "Thinly slice the cucumber and carrot. Mix the carrot with a little vinegar if you want a quick pickle.",
+    "Spread a thin layer of mayonnaise on the bread, add chicken, carrot, cucumber, and cilantro, then serve."
+  ],
+  340: [
+    "Prepare the rice noodles according to package directions, then drain and cool.",
+    "Cook the shrimp until opaque and fully cooked; cool and slice lengthwise.",
+    "Dip one rice-paper wrapper at a time briefly in warm water until pliable. Place lettuce, noodles, carrot, cucumber, mint, and shrimp on the wrapper.",
+    "Fold in the sides and roll tightly. Mix the peanut butter with a little warm water to make a dipping sauce."
+  ],
+  341: [
+    "Use chilled cooked rice if available; otherwise cook rice and spread it out to cool so it does not become mushy.",
+    "Cook the shrimp in a hot skillet until opaque and fully cooked. Set aside.",
+    "Heat oil and scramble the eggs until set. Add chopped carrot and cabbage and stir-fry until tender-crisp.",
+    "Add the rice, shrimp, and soy sauce. Stir-fry until piping hot, then season and serve."
+  ],
+  342: [
+    "Cook the rice according to package directions.",
+    "Place the chicken thighs in a skillet with soy sauce, vinegar, garlic, and a little water.",
+    "Bring to a simmer, cover, and cook, turning occasionally, until the chicken reaches 165°F (74°C) and is tender.",
+    "Uncover and simmer briefly to reduce the sauce. Serve the chicken and sauce over rice."
+  ],
+
+  // ───────── Middle East & Mediterranean ─────────
+  343: [
+    "Mix the yogurt with lemon juice, garlic, and seasonings. Coat the chicken and marinate in the refrigerator.",
+    "Cook the rice according to package directions. Chop the tomato and cucumber.",
+    "Thread the chicken onto skewers if desired and grill or pan-cook, turning until browned and the center reaches 165°F (74°C).",
+    "Serve the chicken with rice, tomato, cucumber, and any remaining yogurt sauce that did not touch raw chicken."
+  ],
+  344: [
+    "Cook the bulgur according to package directions and allow it to cool.",
+    "Rinse and drain the chickpeas. Dice the tomato and cucumber and finely chop the parsley and mint.",
+    "Combine the bulgur, chickpeas, vegetables, herbs, olive oil, and lemon juice.",
+    "Toss well, season to taste, and chill briefly before serving if desired."
+  ],
+  345: [
+    "Rinse the lentils and cook in water until tender but not falling apart; drain if needed.",
+    "Cook the rice according to package directions.",
+    "Thinly slice the onion. Heat the olive oil in a skillet and cook the onion over medium-low heat, stirring regularly, until deeply golden and soft.",
+    "Mix the lentils and rice together, top with the browned onions, and serve."
+  ],
+  346: [
+    "Mix the ground lamb with parsley, salt, pepper, and any available kofta spices. Shape into small patties or oval kebabs.",
+    "Cook the kofta in a skillet or under a grill, turning until browned and the center reaches 160°F (71°C).",
+    "Warm the pita and prepare the tomato and cucumber.",
+    "Serve the kofta in or alongside pita with hummus, tomato, cucumber, and parsley."
+  ],
+  347: [
+    "Season the chicken thighs. Chop the onion and carrot and cut the dried apricots into pieces.",
+    "Brown the chicken in a pot, then add the onion, carrot, chickpeas, apricots, and tagine-style spices if available.",
+    "Add a little water or broth, cover, and simmer until the chicken reaches 165°F (74°C) and the vegetables are tender.",
+    "Prepare the couscous according to its package directions and serve the chicken stew over it."
+  ],
+  348: [
+    "Chop the tomatoes, bell pepper, and onion.",
+    "Heat a little oil in a skillet and cook the onion and pepper until softened.",
+    "Add the tomatoes and simmer until they release their juices and form a thick sauce.",
+    "Beat the eggs, pour them into the pan, and stir gently until fully set. Serve with bread."
+  ],
+  349: [
+    "Season the chicken and cook in a skillet or grill pan until browned and the center reaches 165°F (74°C). Slice thinly.",
+    "Chop the tomato, cucumber, and onion.",
+    "Mix the yogurt with seasonings and a little water or lemon juice to make a sauce.",
+    "Warm the pita, fill with chicken and vegetables, and top with the yogurt sauce."
+  ],
+  350: [
+    "Peel or scrub the potatoes and slice them thinly. Thinly slice the onion.",
+    "Cook the potato and onion slowly in olive oil in a covered skillet, stirring carefully, until tender but not browned heavily. Drain excess oil if needed.",
+    "Beat the eggs and mix them with the cooked potato and onion.",
+    "Pour into a lightly oiled nonstick skillet and cook over low heat until nearly set. Carefully flip using a plate and cook the other side until the egg is fully set."
+  ],
+  351: [
+    "Roughly chop the tomatoes, cucumber, and bell pepper. Peel the garlic.",
+    "Blend the vegetables with olive oil, garlic, and a little water until smooth or slightly textured.",
+    "Season with salt and a little vinegar if available, then refrigerate until cold.",
+    "Toast the bread and serve alongside the chilled gazpacho."
+  ],
+  352: [
+    "Cut the eggplant, zucchini, bell pepper, tomato, and onion into bite-size pieces.",
+    "Heat olive oil in a pot or deep skillet. Sauté the onion and bell pepper until softened.",
+    "Add eggplant, zucchini, and tomato. Cover and simmer gently, stirring occasionally, until all vegetables are tender.",
+    "Cook the rice according to package directions and serve the ratatouille over it."
+  ],
+  353: [
+    "Preheat the oven to 425°F (220°C). Place the pita on a baking tray.",
+    "Spread the tomato sauce evenly over the pita and add the mozzarella.",
+    "Bake for about 8–12 minutes, until the cheese is melted and the pita edges are crisp.",
+    "Top with fresh basil and serve."
+  ],
+  354: [
+    "Chop the carrot, celery, tomato, and zucchini.",
+    "In a pot, sauté the carrot and celery in a little oil until beginning to soften.",
+    "Add the tomato, white beans, pasta, zucchini, and vegetable broth. Simmer, stirring occasionally, until the pasta is tender and the vegetables are cooked.",
+    "Add water or broth if the soup becomes too thick. Season to taste and serve hot."
+  ],
+
+  // ───────── Africa ─────────
+  355: [
+    "Season the chicken thighs and cook in a skillet until browned; remove and set aside if needed.",
+    "Blend or finely chop the tomato, onion, and bell pepper. Sauté the mixture in oil until softened and reduced.",
+    "Stir in the rice, seasonings, and enough water or broth for the rice to cook. Return the chicken to the pot.",
+    "Cover and simmer until the rice is tender and the chicken reaches 165°F (74°C), adding a little water if needed."
+  ],
+  356: [
+    "Rinse the red lentils. Finely chop the onion, garlic, and ginger.",
+    "Cook the onion in oil over medium heat until softened. Add garlic, ginger, tomato, and berbere or other warm spices if available.",
+    "Stir in the lentils and water. Simmer, stirring occasionally, until the lentils break down and the stew thickens.",
+    "Prepare injera if available. Teff flour alone needs water and fermentation or a suitable flatbread method; serve the lentil stew with injera or another flatbread."
+  ],
+  357: [
+    "Cook the rice according to package directions.",
+    "Dice the sweet potato and chicken. In a pot, cook the chicken in a little oil until browned on the outside.",
+    "Add sweet potato, chopped tomato, peanut butter, and a little water or broth. Simmer until the sweet potato is tender and the chicken reaches 165°F (74°C).",
+    "Stir in the spinach until wilted, adjust the sauce with water as needed, and serve over rice."
+  ],
+
+  // ───────── Caribbean & Latin America ─────────
+  358: [
+    "Season the chicken thighs with jerk seasoning if available. Brown them in a skillet or pot.",
+    "Add rice, kidney beans, coconut milk, chopped onion, and enough water for the rice to cook.",
+    "Cover and simmer gently until the rice is tender and the chicken reaches 165°F (74°C), adding water if needed.",
+    "Rest briefly, fluff the rice, and serve the chicken with the rice and beans."
+  ],
+  359: [
+    "Season the chicken thighs and cut into bite-size pieces. Chop the onion, tomato, and bell pepper.",
+    "Brown the chicken in a pot with a little oil. Add the onion and bell pepper and cook until softened.",
+    "Stir in the rice, tomato, peas, seasonings, and enough water or broth for the rice to cook.",
+    "Cover and simmer until the rice is tender and the chicken reaches 165°F (74°C). Rest briefly and serve."
+  ],
+  360: [
+    "Cook the rice according to package directions.",
+    "Slice the plantain into diagonal pieces. Heat a little oil in a skillet and cook the plantain on both sides until golden and tender.",
+    "Sauté chopped onion in a pot, add the black beans and a splash of water, and simmer until hot and seasoned.",
+    "Serve the beans over rice with the cooked plantain."
+  ],
+  361: [
+    "Keep the fish refrigerated and use fish specifically sold for raw preparations. Cut it into small, even pieces using clean utensils.",
+    "Toss the fish with lime juice, chopped onion, tomato, and cilantro in a nonreactive bowl.",
+    "Cover and refrigerate while the fish marinates, stirring occasionally. Citrus changes the fish's texture but does not reliably eliminate foodborne pathogens; cooking the fish fully is the safer option.",
+    "Fold in diced avocado just before serving. Keep chilled and serve promptly."
+  ],
+  362: [
+    "Cut the tortillas into wedges or strips. Bake or lightly pan-toast until crisp, using a little oil if needed.",
+    "Warm the tomato sauce in a skillet with chopped onion and seasonings.",
+    "Add the tortilla pieces and toss briefly so they soften slightly while retaining some texture.",
+    "Top with the egg, cooked until fully set, and sprinkle with cheese. Serve warm."
+  ],
+  363: [
+    "Cook the rice according to package directions.",
+    "Slice the sausage and cook in a pot until browned and heated through.",
+    "Add the black beans and a splash of water. Simmer with seasonings until the beans are hot and the flavors combine.",
+    "Stir in chopped kale and cook until wilted and tender. Serve over rice."
+  ],
+  364: [
+    "Cook the rice according to package directions.",
+    "Cut the beef into thin strips and the potato into thin fries or wedges. Slice the onion and tomato.",
+    "Cook the potatoes in a skillet with oil until browned and tender; set aside. Stir-fry the beef in a very hot skillet until browned and safely cooked.",
+    "Add the onion, tomato, and soy sauce and stir-fry briefly. Fold in the potatoes and serve with rice."
+  ],
+
+  // ───────── Europe ─────────
+  365: [
+    "Whisk the wheat flour, egg, and milk into a smooth, pourable batter. Rest for about 10 minutes if time allows.",
+    "Lightly oil a nonstick skillet and pour in a thin layer of batter, swirling to cover the pan.",
+    "Cook until the edges lift and the underside is lightly golden, then flip and cook the other side.",
+    "Fill with sliced banana, fold, and serve."
+  ],
+  366: [
+    "Preheat the oven to 425°F (220°C). Cut the potato into wedges and toss with olive oil and seasonings.",
+    "Spread the wedges on a baking tray and roast for 15 minutes.",
+    "Coat the cod with breadcrumbs and place it on the tray beside the potatoes, turning the wedges as needed.",
+    "Bake until the cod reaches 145°F (63°C) and flakes easily and the potatoes are golden and tender."
+  ],
+  367: [
+    "Cut the beef, potato, carrot, and onion into bite-size pieces.",
+    "Brown the beef in a heavy pot in batches. Add the onion and cook until softened.",
+    "Add the carrot, potato, beef broth, and enough water to mostly cover the ingredients. Bring to a simmer.",
+    "Cover and simmer gently until the beef is tender and the vegetables are cooked, about 1–2 hours depending on the cut. Add water as needed and season to taste."
+  ],
+  368: [
+    "Mix the ground beef with breadcrumbs, a little milk, finely chopped onion, and seasonings. Shape into small meatballs.",
+    "Brown the meatballs in a skillet, turning carefully. Cook until the centers reach 160°F (71°C), then set aside.",
+    "Boil the potatoes in salted water until fork-tender and drain.",
+    "Add a little milk to the skillet to make a light pan sauce, return the meatballs to warm through, and serve with the potatoes."
+  ],
 };
 
 export const getRecipe = (mealId: number): string[] =>
