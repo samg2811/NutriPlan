@@ -87,7 +87,7 @@ Rules:
             temperature: 0.2,
           },
         }),
-        signal: AbortSignal.timeout(20000),
+        signal: AbortSignal.timeout(25000),
       }
     );
 
@@ -142,7 +142,7 @@ Rules:
               food.grams > 0 &&
               food.grams <= 2000
           )
-          .slice(0, 15)
+          .slice(0, 5)
           .map((food) => ({
             name: food.name.trim(),
             grams: food.grams,
