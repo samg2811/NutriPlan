@@ -830,9 +830,6 @@ export default function Home() {
         </section>
       )}
 
-      {/* WEEKLY MEAL PLAN + PERSONALIZE QUIZ (NEW) */}
-      <WeeklyMealPlan />
-
       {/* AI FOOD ANALYSIS */}
       <section className="camera-section" id="camera">
         <div>
