@@ -874,20 +874,45 @@ export default function Home() {
               {analysisError}
             </p>
           )}
-        </div>
-
-        <div className="camera-card">
+        </div>       
+        <label
+          className="camera-card camera-upload-target"
+          aria-label={
+            selectedImage
+              ? "Choose a different food photo"
+              : "Choose a food photo"
+          }
+        >
+          <input
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handleImageUpload}
+            hidden
+          />
+        
           {!selectedImage && (
             <div className="empty-camera">
               <div className="camera-icon">📸</div>
-
               <h3>Upload a food photo</h3>
-
               <p>
-                We'll use AI to identify what's on your plate.
+                Click here to choose a photo or take one with your camera.
               </p>
             </div>
           )}
+        
+          {selectedImage && (
+            <div className="image-preview">
+              <img
+                src={selectedImage}
+                alt="Uploaded food — click to choose another"
+              />
+              <p className="camera-change-hint">
+                Click to change photo
+              </p>
+            </div>
+          )}
+        </label>
 
           {selectedImage && (
             <div className="image-preview">
