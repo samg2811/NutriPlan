@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { meals } from "@/data/meals";
 import { lookupPer100g } from "@/lib/logusda";
+import { cleanPrefs, findViolations } from "@/lib/restrictions";
 
 export const maxDuration = 30;
 
@@ -16,42 +17,26 @@ async function mealMacros(meal: (typeof meals)[number]): Promise<Macros | null> 
   const total: Macros = { calories: 0, protein: 0, carbs: 0, fat: 0 };
   let found = 0;
 
-  // Look up all of this meal's ingredients at the same time instead of one by one.
-  const matches = await Promise.all(meal.ingredients.map((ing) => lookupPer100g(ing.name)));
-  meal.ingredients.forEach((ing, i) => {
-    const match = matches[i];
-    if (!match) return;
+  for (const ing of meal.ingredients) {
+    const match = await lookupPer100g(ing.name);
+    if (!match) continue;
     found++;
     const f = ing.grams / 100;
     total.calories += match.per100g.calories * f;
     total.protein += match.per100g.protein * f;
     total.carbs += match.per100g.carbs * f;
     total.fat += match.per100g.fat * f;
-  });
+  }
 
   const result = found > 0 ? total : null;
   mealCache.set(key, result);
   return result;
 }
 
-// Fetch each distinct ingredient once, 20 at a time, the first time anyone asks.
-// After that every meal calculation is answered from the cache.
-let warmup: Promise<void> | null = null;
-function warmIngredients(): Promise<void> {
-  if (!warmup) {
-    warmup = (async () => {
-      const names = Array.from(new Set(meals.flatMap((m) => m.ingredients.map((i) => i.name))));
-      for (let i = 0; i < names.length; i += 20) {
-        await Promise.all(names.slice(i, i + 20).map((n) => lookupPer100g(n)));
-      }
-    })().catch(() => { warmup = null; });
-  }
-  return warmup;
-}
-
 export async function POST(req: Request) {
   try {
-    const { remainingCalories, remainingProtein, hour } = await req.json();
+    const body = await req.json();
+    const { remainingCalories, remainingProtein, hour } = body;
 
     if (
       typeof remainingCalories !== "number" ||
@@ -61,10 +46,25 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid input" }, { status: 400 });
     }
 
+    // Dietary restrictions sent by the app (validated before use)
+    const prefs = cleanPrefs(body.restrictions, body.avoid);
+
     if (remainingCalories < 150) {
       return NextResponse.json({
         suggestions: [],
         note: "You've reached your calorie goal for today. Nice work!",
+      });
+    }
+
+    // Remove meals that break a restriction BEFORE doing any lookups
+    const eligible = meals.filter(
+      (m) => findViolations(m, prefs.ids, prefs.avoid).length === 0
+    );
+
+    if (eligible.length === 0) {
+      return NextResponse.json({
+        suggestions: [],
+        note: "None of our meals fit your dietary restrictions. Try removing one.",
       });
     }
 
@@ -73,12 +73,10 @@ export async function POST(req: Request) {
     const targetCal = remainingCalories / mealsLeft;
     const targetProtein = Math.max(remainingProtein, 0) / mealsLeft;
 
-    await warmIngredients();
-
-    // Calculate macros for every meal (in small parallel batches)
+    // Calculate macros for every eligible meal (in small parallel batches)
     const withMacros: { meal: (typeof meals)[number]; macros: Macros }[] = [];
-    for (let i = 0; i < meals.length; i += 8) {
-      const batch = meals.slice(i, i + 8);
+    for (let i = 0; i < eligible.length; i += 8) {
+      const batch = eligible.slice(i, i + 8);
       const results = await Promise.all(batch.map((m) => mealMacros(m)));
       batch.forEach((meal, idx) => {
         const macros = results[idx];
