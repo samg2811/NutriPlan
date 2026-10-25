@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "NutriPlan",
+  title: "NutriGoal",
   description:
     "Smarter meal planning based on what you have, your budget, and your time.",
 };
