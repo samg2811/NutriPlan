@@ -673,16 +673,18 @@ export default function Home() {
   <div
     className="logo"
     style={{ display: "flex", alignItems: "center", gap: 10 }}
-  >
+  >   
+  <div className="brand">
     <NextImage
-      src="/nutriplan-logo.png"
-      alt=""
-      width={44}
-      height={44}
+      src="/nutrigoal-logo.png"
+      alt="NutriGoal logo"
+      width={48}
+      height={48}
+      className="brand-logo"
+      priority
     />
-    NutriGoal
+    <span className="logo">NutriPlan</span>
   </div>
-
   <div className="nav-links">
           <a href="#planner">Meal Planner</a>
           <a href="/weekly-plan">Weekly Plan</a>
